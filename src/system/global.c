@@ -25,7 +25,8 @@ texture_get_cached
 */
 Texture2D texture_get_cached(char *texture_name)
 {
-    for (int i=0; i<texture_cache_count; i++)
+    //search for already-cached texture
+    for (int i = 0; i < texture_cache_count; i++)
     {
         if (strcmp(texture_cache[i].name, texture_name) == 0)
         {
@@ -33,24 +34,55 @@ Texture2D texture_get_cached(char *texture_name)
         }
     }
 
-    if (texture_cache_count >= MAX_TEXTURES)
-    {
-        
-        printf("Texture Cache full");
-        return texture_get_default();
-    }
-
+    //prepare the texture path
     char path[128];
     snprintf(path, sizeof(path), "textures/%s.png", texture_name);
 
+    //attempt to load the texture
     Texture2D tex = LoadTexture(path);
+
+    //fallback to __TB_empty.png if failed
     if (tex.id == 0)
     {
-        printf("Failed to load texture: %s", path);
-        return texture_get_default();
+        printf("Failed to load texture: %s\n", path);
+
+        //check if fallback is already cached
+        for (int i = 0; i < texture_cache_count; i++)
+        {
+            if (strcmp(texture_cache[i].name, "__TB_empty") == 0)
+            {
+                return texture_cache[i].texture;
+            }
+        }
+
+        //not cached yet, try to load it
+        snprintf(path, sizeof(path), "textures/__TB_empty.png");
+        tex = LoadTexture(path);
+        if (tex.id == 0)
+        {
+            printf("FATAL: Failed to load fallback texture __TB_empty.png\n");
+            return default_texture;
+        }
+
+        //cache fallback texture
+        strncpy(texture_cache[texture_cache_count].name, "__TB_empty", 63);
+        texture_cache[texture_cache_count].texture = tex;
+        texture_cache_count++;
+
+        return tex;
     }
 
-    strncpy(texture_cache[texture_cache_count].name, texture_name, 63);
-    texture_cache[texture_cache_count].texture = tex;
+    //cache the successfully loaded texture
+    if (texture_cache_count < MAX_TEXTURES)
+    {
+        strncpy(texture_cache[texture_cache_count].name, texture_name, 63);
+        texture_cache[texture_cache_count].texture = tex;
+        texture_cache_count++;
+    }
+    else
+    {
+        printf("Texture cache is full! Returning uncached texture.\n");
+    }
+
     return tex;
 }
