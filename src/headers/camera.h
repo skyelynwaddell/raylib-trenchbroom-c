@@ -6,6 +6,7 @@
 
 extern Camera camera;
 extern int camera_mode;
+extern int camera_move_spd;
 
 void camera_init();
 

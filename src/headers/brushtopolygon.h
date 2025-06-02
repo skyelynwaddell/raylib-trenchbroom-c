@@ -21,8 +21,14 @@ bool polygon_get_intersection(
     Vector3* out
 );
 
+
 void polygon_generate_from_brush(Brush *brush);
-void polygon_sort_vertices(Polygon* poly);
+void polygon_sort_vertices(Polygon* poly, Vector3 normal);
 void polygon_draw_all();
+void polygon_draw_wireframe();
+void polygon_draw_uvs();
+Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face);
+void polygon_normalize_uv(Vector2 *uvs, int count);
+bool polygon_has_vertex(Polygon *poly, Vector3 v);
 
 #endif // BRUSH_TO_POLYGON_H

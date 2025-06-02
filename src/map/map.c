@@ -8,7 +8,11 @@
 
 Map map;
 
-// Stores the data about the currently loaded map.
+/*
+parse_map
+filename[const char*] -- the filename of the map to be loaded ie. "myamazingmap.map"
+-- Stores the data about the currently loaded map.
+*/
 int parse_map(const char* filename)
 {
     printf("\n \n");
@@ -124,11 +128,6 @@ int parse_map(const char* filename)
             // success
             if (matched == 21)
             {
-                //printf("Parsed Face %d for Brush %d:\n", current_brushface_index, map.brush_count);
-                //printf("  v1: (%.1f %.1f %.1f)\n", brushface.pos_1.x, brushface.pos_1.y, brushface.pos_1.z);
-                //printf("  v2: (%.1f %.1f %.1f)\n", brushface.pos_2.x, brushface.pos_2.y, brushface.pos_2.z);
-                //printf("  v3: (%.1f %.1f %.1f)\n", brushface.pos_3.x, brushface.pos_3.y, brushface.pos_3.z);
-
                 // get texture name
                 strncpy(brushface.texture, texture_name, sizeof(brushface.texture));
                 brushface.texture[sizeof(brushface.texture) - 1] = '\0';
@@ -158,7 +157,8 @@ int parse_map(const char* filename)
         // loop over all faces in brush
         for (int j= 0; j < map.brushes[i].brush_face_count; j++)
         {
-            polygon_sort_vertices(&map.brushes[i].polys[j]);
+            Plane plane = brushface_to_plane(map.brushes[i].brush_faces[j]);
+            polygon_sort_vertices(&map.brushes[i].polys[j], plane.normal);
         }
     }
 
@@ -166,7 +166,12 @@ int parse_map(const char* filename)
     return true;
 }
 
-// compares two strings to see if they match
+/*
+string_equals
+string[char* string] - The first string to be compared
+string[char* string_to_compare_to] - the second string that is compared to the first string
+-- compares two strings to see if they match
+*/
 int string_equals(char* string, char* string_to_compare_to)
 {
     if (strcmp(string, string_to_compare_to) == 0) return 1;

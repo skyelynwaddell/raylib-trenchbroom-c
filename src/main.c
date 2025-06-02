@@ -40,6 +40,16 @@ int main()
         // Update
         // TODO : Update your variables here
         // -----------------------------
+        
+        // Vector3 move = {0};
+        // if (IsKeyDown(KEY_W)) move.z -= 1.0f;
+        // if (IsKeyDown(KEY_S)) move.z += 1.0f;
+        // if (IsKeyDown(KEY_A)) move.x -= 1.0f;
+        // if (IsKeyDown(KEY_D)) move.x += 1.0f;
+        // move = Vector3Scale(move,camera_move_spd);
+        // Vector3 rotation = { 0 };
+        // rotation.y = GetMouseDelta().x * 0.003f;  // Yaw
+        // rotation.x = GetMouseDelta().y * 0.003f;  // Pitch
         UpdateCamera(&camera, camera_mode);
 
         // Draw

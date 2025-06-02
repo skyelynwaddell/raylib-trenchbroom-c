@@ -4,7 +4,12 @@
 
 Camera camera;
 int camera_mode;
+int camera_move_spd;
 
+/*
+camera_init
+-- creates the 3d camea object
+*/
 void camera_init()
 {
     camera.position = (Vector3){ 0.0f, 2.0f, 4.0 };

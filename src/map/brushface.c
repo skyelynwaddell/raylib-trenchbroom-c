@@ -22,6 +22,7 @@ void brushface_print(BrushFace b, int face_index)
 /*
 --------------------------
 brush_face_to_plane
+face [BrushFace] - the passed in BrushFace to be calculated to a plane
 - turns a BrushFace type into a plane
 */
 Plane brushface_to_plane(BrushFace face)
