@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "raylib.h": "c",
+        "stdio.h": "c",
+        "global.h": "c",
+        "camera.h": "c",
+        "defs.h": "c",
+        "map.h": "c",
+        "string.h": "c",
+        "brush.h": "c",
+        "stdlib.h": "c",
+        "brushface.h": "c",
+        "plane.h": "c",
+        "brushclipper.h": "c",
+        "triangle.h": "c",
+        "polygon.h": "c"
+    }
+}
