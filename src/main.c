@@ -14,9 +14,9 @@ int main()
     camera_init();
 
     // Generates some random columns
-    float heights[MAX_COLUMNS] = { 0 };
-    Vector3 positions[MAX_COLUMNS] = { 0 };
-    Color colors[MAX_COLUMNS] = { 0 };
+    //float heights[MAX_COLUMNS] = { 0 };
+    //Vector3 positions[MAX_COLUMNS] = { 0 };
+    //Color colors[MAX_COLUMNS] = { 0 };
 
     // for (int i = 0; i < MAX_COLUMNS; i++)
     // {

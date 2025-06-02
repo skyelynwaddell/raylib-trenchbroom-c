@@ -161,7 +161,7 @@ void polygon_draw_uvs()
 Clears all the map models from memory
 -- clear memory because raylib does not
 */
-map_clear_models()
+void map_clear_models()
 {
     for (int i=0; i < model_count; i++)
     {
@@ -208,9 +208,9 @@ void map_create_models()
 
             int index = 0;
             for (int i = 0; i < triangle_count; i++) {
-                Vector3 v0 = centroid;
+                Vector3 v2 = centroid;
                 Vector3 v1 = poly->vertices[i];
-                Vector3 v2 = poly->vertices[(i + 1) % poly->vertex_count];
+                Vector3 v0 = poly->vertices[(i + 1) % poly->vertex_count];
 
                 Vector2 uv0 = polygon_project_to_uv(v0, face);
                 Vector2 uv1 = polygon_project_to_uv(v1, face);

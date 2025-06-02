@@ -36,7 +36,7 @@ Texture2D texture_get_cached(char *texture_name)
     if (texture_cache_count >= MAX_TEXTURES)
     {
         
-        fprintf(ferror, "Texture Cache full");
+        printf("Texture Cache full");
         return texture_get_default();
     }
 
@@ -46,7 +46,7 @@ Texture2D texture_get_cached(char *texture_name)
     Texture2D tex = LoadTexture(path);
     if (tex.id == 0)
     {
-        fprintf(ferror, "Failed to load texture: %s", path);
+        printf("Failed to load texture: %s", path);
         return texture_get_default();
     }
 
