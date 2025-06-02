@@ -20,5 +20,6 @@ extern Map map;
 
 int parse_map(const char* filename);
 int string_equals(char* string, char* string_to_compare_to);
+Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v);
 
 #endif // MAP_H

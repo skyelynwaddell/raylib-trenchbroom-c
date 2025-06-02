@@ -12,6 +12,9 @@
 #include "../headers/polygon.h"
 #include "../headers/map.h"
 
+Model models[10000]; // if you have more than 10,000 map brushes, you need a second map...
+int model_count = 0;
+
 /*
 polygon_get_intersection
 - gets the intersecting points from a polygon to clip them
@@ -146,7 +149,33 @@ polygon_draw_uvs
 */
 void polygon_draw_uvs()
 {
-    //loop through all brushes in the map
+    for (int i=0; i < model_count; i++)
+    {
+        DrawModel(models[i], (Vector3){0}, 1.0f, WHITE);
+    }
+
+    // free raylib model mem
+}
+
+/*
+Clears all the map models from memory
+-- clear memory because raylib does not
+*/
+map_clear_models()
+{
+    for (int i=0; i < model_count; i++)
+    {
+        UnloadModel(models[i]);
+    }
+}
+
+/*
+map_create_model
+-- creates a model from a polygonal brush
+*/
+void map_create_models()
+{
+//loop through all brushes in the map
     for (int i=0; i<map.brush_count; i++)
     {
         Brush *brush = &map.brushes[i];
@@ -219,10 +248,8 @@ void polygon_draw_uvs()
             Model model = LoadModelFromMesh(mesh);
             model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
-            DrawModel(model, (Vector3){0}, 1.0f, WHITE);
-
-            // free raylib model mem
-            UnloadModel(model);
+            models[model_count++] = model;
+            //UnloadModel(model);
         }
     }
 }
@@ -278,10 +305,7 @@ void polygon_sort_vertices(Polygon* poly, Vector3 normal)
 
     //compute polygon normal
     Vector3 edge1 = Vector3Subtract(poly->vertices[1], poly->vertices[0]);
-    Vector3 edge2 = Vector3Subtract(poly->vertices[2], poly->vertices[0]);
-    //Vector3 normal = Vector3Normalize(Vector3CrossProduct(edge1,edge2));
     Vector3 ref_vec = Vector3Normalize(edge1);
-
 
     //temporarily store angles of each vertex relative to centroid and ref_vec
     typedef struct {

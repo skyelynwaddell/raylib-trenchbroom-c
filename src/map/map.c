@@ -132,6 +132,11 @@ int parse_map(const char* filename)
                 strncpy(brushface.texture, texture_name, sizeof(brushface.texture));
                 brushface.texture[sizeof(brushface.texture) - 1] = '\0';
 
+                //re-orientate the map so its not sideways
+                brushface.pos_1 = convert_trenchbroom_to_raylib_axis(brushface.pos_1);
+                brushface.pos_2 = convert_trenchbroom_to_raylib_axis(brushface.pos_2);
+                brushface.pos_3 = convert_trenchbroom_to_raylib_axis(brushface.pos_3);
+
                 if (current_brushface_index < BRUSH_FACE_COUNT)
                 {
                     current_brush.brush_faces[current_brushface_index++] = brushface;
@@ -163,6 +168,7 @@ int parse_map(const char* filename)
     }
 
     fclose(file);
+    map_create_models();
     return true;
 }
 
@@ -176,4 +182,14 @@ int string_equals(char* string, char* string_to_compare_to)
 {
     if (strcmp(string, string_to_compare_to) == 0) return 1;
     return 0;
+}
+
+/*
+convert_trenchbroom_to_raylib_axis
+-- raylib and trenchbroom dont use the same xyz axis, so we have to convert this here
+-- so our map isnt sideways :P
+*/
+Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v)
+{
+    return (Vector3) { v.x, v.z, -v.y };
 }
