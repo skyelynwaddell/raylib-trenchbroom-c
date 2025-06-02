@@ -216,7 +216,7 @@ void map_create_models()
                 Vector2 uv2 = polygon_project_to_uv(v2, face);
 
                 Vector2 uvs[3] = { uv0, uv1, uv2 };
-                polygon_normalize_uv(uvs, 3);
+                //polygon_normalize_uv(uvs, 3); 
 
                 // v0
                 mesh.vertices[index*3 + 0] = v0.x;
