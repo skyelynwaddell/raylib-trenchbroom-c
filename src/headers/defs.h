@@ -9,5 +9,6 @@
 
 #define MAX_COLUMNS 20
 #define MAX_TEXTURES 10000
+#define MAX_POLY_VERTS 64
 
 #endif

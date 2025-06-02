@@ -6,8 +6,6 @@
 #include "../headers/brushtopolygon.h"
 #include "../headers/polygon.h"
 
-#define MAX_POLY_VERTS 64
-
 /*
 draw
 -- any calls to render -things- into the 3D world should be placed here

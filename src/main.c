@@ -5,6 +5,7 @@
 #include "./headers/global.h"
 #include "./headers/camera.h"
 #include "./headers/map.h"
+#include "./headers/cleanup.h"
 
 
 // Program Entry Point
@@ -85,6 +86,7 @@ int main()
 
     // De-Initialization
     // -----------------------------
+    clean_up();
     CloseWindow();
     return 0;
     // -----------------------------

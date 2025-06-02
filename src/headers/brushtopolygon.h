@@ -33,5 +33,6 @@ Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face);
 void polygon_normalize_uv(Vector2 *uvs, int count);
 bool polygon_has_vertex(Polygon *poly, Vector3 v);
 void map_create_models();
+Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle);
 
 #endif // BRUSH_TO_POLYGON_H

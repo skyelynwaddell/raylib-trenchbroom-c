@@ -153,13 +153,12 @@ void polygon_draw_uvs()
     {
         DrawModel(models[i], (Vector3){0}, 1.0f, WHITE);
     }
-
-    // free raylib model mem
 }
 
 /*
 Clears all the map models from memory
 -- clear memory because raylib does not
+-- call this when the game ends
 */
 void map_clear_models()
 {
@@ -365,20 +364,55 @@ polygon_project_to_uv
 */
 Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face)
 {
-    
-    Vector3 s = Vector3Normalize((Vector3){ face->uv_s.x, face->uv_s.y, face->uv_s.z });
-    Vector3 t = Vector3Normalize((Vector3){ face->uv_t.x, face->uv_t.y, face->uv_t.z });
+    Vector3 normal = brushface_to_plane(*face).normal;
+    Vector3 world_up = (Vector3){0,1,0};
+    Vector3 u_axis, v_axis;
 
+    // if the normal is too close to world_up use another axis (X):
+    if (fabsf(Vector3DotProduct(normal, world_up)) > 0.99f)
+    {
+        world_up = (Vector3){1,0,0};
+    }
+
+    //set the u and v axis
+    u_axis = Vector3Normalize(Vector3CrossProduct(world_up, normal));
+    v_axis = Vector3CrossProduct(normal, u_axis);
+    
+    // uv rotation
+    float angle_rad = DEG2RAD * (float)face->uv_rotation;
+    u_axis = rotate_vector_around_axis(u_axis, normal, angle_rad);
+    v_axis = rotate_vector_around_axis(v_axis, normal, angle_rad);
+
+    // use rotated vectors
     float s_offset = face->uv_s.w;
     float t_offset = face->uv_t.w;
 
-    float u = Vector3DotProduct(point, s) + s_offset;
-    float v = Vector3DotProduct(point, t) + t_offset;
+    //Vector3 s = (Vector3){ face->uv_s.x, face->uv_s.y, face->uv_s.z };
+    //Vector3 t = (Vector3){ face->uv_t.x, face->uv_t.y, face->uv_t.z };
 
-    u /= face->u_scale;
-    v /= face->v_scale;
+    float u = Vector3DotProduct(point, u_axis) + s_offset;// / (float)face->u_scale;
+    float v = Vector3DotProduct(point, v_axis) + t_offset;// / (float)face->v_scale;
 
-    return (Vector2){u,v};
+    float _scale_factor = 64.0;
+    u /= (float)face->u_scale * _scale_factor;
+    v /= (float)face->v_scale * _scale_factor;
+
+    return (Vector2){ u, v };
+}
+
+Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle)
+{
+    axis = Vector3Normalize(axis);
+    float cos_theta = cosf(angle);
+    float sin_theta = sinf(angle);
+
+    return Vector3Add(
+        Vector3Add(
+            Vector3Scale(vec, cos_theta),
+            Vector3Scale(Vector3CrossProduct(axis, vec), sin_theta)
+        ),
+        Vector3Scale(axis, Vector3DotProduct(axis, vec) * (1 - cos_theta))
+    );
 }
 
 
