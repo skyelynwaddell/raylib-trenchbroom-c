@@ -392,14 +392,14 @@ Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face)
     float _scale_factor = (float)texture.width;
 
     // calc uv
-    float u = Vector3DotProduct(point, u_axis) + (s_offset);// / (float)face->u_scale;
-    float v = Vector3DotProduct(point, v_axis) + (t_offset);// + t_offset;// / (float)face->v_scale;
+    float u = Vector3DotProduct(point, u_axis) - (s_offset);// / (float)face->u_scale;
+    float v = Vector3DotProduct(point, v_axis) - (t_offset);// + t_offset;// / (float)face->v_scale;
 
     //scale the uvs
     u /= (float)face->u_scale * _scale_factor;
     v /= (float)face->v_scale * _scale_factor;
 
-    return (Vector2){ u, v };
+    return (Vector2){ 1.0f-u, 1.0f-v };
 }
 
 Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle)
