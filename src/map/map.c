@@ -133,9 +133,9 @@ int parse_map(const char* filename)
                 brushface.texture[sizeof(brushface.texture) - 1] = '\0';
 
                 //re-orientate the map so its not sideways
-                brushface.pos_1 = convert_trenchbroom_to_raylib_axis(brushface.pos_1);
-                brushface.pos_2 = convert_trenchbroom_to_raylib_axis(brushface.pos_2);
-                brushface.pos_3 = convert_trenchbroom_to_raylib_axis(brushface.pos_3);
+                //brushface.pos_1 = convert_trenchbroom_to_raylib_axis(brushface.pos_1);
+                //brushface.pos_2 = convert_trenchbroom_to_raylib_axis(brushface.pos_2);
+                //brushface.pos_3 = convert_trenchbroom_to_raylib_axis(brushface.pos_3);
 
                 if (current_brushface_index < BRUSH_FACE_COUNT)
                 {

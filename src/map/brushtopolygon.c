@@ -138,8 +138,9 @@ polygon_draw_all
 */
 void polygon_draw_all()
 {
-    polygon_draw_wireframe(); // debug
     polygon_draw_uvs();
+    //polygon_draw_wireframe(); // debug
+
 }
 
 
@@ -172,25 +173,112 @@ void map_clear_models()
 map_create_model
 -- creates a model from a polygonal brush
 */
+// void map_create_models()
+// {
+
+//     float scale = 0.1;
+//     //loop through all brushes in the map
+//     for (int i=0; i<map.brush_count; i++)
+//     {
+//         Brush *brush = &map.brushes[i];
+
+//         // loop through each brush face per brush
+//         for (int j=0; j<brush->brush_face_count; j++)
+//         {
+//             BrushFace *face = &brush->brush_faces[j];
+//             Polygon *poly = &brush->polys[j];
+
+//             // validate if this poly has atleast 3 vertices.
+//             if (poly->vertex_count < 3) continue;
+
+//             Texture2D texture = texture_get_cached(face->texture);
+
+//             // Calculate centroid
+//             Vector3 centroid = {0};
+//             for (int i = 0; i < poly->vertex_count; i++) {
+//                 centroid = Vector3Add(centroid, poly->vertices[i]);
+//             }
+//             centroid = Vector3Scale(centroid, 1.0f / poly->vertex_count);
+
+//             int triangle_count = poly->vertex_count;
+//             Mesh mesh = {0};
+//             mesh.vertexCount = triangle_count * 3;
+//             mesh.triangleCount = triangle_count;
+
+//             mesh.vertices = (float *)MemAlloc(mesh.vertexCount * 3 * sizeof(float));
+//             mesh.texcoords = (float *)MemAlloc(mesh.vertexCount * 2 * sizeof(float));
+
+//             int index = 0;
+//             for (int i = 0; i < triangle_count; i++) {
+//                 Vector3 v2 = centroid;
+//                 Vector3 v1 = poly->vertices[i];
+//                 Vector3 v0 = poly->vertices[(i + 1) % poly->vertex_count];
+
+//                 Vector2 uv0 = polygon_project_to_uv(v0, face);
+//                 Vector2 uv1 = polygon_project_to_uv(v1, face);
+//                 Vector2 uv2 = polygon_project_to_uv(v2, face);
+
+//                 Vector2 uvs[3] = { uv0, uv1, uv2 };
+//                 //polygon_normalize_uv(uvs, 3); 
+
+//                 // v0
+//                 mesh.vertices[index*3 + 0] = v0.x;
+//                 mesh.vertices[index*3 + 1] = v0.y;
+//                 mesh.vertices[index*3 + 2] = v0.z;
+//                 mesh.texcoords[index*2 + 0] = uvs[0].x;
+//                 mesh.texcoords[index*2 + 1] = uvs[0].y;
+//                 index++;
+
+//                 // v1
+//                 mesh.vertices[index*3 + 0] = v1.x;
+//                 mesh.vertices[index*3 + 1] = v1.y;
+//                 mesh.vertices[index*3 + 2] = v1.z;
+//                 mesh.texcoords[index*2 + 0] = uvs[1].x;
+//                 mesh.texcoords[index*2 + 1] = uvs[1].y;
+//                 index++;
+
+//                 // v2
+//                 mesh.vertices[index*3 + 0] = v2.x;
+//                 mesh.vertices[index*3 + 1] = v2.y;
+//                 mesh.vertices[index*3 + 2] = v2.z;
+//                 mesh.texcoords[index*2 + 0] = uvs[2].x;
+//                 mesh.texcoords[index*2 + 1] = uvs[2].y;
+//                 index++;
+//             }
+
+//             UploadMesh(&mesh, false);
+//             Model model = LoadModelFromMesh(mesh);
+//             model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
+//             models[model_count++] = model;
+//             //UnloadModel(model);
+//         }
+//     }
+// }
 void map_create_models()
 {
-//loop through all brushes in the map
-    for (int i=0; i<map.brush_count; i++)
+    float scale = 0.1f;
+    float rotation_degrees = 0.0f; // change to 90.0f, 180.0f, etc. if needed
+    float rotation_radians = rotation_degrees * (PI / 180.0f);
+
+    // Precompute Y-axis rotation matrix (TrenchBroom Y is Raylib Z)
+    float cos_theta = cosf(rotation_radians);
+    float sin_theta = sinf(rotation_radians);
+
+    for (int i = 0; i < map.brush_count; i++)
     {
         Brush *brush = &map.brushes[i];
 
-        // loop through each brush face per brush
-        for (int j=0; j<brush->brush_face_count; j++)
+        for (int j = 0; j < brush->brush_face_count; j++)
         {
             BrushFace *face = &brush->brush_faces[j];
             Polygon *poly = &brush->polys[j];
 
-            // validate if this poly has atleast 3 vertices.
-            if (poly->vertex_count < 3) return;
+            if (poly->vertex_count < 3) continue;
 
             Texture2D texture = texture_get_cached(face->texture);
 
-            // Calculate centroid
+            // Centroid calculation (raw)
             Vector3 centroid = {0};
             for (int i = 0; i < poly->vertex_count; i++) {
                 centroid = Vector3Add(centroid, poly->vertices[i]);
@@ -207,40 +295,45 @@ void map_create_models()
 
             int index = 0;
             for (int i = 0; i < triangle_count; i++) {
-                Vector3 v2 = centroid;
-                Vector3 v1 = poly->vertices[i];
-                Vector3 v0 = poly->vertices[(i + 1) % poly->vertex_count];
+                Vector3 verts[3] = {
+                    poly->vertices[(i + 1) % poly->vertex_count],
+                    poly->vertices[i],
+                    centroid
+                };
 
-                Vector2 uv0 = polygon_project_to_uv(v0, face);
-                Vector2 uv1 = polygon_project_to_uv(v1, face);
-                Vector2 uv2 = polygon_project_to_uv(v2, face);
+                Vector2 uvs[3] = {
+                    polygon_project_to_uv(verts[0], face),
+                    polygon_project_to_uv(verts[1], face),
+                    polygon_project_to_uv(verts[2], face),
+                };
 
-                Vector2 uvs[3] = { uv0, uv1, uv2 };
-                //polygon_normalize_uv(uvs, 3); 
+                for (int v = 0; v < 3; v++) {
+                    Vector3 p = verts[v];
 
-                // v0
-                mesh.vertices[index*3 + 0] = v0.x;
-                mesh.vertices[index*3 + 1] = v0.y;
-                mesh.vertices[index*3 + 2] = v0.z;
-                mesh.texcoords[index*2 + 0] = uvs[0].x;
-                mesh.texcoords[index*2 + 1] = uvs[0].y;
-                index++;
+                    // ✅ Coordinate conversion: (x, y, z) → (x, z, -y)
+                    float x = p.x;
+                    float y = p.z;    // swap Y and Z
+                    float z = -p.y;   // invert old Y
 
-                // v1
-                mesh.vertices[index*3 + 0] = v1.x;
-                mesh.vertices[index*3 + 1] = v1.y;
-                mesh.vertices[index*3 + 2] = v1.z;
-                mesh.texcoords[index*2 + 0] = uvs[1].x;
-                mesh.texcoords[index*2 + 1] = uvs[1].y;
-                index++;
+                    // ✅ Apply Y-axis rotation (around new Y axis, which was TrenchBroom Z)
+                    float x_rot = x * cos_theta - z * sin_theta;
+                    float z_rot = x * sin_theta + z * cos_theta;
 
-                // v2
-                mesh.vertices[index*3 + 0] = v2.x;
-                mesh.vertices[index*3 + 1] = v2.y;
-                mesh.vertices[index*3 + 2] = v2.z;
-                mesh.texcoords[index*2 + 0] = uvs[2].x;
-                mesh.texcoords[index*2 + 1] = uvs[2].y;
-                index++;
+                    // ✅ Apply scale
+                    x_rot *= scale;
+                    y *= scale;
+                    z_rot *= scale;
+
+                    // Store vertex
+                    mesh.vertices[index * 3 + 0] = x_rot;
+                    mesh.vertices[index * 3 + 1] = y;
+                    mesh.vertices[index * 3 + 2] = z_rot;
+
+                    mesh.texcoords[index * 2 + 0] = uvs[v].x;
+                    mesh.texcoords[index * 2 + 1] = uvs[v].y;
+
+                    index++;
+                }
             }
 
             UploadMesh(&mesh, false);
@@ -248,7 +341,6 @@ void map_create_models()
             model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
             models[model_count++] = model;
-            //UnloadModel(model);
         }
     }
 }
@@ -260,27 +352,31 @@ polygon_draw_wireframe
 */
 void polygon_draw_wireframe()
 {
+    for (int i=0; i < model_count; i++)
+    {
+        DrawModelWires(models[i], (Vector3){0}, 1.0f, RED);
+    }
     /// DRAWS DEBUG WIREFRAME OF THE OBJECT
-        for (int i = 0; i < map.brush_count; i++)
-        {
-            Brush *brush = &map.brushes[i];
+        // for (int i = 0; i < map.brush_count; i++)
+        // {
+        //     Brush *brush = &map.brushes[i];
 
-            //printf("Attempting to draw brush...");
-            for (int j = 0; j < brush->brush_face_count; j++)
-            {
-                //printf("Brushface data:\n");
-                //brushface_print(brush->brush_faces[j], j);
-                Polygon *poly = &brush->polys[j];
+        //     //printf("Attempting to draw brush...");
+        //     for (int j = 0; j < brush->brush_face_count; j++)
+        //     {
+        //         //printf("Brushface data:\n");
+        //         //brushface_print(brush->brush_faces[j], j);
+        //         Polygon *poly = &brush->polys[j];
 
-                for (int k = 0; k < poly->vertex_count; k++)
-                {
-                    Vector3 a = poly->vertices[k];
-                    Vector3 b = poly->vertices[(k + 1) % poly->vertex_count];
-                    DrawLine3D(a, b, RED);
-                    DrawPoint3D(a, BLUE);
-                }
-            }
-        }
+        //         for (int k = 0; k < poly->vertex_count; k++)
+        //         {
+        //             Vector3 a = poly->vertices[k];
+        //             Vector3 b = poly->vertices[(k + 1) % poly->vertex_count];
+        //             DrawLine3D(a, b, RED);
+        //             DrawPoint3D(a, BLUE);
+        //         }
+        //     }
+        // }
 }
 
 
@@ -364,42 +460,64 @@ polygon_project_to_uv
 */
 Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face)
 {
-    Vector3 normal = brushface_to_plane(*face).normal;
-    Vector3 world_up = (Vector3){0,1,0};
-    Vector3 u_axis, v_axis;
     Texture2D texture = texture_get_cached(face->texture);
+    Vector2 textureSize = {texture.width, texture.height};
 
-    // if the normal is too close to world_up use another axis (X):
-    if (fabsf(Vector3DotProduct(normal, world_up)) > 0.99f)
-    {
-        world_up = (Vector3){1,0,0};
-    }
+    Vector3 uv_x = (Vector3){ face->uv_s.x, face->uv_s.y, face->uv_s.z };
+    Vector3 uv_y = (Vector3){ face->uv_t.x, face->uv_t.y, face->uv_t.z };
 
-    //set the u and v axis
-    u_axis = Vector3Normalize(Vector3CrossProduct(world_up, normal));
-    v_axis = Vector3CrossProduct(normal, u_axis);
+    float uAxisDot = Vector3DotProduct(point, uv_x);
+    float vAxisDot = Vector3DotProduct(point, uv_y);
+
+    float u = (uAxisDot / (textureSize.x * face->u_scale)) +
+              (face->uv_s.w / textureSize.x);
+
+    float v = (vAxisDot / (textureSize.y * face->v_scale)) +
+              (face->uv_t.w / textureSize.y);
+
+    return (Vector2){ u, v };
+//     Vector3 normal = brushface_to_plane(*face).normal;
+//     Vector3 world_up = (Vector3){0,1,0};
+//     Vector3 u_axis, v_axis;
+//     Texture2D texture = texture_get_cached(face->texture);
+
+//     //if the normal is too close to world_up use another axis (X):
+//     if (fabsf(Vector3DotProduct(normal, world_up)) > 0.99f)
+//     {
+//         world_up = (Vector3){-1,0,0};
+//     }
+
+//     // //set the u and v axisqq
+
+//     Vector3 uv_s = { face->uv_s.x, face->uv_s.y, face->uv_s.z };
+//     Vector3 uv_t = { face->uv_t.x, face->uv_t.x, face->uv_t.x };
+//     u_axis = Vector3Normalize(Vector3CrossProduct(uv_s, normal));
+//     v_axis = Vector3CrossProduct(normal, uv_t);
     
-    // uv rotation
-    float angle_rad = DEG2RAD * (float)face->uv_rotation;
-    u_axis = rotate_vector_around_axis(u_axis, normal, angle_rad);
-    v_axis = rotate_vector_around_axis(v_axis, normal, angle_rad);
+//     // uv rotation
+//     float angle_rad = DEG2RAD * (float)face->uv_rotation;
+//     u_axis = rotate_vector_around_axis(u_axis, normal, angle_rad);
+//     v_axis = rotate_vector_around_axis(v_axis, normal, angle_rad);
 
-    //get offset
-    float s_offset = face->uv_s.w;
-    float t_offset = face->uv_t.w;
+//     //get offset
+//     float s_offset = face->uv_s.w;
+//     float t_offset = face->uv_t.w;
 
-    // get the scale of the image
-    float _scale_factor = (float)texture.width;
+//     // get the scale of the image
+//     float _scale_factor = (float)texture.width;
 
-    // calc uv
-    float u = Vector3DotProduct(point, u_axis) - (s_offset);// / (float)face->u_scale;
-    float v = Vector3DotProduct(point, v_axis) - (t_offset);// + t_offset;// / (float)face->v_scale;
+    //float u = Vector3DotProduct(point, u_axis) / (texture.width) - (s_offset/texture.width);
+    //float v = Vector3DotProduct(point, v_axis) / (texture.height) - (t_offset/texture.height);
 
-    //scale the uvs
-    u /= (float)face->u_scale * _scale_factor;
-    v /= (float)face->v_scale * _scale_factor;
+    // // calc uv
+    // float u = Vector3DotProduct(point, u_axis) - (s_offset);// / (float)face->u_scale;
+    // float v = Vector3DotProduct(point, v_axis) - (t_offset);// + t_offset;// / (float)face->v_scale;
 
-    return (Vector2){ 1.0f-u, 1.0f-v };
+    // //scale the uvs
+    // u /= (float)face->u_scale * _scale_factor;
+    // v /= (float)face->v_scale * _scale_factor;
+
+    // return (Vector2){ 1.0f-u, 1.0f-v };
 }
 
 Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle)
