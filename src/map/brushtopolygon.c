@@ -367,6 +367,7 @@ Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face)
     Vector3 normal = brushface_to_plane(*face).normal;
     Vector3 world_up = (Vector3){0,1,0};
     Vector3 u_axis, v_axis;
+    Texture2D texture = texture_get_cached(face->texture);
 
     // if the normal is too close to world_up use another axis (X):
     if (fabsf(Vector3DotProduct(normal, world_up)) > 0.99f)
@@ -383,17 +384,18 @@ Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face)
     u_axis = rotate_vector_around_axis(u_axis, normal, angle_rad);
     v_axis = rotate_vector_around_axis(v_axis, normal, angle_rad);
 
-    // use rotated vectors
+    //get offset
     float s_offset = face->uv_s.w;
     float t_offset = face->uv_t.w;
 
-    //Vector3 s = (Vector3){ face->uv_s.x, face->uv_s.y, face->uv_s.z };
-    //Vector3 t = (Vector3){ face->uv_t.x, face->uv_t.y, face->uv_t.z };
+    // get the scale of the image
+    float _scale_factor = (float)texture.width;
 
-    float u = Vector3DotProduct(point, u_axis) + s_offset;// / (float)face->u_scale;
-    float v = Vector3DotProduct(point, v_axis) + t_offset;// / (float)face->v_scale;
+    // calc uv
+    float u = Vector3DotProduct(point, u_axis) + (s_offset);// / (float)face->u_scale;
+    float v = Vector3DotProduct(point, v_axis) + (t_offset);// + t_offset;// / (float)face->v_scale;
 
-    float _scale_factor = 64.0;
+    //scale the uvs
     u /= (float)face->u_scale * _scale_factor;
     v /= (float)face->v_scale * _scale_factor;
 
