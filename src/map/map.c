@@ -5,15 +5,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../headers/brushtopolygon.h"
+#include "../headers/texturemanager.h"
 
-Map map;
+Map map; // stores the currently loaded map
 
 /*
 parse_map
 filename[const char*] -- the filename of the map to be loaded ie. "myamazingmap.map"
 -- Stores the data about the currently loaded map.
 */
-int parse_map(const char* filename)
+int map_parse(const char* filename)
 {
     printf("\n \n");
     printf("Loading map data...\n");
@@ -163,7 +164,7 @@ int parse_map(const char* filename)
         for (int j= 0; j < map.brushes[i].brush_face_count; j++)
         {
             Plane plane = brushface_to_plane(map.brushes[i].brush_faces[j]);
-            polygon_sort_vertices(&map.brushes[i].polys[j], plane.normal);
+            polygon_sort_vertices(&map.brushes[i].polys[j], (Vector3){ plane.normal.x, plane.normal.y, plane.normal.z });
         }
     }
 
@@ -173,23 +174,109 @@ int parse_map(const char* filename)
 }
 
 /*
-string_equals
-string[char* string] - The first string to be compared
-string[char* string_to_compare_to] - the second string that is compared to the first string
--- compares two strings to see if they match
+map_create_models
+-- creates a model from a polygonal brush
 */
-int string_equals(char* string, char* string_to_compare_to)
+void map_create_models()
 {
-    if (strcmp(string, string_to_compare_to) == 0) return 1;
-    return 0;
+    float scale = 0.1f;
+    float rotation_degrees = 0.0f; // change to 90.0f, 180.0f, etc. if needed
+    float rotation_radians = rotation_degrees * (PI / 180.0f);
+
+    // Precompute Y-axis rotation matrix (TrenchBroom Y is Raylib Z)
+    float cos_theta = cosf(rotation_radians);
+    float sin_theta = sinf(rotation_radians);
+
+    for (int i = 0; i < map.brush_count; i++)
+    {
+        Brush *brush = &map.brushes[i];
+
+        for (int j = 0; j < brush->brush_face_count; j++)
+        {
+            BrushFace *face = &brush->brush_faces[j];
+            Polygon *poly = &brush->polys[j];
+
+            if (poly->vertex_count < 3) continue;
+
+            Texture2D texture = texture_get_cached(face->texture);
+
+            // Centroid calculation (raw)
+            Vector3 centroid = {0};
+            for (int i = 0; i < poly->vertex_count; i++) {
+                centroid = Vector3Add(centroid, poly->vertices[i]);
+            }
+            centroid = Vector3Scale(centroid, 1.0f / poly->vertex_count);
+
+            int triangle_count = poly->vertex_count;
+            Mesh mesh = {0};
+            mesh.vertexCount = triangle_count * 3;
+            mesh.triangleCount = triangle_count;
+
+            mesh.vertices = (float *)MemAlloc(mesh.vertexCount * 3 * sizeof(float));
+            mesh.texcoords = (float *)MemAlloc(mesh.vertexCount * 2 * sizeof(float));
+
+            int index = 0;
+            for (int i = 0; i < triangle_count; i++) {
+                Vector3 verts[3] = {
+                    poly->vertices[(i + 1) % poly->vertex_count],
+                    poly->vertices[i],
+                    centroid
+                };
+
+                Vector2 uvs[3] = {
+                    polygon_project_to_uv(verts[0], face),
+                    polygon_project_to_uv(verts[1], face),
+                    polygon_project_to_uv(verts[2], face),
+                };
+
+                for (int v = 0; v < 3; v++) {
+                    Vector3 p = verts[v];
+
+                    // Coordinate conversion: (x, y, z) → (x, z, -y)
+                    float x = p.x;
+                    float y = p.z;    // swap Y and Z
+                    float z = -p.y;   // invert old Y
+
+                    // Apply Y-axis rotation (around new Y axis, which was TrenchBroom Z)
+                    float x_rot = x * cos_theta - z * sin_theta;
+                    float z_rot = x * sin_theta + z * cos_theta;
+
+                    // Apply scale
+                    x_rot *= scale;
+                    y *= scale;
+                    z_rot *= scale;
+
+                    // Store vertex
+                    mesh.vertices[index * 3 + 0] = x_rot;
+                    mesh.vertices[index * 3 + 1] = y;
+                    mesh.vertices[index * 3 + 2] = z_rot;
+
+                    mesh.texcoords[index * 2 + 0] = uvs[v].x;
+                    mesh.texcoords[index * 2 + 1] = uvs[v].y;
+
+                    index++;
+                }
+            }
+
+            UploadMesh(&mesh, false);
+            Model model = LoadModelFromMesh(mesh);
+            model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
+            models[model_count++] = model;
+        }
+    }
 }
 
 /*
-convert_trenchbroom_to_raylib_axis
--- raylib and trenchbroom dont use the same xyz axis, so we have to convert this here
--- so our map isnt sideways :P
+map_clear_models
+-- clears all the map models from memory
+-- clear memory because raylib does not
+-- call this when the game ends
 */
-Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v)
+void map_clear_models()
 {
-    return (Vector3) { v.x, v.z, -v.y };
+    for (int i=0; i < model_count; i++)
+    {
+        UnloadModel(models[i]);
+    }
 }

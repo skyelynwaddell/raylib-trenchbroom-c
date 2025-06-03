@@ -29,7 +29,7 @@ Plane brushface_to_plane(BrushFace face)
 {
     Vector3 edge1 = Vector3Subtract(face.pos_2, face.pos_1);
     Vector3 edge2 = Vector3Subtract(face.pos_3, face.pos_1);
-    Vector3 normal = Vector3Normalize(Vector3CrossProduct(edge1, edge2));
-    float distance = -Vector3DotProduct(normal, face.pos_1);
+    Vector3 normal = Vector3Normalize(Vector3CrossProduct(edge1,edge2));
+    double distance = -Vector3DotProduct(normal, face.pos_1);
     return (Plane) { normal, distance };
 }

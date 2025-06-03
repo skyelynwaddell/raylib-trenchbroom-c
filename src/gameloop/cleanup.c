@@ -1,4 +1,5 @@
 #include "../headers/cleanup.h"
+#include "../headers/map.h"
 
 /*
 clean_up

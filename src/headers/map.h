@@ -18,8 +18,8 @@ typedef struct {
 
 extern Map map;
 
-int parse_map(const char* filename);
-int string_equals(char* string, char* string_to_compare_to);
-Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v);
+int map_parse(const char* filename);
+void map_create_models();
+void map_clear_models();
 
 #endif // MAP_H

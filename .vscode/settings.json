@@ -13,6 +13,7 @@
         "plane.h": "c",
         "brushclipper.h": "c",
         "triangle.h": "c",
-        "polygon.h": "c"
+        "polygon.h": "c",
+        "utils.h": "c"
     }
 }

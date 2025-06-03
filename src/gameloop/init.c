@@ -1,5 +1,5 @@
-#include "../headers/init.h"
 #include "stdio.h"
+#include "../headers/init.h"
 #include "../headers/map.h"
 
 /*
@@ -9,5 +9,5 @@ init
 */
 void init()
 {
-    parse_map("test.map");
+    map_parse("test.map");
 }

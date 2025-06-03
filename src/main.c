@@ -7,6 +7,10 @@
 #include "./headers/map.h"
 #include "./headers/cleanup.h"
 
+#include "./headers/init.h"
+#include "./headers/draw.h"
+#include "./headers/draw_gui.h"
+
 
 // Program Entry Point
 // -----------------------------

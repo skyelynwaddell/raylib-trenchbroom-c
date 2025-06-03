@@ -8,7 +8,7 @@ int camera_move_spd;
 
 /*
 camera_init
--- creates the 3d camea object
+-- creates the 3d camera object
 */
 void camera_init()
 {
@@ -17,5 +17,5 @@ void camera_init()
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 90.0f;
     camera.projection = CAMERA_PERSPECTIVE;
-    camera_mode = CAMERA_FIRST_PERSON;
+    camera_mode = CAMERA_FREE;
 }

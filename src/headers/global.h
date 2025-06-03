@@ -5,17 +5,6 @@
 #include "raylib.h"
 #include "./defs.h"
 
-typedef struct {
-    char name[64];
-    Texture2D texture;
-
-} TextureCacheEntry;
-
-extern int texture_cache_count;
-extern TextureCacheEntry texture_cache[MAX_TEXTURES];
-extern Texture2D default_texture;
-
-Texture2D texture_get_cached(char *texture_name);
-Texture2D texture_get_default();
+// enter global variables for the game here
 
 #endif // GLOBAL_H

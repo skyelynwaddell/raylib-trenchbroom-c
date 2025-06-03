@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "raylib.h"
+#include "./utils.h"
 
 #include "./brush.h"
 #include "./polygon.h"
@@ -15,9 +16,9 @@ bool polygon_get_intersection(
     Vector3 n1,
     Vector3 n2,
     Vector3 n3,
-    float d1,
-    float d2,
-    float d3,
+    double d1,
+    double d2,
+    double d3,
     Vector3* out
 );
 
@@ -29,10 +30,8 @@ void polygon_sort_vertices(Polygon* poly, Vector3 normal);
 void polygon_draw_all();
 void polygon_draw_wireframe();
 void polygon_draw_uvs();
-Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face);
 void polygon_normalize_uv(Vector2 *uvs, int count);
 bool polygon_has_vertex(Polygon *poly, Vector3 v);
-void map_create_models();
-Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle);
+Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face);
 
 #endif // BRUSH_TO_POLYGON_H
