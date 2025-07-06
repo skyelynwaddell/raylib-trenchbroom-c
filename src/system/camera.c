@@ -2,7 +2,7 @@
 //#include "raylib.h"
 #include "../headers/camera.h"
 
-Camera camera;
+Camera3D camera;
 int camera_mode;
 int camera_move_spd;
 

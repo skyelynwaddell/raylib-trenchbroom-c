@@ -10,5 +10,4 @@ clean_up
 void clean_up()
 {
     map_clear_models(); //clears all the map models cache from memory
-
 }

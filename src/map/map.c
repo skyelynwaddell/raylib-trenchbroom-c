@@ -8,6 +8,8 @@
 #include "../headers/texturemanager.h"
 
 Map map; // stores the currently loaded map
+Model models[10000]; // if you have more than 10,000 map brushes, you need a second map...
+int model_count = 0;
 
 /*
 parse_map
@@ -103,7 +105,13 @@ int map_parse(const char* filename)
                 {
                     map.mapversion = atoi(value);
                     printf("Map Version: %i \n", map.mapversion);
+
+                    //validate map is valve 220
+                    if (map.mapversion != 220){
+                        printf("Only support for valve 220 .map files currently...");
+                    }
                 }
+
             }
         }
 
@@ -144,6 +152,7 @@ int map_parse(const char* filename)
                     current_brush.brush_face_count = current_brushface_index;
                     brushface_print(brushface, current_brushface_index);
                 }
+
             } else {
                 //failed
                 printf("!!! Failed to parse brush face line: %s (matched %d)\n", trimmed, matched);
@@ -172,6 +181,7 @@ int map_parse(const char* filename)
     map_create_models();
     return true;
 }
+
 
 /*
 map_create_models
@@ -223,11 +233,23 @@ void map_create_models()
                     centroid
                 };
 
-                Vector2 uvs[3] = {
-                    polygon_project_to_uv(verts[0], face),
-                    polygon_project_to_uv(verts[1], face),
-                    polygon_project_to_uv(verts[2], face),
-                };
+                Vector2 uvs[3];
+
+                switch(map.mapversion)
+                {
+                    default:
+                        uvs[0] = polygon_project_to_uv_standard(verts[0], face);
+                        uvs[1] = polygon_project_to_uv_standard(verts[1], face);
+                        uvs[2] = polygon_project_to_uv_standard(verts[2], face);
+                    break;
+                    
+                    case 220:
+                        uvs[0] = polygon_project_to_uv_valve220(verts[0], face);
+                        uvs[1] = polygon_project_to_uv_valve220(verts[1], face);
+                        uvs[2] = polygon_project_to_uv_valve220(verts[2], face);
+                    break;
+                }
+                
 
                 for (int v = 0; v < 3; v++) {
                     Vector3 p = verts[v];
@@ -267,6 +289,7 @@ void map_create_models()
     }
 }
 
+
 /*
 map_clear_models
 -- clears all the map models from memory
@@ -279,4 +302,66 @@ void map_clear_models()
     {
         UnloadModel(models[i]);
     }
+}
+
+
+/*
+map_draw
+-- draw all polygons generated in the map
+*/
+void map_draw()
+{
+    map_draw_models();
+    //map_draw_model_wireframes(); // debug
+
+}
+
+
+/*
+map_draw_models
+-- draws each model in the model array
+*/
+void map_draw_models()
+{
+    for (int i=0; i < model_count; i++)
+    {
+        DrawModel(models[i], (Vector3){0}, 1.0f, WHITE);
+    }
+}
+
+
+/*
+map_draw_model_wireframes
+-- draws a debug wireframe around the map polygonal mesh
+*/
+void map_draw_model_wireframes()
+{
+    //draw wireframe reflecting the Geometry coords
+    for (int i=0; i < model_count; i++)
+    {
+        DrawModelWires(models[i], (Vector3){0}, 1.0f, RED);
+    }
+
+    // Draws wireframe reflecting Trenchbroom original brush coords
+    /// DRAWS DEBUG WIREFRAME OF THE OBJECT
+        // for (int i = 0; i < map.brush_count; i++)
+        // {
+        //     Brush *brush = &map.brushes[i];
+
+        //     //printf("Attempting to draw brush...");
+        //     for (int j = 0; j < brush->brush_face_count; j++)
+        //     {
+        //         //printf("Brushface data:\n");
+        //         //brushface_print(brush->brush_faces[j], j);
+        //         Polygon *poly = &brush->polys[j];
+
+        //         for (int k = 0; k < poly->vertex_count; k++)
+        //         {
+        //             Vector3 a = poly->vertices[k];
+        //             Vector3 b = poly->vertices[(k + 1) % poly->vertex_count];
+        //             DrawLine3D(a, b, RED);
+        //             DrawPoint3D(a, BLUE);
+        //         }
+        //     }
+        // }
 }

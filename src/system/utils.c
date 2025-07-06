@@ -13,6 +13,7 @@ int string_equals(char* string, char* string_to_compare_to)
     return 0;
 }
 
+
 /*
 convert_trenchbroom_to_raylib_axis
 -- raylib and trenchbroom dont use the same xyz axis, so we have to convert this here
@@ -22,6 +23,7 @@ Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v)
 {
     return (Vector3) { v.x, v.z, -v.y };
 }
+
 
 /*
 rotate_vector_around_axis
@@ -43,6 +45,7 @@ Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle)
     );
 }
 
+
 /*
 Vector3DoubleCrossProduct
 // Calculate two vectors cross product
@@ -52,6 +55,7 @@ Vector3Double Vector3DoubleCrossProduct(Vector3Double v1, Vector3Double v2)
     Vector3Double result = { v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x };
     return result;
 }
+
 
 /*
 Vector3DoubleScale
@@ -63,12 +67,14 @@ Vector3Double Vector3DoubleScale(Vector3Double v, float scalar)
     return result;
 }
 
+
 // Calculate two vectors dot product
 double Vector3DoubleDotProduct(Vector3Double v1, Vector3Double v2)
 {
     float result = (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
     return result;
 }
+
 
 // Add two vectors
 Vector3Double Vector3DoubleAdd(Vector3Double v1, Vector3Double v2)
@@ -77,12 +83,14 @@ Vector3Double Vector3DoubleAdd(Vector3Double v1, Vector3Double v2)
     return result;
 }
 
+
 // Subtract two vectors
 Vector3Double Vector3DoubleSubtract(Vector3Double v1, Vector3Double v2)
 {
     Vector3Double result = { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
     return result;
 }
+
 
 // Normalize provided vector
 Vector3Double Vector3DoubleNormalize(Vector3Double v)

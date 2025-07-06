@@ -14,6 +14,8 @@
         "brushclipper.h": "c",
         "triangle.h": "c",
         "polygon.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "rcamera.h": "c",
+        "cleanup.h": "c"
     }
 }

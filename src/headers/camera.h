@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include "raylib.h"
+#include "rcamera.h"
+
 
 extern Camera camera;
 extern int camera_mode;

@@ -6,7 +6,10 @@
 #include "./brush.h"
 
 #define MAX_LINE 1024
-#define MAX_BRUSHES 1024
+#define MAX_BRUSHES 10000
+
+extern Model models[];
+extern int model_count;
 
 // struct to hold the data stored in .map file
 typedef struct {
@@ -21,5 +24,8 @@ extern Map map;
 int map_parse(const char* filename);
 void map_create_models();
 void map_clear_models();
+void map_draw();
+void map_draw_model_wireframes();
+void map_draw_models();
 
 #endif // MAP_H
