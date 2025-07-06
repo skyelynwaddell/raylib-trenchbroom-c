@@ -1,6 +1,11 @@
 #include "stdio.h"
 #include "../headers/init.h"
 #include "../headers/map.h"
+#include "../headers/camera.h"
+#include "raylib.h"
+#include "raygui.h"
+#include <defs.h>
+#include <global.h>
 
 /*
 init
@@ -9,5 +14,10 @@ init
 */
 void init()
 {
+    camera_init();
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE);
+    DisableCursor(); // Limit cursor to relative movement inside the window
+    SetTargetFPS(FPS);
+    
     map_parse("test.map");
 }

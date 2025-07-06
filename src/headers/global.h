@@ -5,6 +5,10 @@
 #include "raylib.h"
 #include "./defs.h"
 
-// enter global variables for the game here
+// Global variables
+
+extern int paused; // Game pause state
+
+void pause_toggle(); // Toggle pause state
 
 #endif // GLOBAL_H

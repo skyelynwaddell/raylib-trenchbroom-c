@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "raylib.h": "c",
         "stdio.h": "c",
         "global.h": "c",
@@ -16,6 +17,8 @@
         "polygon.h": "c",
         "utils.h": "c",
         "rcamera.h": "c",
-        "cleanup.h": "c"
+        "cleanup.h": "c",
+        "stdbool.h": "c",
+        "raygui.h": "c"
     }
 }

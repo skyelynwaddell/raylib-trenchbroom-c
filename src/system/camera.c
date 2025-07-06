@@ -1,5 +1,5 @@
-//#include <stdio.h>
-//#include "raylib.h"
+#include <stdio.h>
+#include "raylib.h"
 #include "../headers/camera.h"
 
 Camera3D camera;

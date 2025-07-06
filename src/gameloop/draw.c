@@ -5,6 +5,7 @@
 #include "../headers/triangle.h"
 #include "../headers/brushtopolygon.h"
 #include "../headers/polygon.h"
+#include <camera.h>
 
 /*
 draw
@@ -12,5 +13,7 @@ draw
 */
 void draw()
 {
+    ClearBackground(RAYWHITE);
+    BeginMode3D(camera);
     map_draw();
 }

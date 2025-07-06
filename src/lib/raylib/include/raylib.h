@@ -252,7 +252,7 @@ typedef struct Color {
 } Color;
 
 // Rectangle, 4 components
-typedef struct Rectangle {
+typedef struct Rectangle { 
     float x;                // Rectangle top-left corner position x
     float y;                // Rectangle top-left corner position y
     float width;            // Rectangle width

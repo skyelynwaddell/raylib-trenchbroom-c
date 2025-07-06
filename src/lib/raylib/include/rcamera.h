@@ -169,7 +169,6 @@ RLAPI Matrix GetCameraProjectionMatrix(Camera *camera, float aspect);
 ************************************************************************************/
 #ifndef RCAMERA_IMPLEMENTATION 
 #define RCAMERA_IMPLEMENTATION
-#if defined(RCAMERA_IMPLEMENTATION)
 
 #include "raymath.h"        // Required for vector maths:
                             // Vector3Add()
@@ -553,5 +552,4 @@ void UpdateCameraPro(Camera *camera, Vector3 movement, Vector3 rotation, float z
     CameraMoveToTarget(camera, zoom);
 }
 
-#endif // RCAMERA_IMPLEMENTATION
 #endif
