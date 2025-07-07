@@ -14,6 +14,9 @@
 #include "./headers/draw.h"
 #include "./headers/draw_viewmodel.h"
 #include "./headers/draw_gui.h"
+#include "./headers/player.h"
+
+#include "./lib/raylib/include/rcamera.h"
 
 // Program Entry Point
 // -----------------------------
@@ -21,8 +24,9 @@ int main()
 {
     // Initialization
     // -----------------------------
-    
+    Player player;
     init();
+    player_init(&player);
     GuiLoadStyle(STYLE_AMBER); // Load GUI style from file
 
     // Main Game Loop
@@ -31,6 +35,7 @@ int main()
         SetExitKey(0); // Disable exit key (ESC)
         input();
         update();
+        player_update(&player);
 
         // Draw
         // -----------------------------

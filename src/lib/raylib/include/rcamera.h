@@ -1,3 +1,4 @@
+#define CAMERA_IMPLEMENTATION
 /*******************************************************************************************
 *
 *   rcamera - Basic camera system with support for multiple camera modes
@@ -191,6 +192,10 @@ RLAPI Matrix GetCameraProjectionMatrix(Camera *camera, float aspect);
                             // IsKeyDown()
                             // IsKeyPressed()
                             // GetFrameTime()
+
+
+// Custom Includes
+#include "player.h"
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -551,5 +556,4 @@ void UpdateCameraPro(Camera *camera, Vector3 movement, Vector3 rotation, float z
     // Zoom target distance
     CameraMoveToTarget(camera, zoom);
 }
-
 #endif

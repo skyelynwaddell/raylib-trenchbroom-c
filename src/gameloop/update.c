@@ -10,5 +10,5 @@ update
 void update()
 {
     if (paused) return; // If the game is paused, skip the update logic
-    UpdateCamera(&camera, camera_mode);
+    //UpdateCamera(&camera, camera_mode);
 }

@@ -4,6 +4,10 @@
 
 int paused = false; // Game pause state
 
+float cam_yaw = 0.0f;   // left/right
+float cam_pitch = 0.0f; // up/down
+
+
 /*
 pause_toggle
 This function toggles the pause state of the game.

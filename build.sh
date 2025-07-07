@@ -3,7 +3,7 @@
 mkdir -p bin
 
 gcc -g -Wall -std=c99 \
-  src/*.c src/system/*.c src/map/*.c src/gameloop/* \
+  src/*.c src/system/*.c src/map/*.c src/gameloop/* src/gameobjects/* \
   -I/usr/include \
   -I./lib/raylib/include \
   -I./src/headers \
