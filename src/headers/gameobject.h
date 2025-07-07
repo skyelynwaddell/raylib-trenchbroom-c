@@ -5,6 +5,7 @@
 
 typedef struct {
     Vector3 position;
+    
 } GameObject;
 
 

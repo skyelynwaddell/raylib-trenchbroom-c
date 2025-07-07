@@ -15,7 +15,7 @@ void draw_gui()
     sprintf(fps_text, "%d", GetFPS());
     DrawText(fps_text, 10, 10, 20, BLACK);
 
-    if (paused) draw_pausemenu();
+    if (global_paused) draw_pausemenu();
 }
 
 

@@ -7,10 +7,10 @@
 
 // Global variables
 
-extern int paused; // Game pause state
+extern int global_paused; // Game pause state
 
-extern float cam_yaw;  // left/right
-extern float cam_pitch; // up/down
+extern float global_cam_yaw;  // left/right
+extern float global_cam_pitch; // up/down
 
 void pause_toggle(); // Toggle pause state
 

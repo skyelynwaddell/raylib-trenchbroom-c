@@ -28,23 +28,23 @@ void camera_follow_player(Camera3D *camera, Player *target)
     Vector2 mouseDelta = GetMouseDelta();
     float sensitivity = 0.002f;
 
-    cam_yaw -= mouseDelta.x * sensitivity;
-    cam_pitch -= mouseDelta.y * sensitivity;
+    global_cam_yaw -= mouseDelta.x * sensitivity;
+    global_cam_pitch -= mouseDelta.y * sensitivity;
 
     // Clamp pitch between looking straight up and down
-    if (cam_pitch > PI/2 - 0.01f) cam_pitch = PI/2 - 0.01f;
-    if (cam_pitch < -PI/2 + 0.01f) cam_pitch = -PI/2 + 0.01f;
+    if (global_cam_pitch > PI/2 - 0.01f) global_cam_pitch = PI/2 - 0.01f;
+    if (global_cam_pitch < -PI/2 + 0.01f) global_cam_pitch = -PI/2 + 0.01f;
 
     // Calculate forward vector from yaw and pitch
     Vector3 forward = {
-        cosf(cam_pitch) * sinf(cam_yaw),
-        sinf(cam_pitch),
-        cosf(cam_pitch) * cosf(cam_yaw)
+        cosf(global_cam_pitch) * sinf(global_cam_yaw),
+        sinf(global_cam_pitch),
+        cosf(global_cam_pitch) * cosf(global_cam_yaw)
     };
 
     // Set camera position just above player position (eye height)
     Vector3 eyeOffset = {0.0f, 1.7f, 0.0f}; // adjust for player height
-    camera->position = Vector3Add(target->parent.position, eyeOffset);
+    camera->position = Vector3Add(target->gameobject.position, eyeOffset);
 
     // Camera target is forward direction from eye position
     camera->target = Vector3Add(camera->position, forward);

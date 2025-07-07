@@ -19,6 +19,9 @@
         "rcamera.h": "c",
         "cleanup.h": "c",
         "stdbool.h": "c",
-        "raygui.h": "c"
+        "raygui.h": "c",
+        "__node_handle": "c",
+        "collisionbox.h": "c",
+        "raymath.h": "c"
     }
 }

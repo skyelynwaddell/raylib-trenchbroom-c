@@ -24,9 +24,8 @@ int main()
 {
     // Initialization
     // -----------------------------
-    Player player;
     init();
-    player_init(&player);
+    player_init();
     GuiLoadStyle(STYLE_AMBER); // Load GUI style from file
 
     // Main Game Loop
@@ -35,13 +34,14 @@ int main()
         SetExitKey(0); // Disable exit key (ESC)
         input();
         update();
-        player_update(&player);
+        player_update();
 
         // Draw
         // -----------------------------
         BeginDrawing();
 
             draw();
+            player_draw();
             draw_viewmodel();
             EndMode3D();
             draw_gui();
