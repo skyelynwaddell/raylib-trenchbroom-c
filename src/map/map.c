@@ -6,9 +6,11 @@
 #include <stdlib.h>
 #include "../headers/brushtopolygon.h"
 #include "../headers/texturemanager.h"
+#include "collisionbox.h"
 
 Map map; // stores the currently loaded map
 Model models[10000]; // if you have more than 10,000 map brushes, you need a second map...
+CollisionBox brush_collisions[10000]
 int model_count = 0;
 
 /*
@@ -78,6 +80,7 @@ int map_parse(const char* filename)
                 if (map.brush_count < MAX_BRUSHES)
                 {
                     map.brushes[map.brush_count++] = current_brush;
+                    // TODO : Create CollisionBox for each brush
                     printf("Created BRUSH %i \n \n", map.brush_count-1);
                 }
                 in_brush = 0;
@@ -237,13 +240,13 @@ void map_create_models()
 
                 switch(map.mapversion)
                 {
-                    default:
+                    default: // Standard MAP Format
                         uvs[0] = polygon_project_to_uv_standard(verts[0], face);
                         uvs[1] = polygon_project_to_uv_standard(verts[1], face);
                         uvs[2] = polygon_project_to_uv_standard(verts[2], face);
                     break;
                     
-                    case 220:
+                    case 220: // Valve 220 Map Format
                         uvs[0] = polygon_project_to_uv_valve220(verts[0], face);
                         uvs[1] = polygon_project_to_uv_valve220(verts[1], face);
                         uvs[2] = polygon_project_to_uv_valve220(verts[2], face);

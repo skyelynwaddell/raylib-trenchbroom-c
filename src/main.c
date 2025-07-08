@@ -52,7 +52,6 @@ int main()
 
     // De-Initialization
     // -----------------------------
-    
     clean_up();
     CloseWindow();
     return 0;

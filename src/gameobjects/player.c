@@ -20,8 +20,8 @@ void player_init()
     player.gameobject.position = (Vector3){ p,p,p };
 
     // create player collision box
-    float h = 5.0f; // 5 units tall
-    float w = 2.0f; // 2 units thick/wide
+    float h = 4.0f; // units tall
+    float w = 1.0f; // units thick/wide
     collisionbox_set(
         &player.collision_box,
         player.gameobject.position,
@@ -73,7 +73,8 @@ void player_update()
 
     //printf("Player Pos x%.2f z%.2f \n", player.gameobject.position.x, player.parent.position.z);
     camera_follow_player(&camera, &player);
-    collisionbox_set_position(&player.collision_box, player.gameobject.position);
+    Vector3 pos = player.gameobject.position;
+    collisionbox_set_position(&player.collision_box, (Vector3){ pos.x, pos.y, pos.z });
 };
 
 
@@ -87,5 +88,4 @@ This is for actual player model etc not the arms or view model weapon.
 void player_draw()
 {
     DrawBoundingBox(player.collision_box.bounding_box, RED);
-
 }
