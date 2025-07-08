@@ -10,7 +10,7 @@
 
 Map map; // stores the currently loaded map
 Model models[10000]; // if you have more than 10,000 map brushes, you need a second map...
-CollisionBox brush_collisions[10000]
+CollisionBox brush_collisions[10000];
 int model_count = 0;
 
 /*
