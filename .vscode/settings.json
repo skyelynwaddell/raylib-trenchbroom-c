@@ -22,6 +22,7 @@
         "raygui.h": "c",
         "__node_handle": "c",
         "collisionbox.h": "c",
-        "raymath.h": "c"
+        "raymath.h": "c",
+        "gameobject.h": "c"
     }
 }

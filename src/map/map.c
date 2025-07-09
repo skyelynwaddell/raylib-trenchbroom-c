@@ -7,9 +7,11 @@
 #include "../headers/brushtopolygon.h"
 #include "../headers/texturemanager.h"
 #include "collisionbox.h"
+#include "geometry.h"
+#include "float.h"
 
 Map map; // stores the currently loaded map
-Model models[10000]; // if you have more than 10,000 map brushes, you need a second map...
+Geometry models[10000]; // if you have more than 10,000 map brushes, you need a second map...
 CollisionBox brush_collisions[10000];
 int model_count = 0;
 
@@ -283,11 +285,66 @@ void map_create_models()
                 }
             }
 
+            // AABB Bounds - Create bounding box / collision shape for simple checks
+            Vector3 min = { FLT_MAX, FLT_MAX, FLT_MAX };
+            Vector3 max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+            for (int v = 0; v < mesh.vertexCount; v++) {
+                Vector3 vert = {
+                    mesh.vertices[v * 3 + 0],
+                    mesh.vertices[v * 3 + 1],
+                    mesh.vertices[v * 3 + 2],
+                };
+
+                if (vert.x < min.x) min.x = vert.x;
+                if (vert.y < min.y) min.y = vert.y;
+                if (vert.z < min.z) min.z = vert.z;
+
+                if (vert.x > max.x) max.x = vert.x;
+                if (vert.y > max.y) max.y = vert.y;
+                if (vert.z > max.z) max.z = vert.z;
+            }
+            BoundingBox bounds = (BoundingBox){ min, max };
+
+            int tri_count = mesh.vertexCount / 3;
+
+            CollisionTriangle shape = {
+                .triangles = MemAlloc(sizeof(Triangle) * tri_count),
+                .count = tri_count
+            };
+
+            // Triangle Collisions -- More advanced detection
+            for (int i=0; i<tri_count; i++)
+            {
+                shape.triangles[i].a = (Vector3){
+                mesh.vertices[(i * 3 + 0) * 3 + 0],
+                mesh.vertices[(i * 3 + 0) * 3 + 1],
+                mesh.vertices[(i * 3 + 0) * 3 + 2]
+            };
+            shape.triangles[i].b = (Vector3){
+                mesh.vertices[(i * 3 + 1) * 3 + 0],
+                mesh.vertices[(i * 3 + 1) * 3 + 1],
+                mesh.vertices[(i * 3 + 1) * 3 + 2]
+            };
+            shape.triangles[i].c = (Vector3){
+                mesh.vertices[(i * 3 + 2) * 3 + 0],
+                mesh.vertices[(i * 3 + 2) * 3 + 1],
+                mesh.vertices[(i * 3 + 2) * 3 + 2]
+            };
+            }
+
+
             UploadMesh(&mesh, false);
             Model model = LoadModelFromMesh(mesh);
             model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
-            models[model_count++] = model;
+            Geometry geometry;
+            geometry.model = model;
+            geometry.bounds = bounds;
+            geometry.collision = shape;
+
+            models[model_count++] = geometry;
+            
         }
     }
 }
@@ -303,7 +360,7 @@ void map_clear_models()
 {
     for (int i=0; i < model_count; i++)
     {
-        UnloadModel(models[i]);
+        UnloadModel(models[i].model);
     }
 }
 
@@ -328,7 +385,9 @@ void map_draw_models()
 {
     for (int i=0; i < model_count; i++)
     {
-        DrawModel(models[i], (Vector3){0}, 1.0f, WHITE);
+        DrawModel(models[i].model, (Vector3){0}, 1.0f, WHITE);
+        DrawModelWires(models[i].model,(Vector3){0}, 1.0f, WHITE);
+        //DrawBoundingBox(models[i].bounds,PURPLE);
     }
 }
 
@@ -342,7 +401,7 @@ void map_draw_model_wireframes()
     //draw wireframe reflecting the Geometry coords
     for (int i=0; i < model_count; i++)
     {
-        DrawModelWires(models[i], (Vector3){0}, 1.0f, RED);
+        DrawModelWires(models[i].model, (Vector3){0}, 1.0f, RED);
     }
 
     // Draws wireframe reflecting Trenchbroom original brush coords

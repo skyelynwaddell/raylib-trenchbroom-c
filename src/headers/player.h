@@ -7,9 +7,7 @@
 
 typedef struct {
     GameObject gameobject;
-    CollisionBox collision_box;
     int health;
-    float speed;
 } Player;
 
 extern Player player;
@@ -17,5 +15,9 @@ extern Player player;
 void player_init();
 void player_update();
 void player_draw();
+
+Vector3 player_get_move_dir();
+void player_jump();
+void player_handle_jump();
 
 #endif // PLAYER_H

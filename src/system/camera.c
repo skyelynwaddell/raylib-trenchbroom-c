@@ -10,7 +10,7 @@ int camera_move_spd;
 
 /*
 camera_init
--- creates the 3d camera object
+Creates the 3d camera object
 */
 void camera_init()
 {
@@ -22,7 +22,11 @@ void camera_init()
     camera_mode = CAMERA_FIRST_PERSON;
 }
 
-// Keep yaw and pitch persistent (static or 
+
+/*
+camera_follow_player
+Makes the Camera follow the Player target in First Person
+*/
 void camera_follow_player(Camera3D *camera, Player *target)
 {
     Vector2 mouseDelta = GetMouseDelta();
@@ -53,23 +57,35 @@ void camera_follow_player(Camera3D *camera, Player *target)
     camera->up = (Vector3){0.0f, 1.0f, 0.0f};
 
     // Optionally update player's yaw (to rotate player model with camera)
-   // target->parent.rotation.y = yaw; // if your player has rotation property
+    // target->parent.rotation.y = yaw; // if your player has rotation property
 }
 
 
+/*
+camera_get_forward
+Gets the forward direction of the camera
+*/
 Vector3 camera_get_forward(Camera *camera)
 {
     return Vector3Normalize(Vector3Subtract(camera->target, camera->position));
 }
 
-// Returns the cameras up vector (normalized)
-// Note: The up vector might not be perpendicular to the forward vector
+
+/*
+camera_get_up
+Returns the cameras up vector (normalized)
+Note: The up vector might not be perpendicular to the forward vector
+*/
 Vector3 camera_get_up(Camera *camera)
 {
     return Vector3Normalize(camera->up);
 }
 
-// Returns the cameras right vector (normalized)
+
+/*
+camera_get_right
+Returns the cameras right vector (normalized)
+*/
 Vector3 camera_get_right(Camera *camera)
 {
     Vector3 forward = camera_get_forward(camera);
@@ -78,10 +94,14 @@ Vector3 camera_get_right(Camera *camera)
     return Vector3Normalize(Vector3CrossProduct(forward, up));
 }
 
-// Rotates the camera around its up vector
-// Yaw is "looking left and right"
-// If rotateAroundTarget is false, the camera rotates around its position
-// Note: angle must be provided in radians
+
+/*
+camera_yaw
+Rotates the camera around its up vector
+Yaw is "looking left and right"
+If rotateAroundTarget is false, the camera rotates around its position
+Note: angle must be provided in radians
+*/
 void camera_yaw(Camera *camera, float angle, bool rotateAroundTarget)
 {
     // Rotation axis
@@ -106,11 +126,14 @@ void camera_yaw(Camera *camera, float angle, bool rotateAroundTarget)
 }
 
 
-// Rotates the camera around its right vector, pitch is "looking up and down"
-//  - lockView prevents camera overrotation (aka "somersaults")
-//  - rotateAroundTarget defines if rotation is around target or around its position
-//  - rotateUp rotates the up direction as well (typically only usefull in CAMERA_FREE)
-// NOTE: angle must be provided in radians
+/*
+camera_pitch
+Rotates the camera around its right vector, pitch is "looking up and down"
+lockView prevents camera overrotation (aka "somersaults")
+rotateAroundTarget defines if rotation is around target or around its position
+rotateUp rotates the up direction as well (typically only usefull in CAMERA_FREE)
+NOTE: angle must be provided in radians
+*/
 void camera_pitch(Camera *camera, float angle, bool lockView, bool rotateAroundTarget, bool rotateUp)
 {
     // Up direction
@@ -160,9 +183,13 @@ void camera_pitch(Camera *camera, float angle, bool lockView, bool rotateAroundT
     }
 }
 
-// Rotates the camera around its forward vector
-// Roll is "turning your head sideways to the left or right"
-// Note: angle must be provided in radians
+
+/*
+camera_roll
+Rotates the camera around its forward vector
+Roll is "turning your head sideways to the left or right"
+Note: angle must be provided in radians
+*/
 void camera_roll(Camera *camera, float angle)
 {
     // Rotation axis

@@ -2,6 +2,10 @@
 #include "raylib.h"
 #include "raymath.h"
 
+/*
+collisionbox_set
+Sets all of a collision box's properties
+*/
 void collisionbox_set(CollisionBox *box, Vector3 _position, Vector3 _size, int _scale)
 {
     box->position = _position;
@@ -12,8 +16,8 @@ void collisionbox_set(CollisionBox *box, Vector3 _position, Vector3 _size, int _
 
 /*
 collisionbox_update_aabb
-Called after you update a CollisionBox position, scale and/or size
-or else no affect will be made to the collisionbox
+! Call after you update a CollisionBox position, scale and/or size
+or else no affect will be made to the collisionbox !
 */
 void collisionbox_update_aabb(CollisionBox *box)
 {
@@ -22,6 +26,11 @@ void collisionbox_update_aabb(CollisionBox *box)
     box->bounding_box.max = Vector3Add(box->position, half);
 }
 
+/*
+collisionbox_set_position
+Sets the xyz of the collisionbox, use this to make collisionbox
+follow a player etc.
+*/
 void collisionbox_set_position(CollisionBox *box, Vector3 _position)
 {
     box->position = _position;
