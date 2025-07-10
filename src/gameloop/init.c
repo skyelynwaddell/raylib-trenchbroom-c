@@ -14,6 +14,7 @@ init
 */
 void init()
 {
+    printf("### Skyesrc ###\n");
     camera_init();
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE);
     DisableCursor(); // Limit cursor to relative movement inside the window

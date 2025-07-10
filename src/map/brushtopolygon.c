@@ -52,7 +52,7 @@ polygon_generate_from_brush
 */
 void polygon_generate_from_brush(Brush *brush)
 {
-    printf("Setting vertex counts to 0...\n");
+    //printf("Setting vertex counts to 0...\n");
     for (int i=0; i < brush->brush_face_count; i++)
     {
         brush->polys[i].vertex_count = 0;
@@ -61,7 +61,7 @@ void polygon_generate_from_brush(Brush *brush)
     for (int i=0; i < brush->brush_face_count - 2; i++){
         for (int j = i+1; j < brush->brush_face_count -1; j++){
             for (int k = j + 1; k < brush->brush_face_count; k++){
-                printf("Generating plane: ");
+                //printf("Generating plane: ");
 
                 //create planes from brush faces
                 Plane plane_i = brushface_to_plane(brush->brush_faces[i]);
@@ -75,7 +75,7 @@ void polygon_generate_from_brush(Brush *brush)
                     plane_i.distance, plane_j.distance, plane_k.distance, &p
                 )) 
                 {
-                    printf("FAILED.\n");
+                    //printf("FAILED.\n");
                     continue;
                 }
 
@@ -87,7 +87,7 @@ void polygon_generate_from_brush(Brush *brush)
                     if (Vector3DotProduct(test_plane.normal, p) + test_plane.distance < -0.001f)
                     {
                         //point is outside reject it
-                        printf("FAILED.\n");
+                        //printf("FAILED.\n");
                         legal = false;
                         break;
                     }
@@ -99,7 +99,8 @@ void polygon_generate_from_brush(Brush *brush)
                     int success = false; // checks if the plane creating was success
 
                     ///checks for i
-                    if (!polygon_has_vertex(&brush->polys[i],p) && (brush->polys[i].vertex_count < MAX_VERTICES_PER_FACE))
+                    if (!polygon_has_vertex(&brush->polys[i],p) && 
+                    (brush->polys[i].vertex_count < MAX_VERTICES_PER_FACE))
                     {
                         success = true;
                         brush->polys[i].vertices[brush->polys[i].vertex_count++] = p;
@@ -107,7 +108,8 @@ void polygon_generate_from_brush(Brush *brush)
 
 
                     ///checks for j
-                    if (!polygon_has_vertex(&brush->polys[j],p) && brush->polys[j].vertex_count < MAX_VERTICES_PER_FACE)
+                    if (!polygon_has_vertex(&brush->polys[j],p) && 
+                    brush->polys[j].vertex_count < MAX_VERTICES_PER_FACE)
                     {
                         success = true;
                         brush->polys[j].vertices[brush->polys[j].vertex_count++] = p;
@@ -115,15 +117,16 @@ void polygon_generate_from_brush(Brush *brush)
 
 
                     ///checks for k
-                    if (!polygon_has_vertex(&brush->polys[k],p) && brush->polys[k].vertex_count < MAX_VERTICES_PER_FACE)
+                    if (!polygon_has_vertex(&brush->polys[k],p) && 
+                    brush->polys[k].vertex_count < MAX_VERTICES_PER_FACE)
                     {
                         success = true;
                         brush->polys[k].vertices[brush->polys[k].vertex_count++] = p;
                     }
 
                     /// print if the creation was successful or not
-                    if (success == true) printf("SUCCESS.\n");
-                    else printf("FAILED.\n");
+                    //if (success == true) printf("SUCCESS.\n");
+                    //else printf("FAILED.\n");
                 }
             }
         }

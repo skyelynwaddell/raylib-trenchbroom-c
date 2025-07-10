@@ -134,8 +134,13 @@ rotateAroundTarget defines if rotation is around target or around its position
 rotateUp rotates the up direction as well (typically only usefull in CAMERA_FREE)
 NOTE: angle must be provided in radians
 */
-void camera_pitch(Camera *camera, float angle, bool lockView, bool rotateAroundTarget, bool rotateUp)
-{
+void camera_pitch(
+    Camera *camera, 
+    float angle, 
+    bool lockView, 
+    bool rotateAroundTarget, 
+    bool rotateUp
+){
     // Up direction
     Vector3 up = camera_get_up(camera);
 

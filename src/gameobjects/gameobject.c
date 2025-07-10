@@ -117,7 +117,6 @@ Applies vertical gravity to the player object
 */
 void apply_gravity(GameObject *obj)
 {
-    // apply gravity
     obj->yspd += obj->gravity;
 }
 
@@ -126,55 +125,46 @@ void apply_gravity(GameObject *obj)
 check_collisions
 Handles all the X Y Z collisions between obj and walls/floors/ceilings
 */
-void check_collisions(GameObject *obj, Vector3 move_dir, float move_spd, int is_player)
+void check_collisions(GameObject *obj, int is_player)
 {
-    // check for Floor collisions
-    // --- try Y movement ---
-    Vector3 try_move_y = { 0.0f, obj->yspd, 0.0f };
-    Vector3 test_pos_y = Vector3Add(obj->position, try_move_y);
-    collisionbox_set_position(&obj->collision_box, test_pos_y);
+    Vector3 original_pos = obj->position;
+    float dt = GetFrameTime();
+
+    // ---- Y axis (gravity + jump) ----
+    Vector3 moveY = { 0.0f, obj->yspd * dt, 0.0f };
+    Vector3 testY = Vector3Add(obj->position, moveY);
+    collisionbox_set_position(&obj->collision_box, testY);
 
     if (!place_meeting_solid(obj)) {
-        // falling
-        obj->position.y += obj->yspd;
-        
-        if (is_player == true) 
-            global_player_onground = false;
-    } 
-    else 
-    {
-        // on floor
-        if (obj->yspd < 0.0f && is_player == true) 
-            global_player_onground = true;
-
+        obj->position.y += moveY.y;
+        if (is_player) global_player_onground = false;
+    } else {
+        if (obj->yspd < 0 && is_player) global_player_onground = true;
         obj->yspd = 0.0f;
     }
 
-    // check for wall collisions
-    if (Vector3Length(move_dir) > 0.0f)
-    {
-        move_dir = Vector3Normalize(move_dir);
-        move_dir = Vector3Scale(move_dir, move_spd);
+    // ---- X axis ----
+    Vector3 moveX = { obj->velocity.x * dt, 0.0f, 0.0f };
+    Vector3 testX = Vector3Add(obj->position, moveX);
+    collisionbox_set_position(&obj->collision_box, testX);
 
-        Vector3 original_pos = obj->position;
-
-        // --- try X movement ---
-        Vector3 try_move_x = { move_dir.x, 0.0f, 0.0f };
-        Vector3 test_pos_x = Vector3Add(original_pos, try_move_x);
-        collisionbox_set_position(&obj->collision_box, test_pos_x);
-        if (!place_meeting_solid(obj)) {
-            obj->position.x += move_dir.x;
-        }
-
-        // --- try Z movement ---
-        Vector3 try_move_z = { 0.0f, 0.0f, move_dir.z };
-        Vector3 test_pos_z = Vector3Add(original_pos, (Vector3){obj->position.x - original_pos.x, 0.0f, 0.0f});
-        test_pos_z = Vector3Add(test_pos_z, try_move_z);
-        collisionbox_set_position(&obj->collision_box, test_pos_z);
-        if (!place_meeting_solid(obj)) {
-            obj->position.z += move_dir.z;
-        }
+    if (!place_meeting_solid(obj)) {
+        obj->position.x += moveX.x;
+    } else {
+        obj->velocity.x = 0.0f;
     }
-    // set final collision box position
+
+    // ---- Z axis ----
+    Vector3 moveZ = { 0.0f, 0.0f, obj->velocity.z * dt };
+    Vector3 testZ = Vector3Add(obj->position, moveZ);
+    collisionbox_set_position(&obj->collision_box, testZ);
+
+    if (!place_meeting_solid(obj)) {
+        obj->position.z += moveZ.z;
+    } else {
+        obj->velocity.z = 0.0f;
+    }
+
+    // Final update of the collision box
     collisionbox_set_position(&obj->collision_box, obj->position);
 }

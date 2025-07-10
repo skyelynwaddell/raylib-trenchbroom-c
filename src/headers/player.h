@@ -8,6 +8,7 @@
 typedef struct {
     GameObject gameobject;
     int health;
+    int jump_height;
 } Player;
 
 extern Player player;
@@ -16,7 +17,7 @@ void player_init();
 void player_update();
 void player_draw();
 
-Vector3 player_get_move_dir();
+void player_movement();
 void player_jump();
 void player_handle_jump();
 

@@ -9,6 +9,8 @@
 #include "collisionbox.h"
 #include "geometry.h"
 #include "float.h"
+#include "global.h"
+#include "player.h"
 
 Map map; // stores the currently loaded map
 Geometry models[10000]; // if you have more than 10,000 map brushes, you need a second map...
@@ -40,12 +42,17 @@ int map_parse(const char* filename)
     printf("Successfully opened map: %s\n", fullpath);
 
     char line[MAX_LINE];
-    int in_entity = 0;
-    int in_brush = 0;
+    int in_entity = false;
+    int in_brush = false;
+    int current_entity_has_brush = false;
+
     Brush current_brush = {0};
     int current_brushface_index = 0;
 
+    Entity current_entity = {0};
+    int current_entity_index = 0;
 
+    // Loop through all text in the .map file
     while (fgets(line, sizeof(line), file))
     {
         char* trimmed = line;
@@ -54,79 +61,148 @@ int map_parse(const char* filename)
         while(*trimmed == ' ' || *trimmed == '\t') trimmed++;
 
         //skip comments and empty lines
-        //trimmed[strcspn(trimmed, "\r\n")] = 0;
         if (trimmed[0] == '/' && trimmed[1] == '/') continue;
         if (trimmed[0] == '\n' || trimmed[0] == '\0') continue;
 
-        if (strcmp(trimmed, "{\n") == 0)
+        /*
+        Object Start {
+        ----------------------------------
+        */
+        if (strcmp(trimmed, "{\n") == false)
         {
             if (in_entity && !in_brush)
             {
-                in_brush = 1;
+                // Brush Start
+                in_brush = true;
                 current_brushface_index = 0; // restart brush 
                 memset(&current_brush, 0, sizeof(Brush)); //clear brush struct
-                //printf(" Brush start\n");
             }
             else if (!in_entity)
             {
-                in_entity = 1;
-                //printf("Entity start\n");
+                // Entity Start
+                in_entity = true;
+                current_entity_index = 0; // restart entity
+                memset(&current_entity, 0, sizeof(Entity));
             }
             continue;
         }
+        /*
+        ----------------------------------
+        */
 
-        if (strcmp(trimmed, "}\n") == 0)
+
+        /*
+        Object End }
+        ----------------------------------
+        */
+        if (strcmp(trimmed, "}\n") == false)
         {
             if (in_brush)
             {
-                if (map.brush_count < MAX_BRUSHES)
-                {
+                if (map.brush_count < MAX_BRUSHES) 
                     map.brushes[map.brush_count++] = current_brush;
-                    // TODO : Create CollisionBox for each brush
-                    printf("Created BRUSH %i \n \n", map.brush_count-1);
-                }
-                in_brush = 0;
-                //printf(" Brush end\n");
+                in_brush = false;
             }
+            
             else if (in_entity)
             {
-                in_entity = 0;
-                //printf("Entity end\n");
+                /*
+                Parse Entity Classname's
+                ----------------------------------
+                */
+                    // info_player_start
+                    if (string_equals(current_entity.classname, "info_player_start"))
+                    {
+                        global_player_spawn = convert_entity_origin(current_entity.origin);
+                    }
+                /*
+                ----------------------------------
+                */
+
+                // Add Entity to array
+                if (map.entity_count < MAX_ENTITIES) 
+                    map.entities[map.entity_count++] = current_entity;
+                in_entity = false;
             }
             continue;
         }
+        /*
+        ----------------------------------
+        */
 
-        //get key value pairs
+
+        /*
+        Parse Entity
+        ----------------------------------
+        */
         if (in_entity && !in_brush)
         {
             char key[128], value[128];
 
             if (sscanf(trimmed, "\"%127[^\"]\" \"%127[^\"]\"", key, value) == 2) 
             {
-                //printf("  Property: %s = %s\n", key, value);
+                if (strstr(key, "classname") == 0)
+                    printf("  Property: %s = %s\n", key, value);
+                else
+                    printf("\n  Entity: %s = %s\n", key, value);
+                    
 
-                // Get the Map Version of the Map file
+                /*
+                Map Version
+                ----------------------------------
+                */
                 if (string_equals(key, "mapversion"))
                 {
                     map.mapversion = atoi(value);
                     printf("Map Version: %i \n", map.mapversion);
 
-                    //validate map is valve 220
                     if (map.mapversion != 220){
                         printf("Only support for valve 220 .map files currently...");
+                        CloseWindow();
                     }
                 }
+                /*
+                ----------------------------------
+                */
 
+
+                /*
+                Set Current Entity Properties
+                ----------------------------------
+                */
+                    // classname
+                    if (string_equals(key, "classname"))
+                    {
+                        strcpy(current_entity.classname, value);
+                    }
+
+                    // origin
+                    if (string_equals(key, "origin"))
+                    {
+                        sscanf(value, "%f %f %f", &current_entity.origin.x, &current_entity.origin.z, &current_entity.origin.y);
+                    }
+
+                    // set optional properties
+                    
+
+                /*
+                ----------------------------------
+                */
             }
         }
+        /*
+        ----------------------------------
+        */
 
 
-        //parse brush face
+        /*
+        Parse Brush Face
+        ----------------------------------
+        */
         if (in_brush)
         {
             BrushFace brushface = {0};
             char texture_name[64];
-            //printf("   Brush Face: %s", trimmed);
 
             int matched = sscanf(trimmed,
                 "( %f %f %f ) ( %f %f %f ) ( %f %f %f ) %63s [ %f %f %f %f ] [ %f %f %f %f ] %i %i %i",
@@ -139,39 +215,36 @@ int map_parse(const char* filename)
                 &brushface.uv_rotation, &brushface.u_scale, &brushface.v_scale
             );
 
-            // success
-            if (matched == 21)
+            int SUCCESS = 21;
+            if (matched == SUCCESS)
             {
+                // success
                 // get texture name
                 strncpy(brushface.texture, texture_name, sizeof(brushface.texture));
                 brushface.texture[sizeof(brushface.texture) - 1] = '\0';
-
-                //re-orientate the map so its not sideways
-                //brushface.pos_1 = convert_trenchbroom_to_raylib_axis(brushface.pos_1);
-                //brushface.pos_2 = convert_trenchbroom_to_raylib_axis(brushface.pos_2);
-                //brushface.pos_3 = convert_trenchbroom_to_raylib_axis(brushface.pos_3);
 
                 if (current_brushface_index < BRUSH_FACE_COUNT)
                 {
                     current_brush.brush_faces[current_brushface_index++] = brushface;
                     current_brush.brush_face_count = current_brushface_index;
-                    brushface_print(brushface, current_brushface_index);
                 }
-
             } else {
-                //failed
+                // failed
                 printf("!!! Failed to parse brush face line: %s (matched %d)\n", trimmed, matched);
             }
         }
+        /*
+        ----------------------------------
+        */
     }
 
-    printf("Loaded %i brushes. \n", map.brush_count);
+    printf("Loaded %i Geometry Brushes. \n", map.brush_count);
 
     //generate polygons
     printf("Generating map polygons from brushes.... \n");
     for (int i=0; i < map.brush_count; i++)
     {
-        printf("Generating Polygon: %i \n", i);
+        //printf("Generating Polygon: %i \n", i);
         polygon_generate_from_brush(&map.brushes[i]);
         
         // loop over all faces in brush
@@ -333,7 +406,6 @@ void map_create_models()
             };
             }
 
-
             UploadMesh(&mesh, false);
             Model model = LoadModelFromMesh(mesh);
             model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
@@ -403,27 +475,4 @@ void map_draw_model_wireframes()
     {
         DrawModelWires(models[i].model, (Vector3){0}, 1.0f, RED);
     }
-
-    // Draws wireframe reflecting Trenchbroom original brush coords
-    /// DRAWS DEBUG WIREFRAME OF THE OBJECT
-        // for (int i = 0; i < map.brush_count; i++)
-        // {
-        //     Brush *brush = &map.brushes[i];
-
-        //     //printf("Attempting to draw brush...");
-        //     for (int j = 0; j < brush->brush_face_count; j++)
-        //     {
-        //         //printf("Brushface data:\n");
-        //         //brushface_print(brush->brush_faces[j], j);
-        //         Polygon *poly = &brush->polys[j];
-
-        //         for (int k = 0; k < poly->vertex_count; k++)
-        //         {
-        //             Vector3 a = poly->vertices[k];
-        //             Vector3 b = poly->vertices[(k + 1) % poly->vertex_count];
-        //             DrawLine3D(a, b, RED);
-        //             DrawPoint3D(a, BLUE);
-        //         }
-        //     }
-        // }
 }

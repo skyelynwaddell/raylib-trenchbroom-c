@@ -15,24 +15,26 @@ Called when the player object first enters the world
 */
 void player_init()
 {
+    printf("### Player Object Created ###\n");
+
     // spawn position
     player.gameobject.position = global_player_spawn;
 
     // create player collision box
     float h = 4.0f; // units tall
     float w = 1.0f; // units thick/wide
-    int scale = 1;  // collision box scale
     collisionbox_set(
         &player.gameobject.collision_box,
         player.gameobject.position,
-        (Vector3){ w, h, w }, 
-        scale
+        (Vector3){ w, h, w },
+        1
     );
 
     // set player stats
     player.health = 100;
-    player.gameobject.speed = 10.0f;
-    player.gameobject.gravity = -0.0001f;
+    player.jump_height = 20.0;
+    player.gameobject.speed = 20.0f;
+    player.gameobject.gravity = -0.1f;
 };
 
 
@@ -44,54 +46,58 @@ void player_update()
 {
     if (global_paused) return;
 
-    float move_spd = to_delta(player.gameobject.speed);
-    Vector3 move_dir = player_get_move_dir();
-
+    player_movement();
     apply_gravity(&player);
     player_handle_jump();
-    check_collisions(&player, move_dir, move_spd, true);
+    check_collisions(&player, true);
     camera_follow_player(&camera, &player);
 }
 
 
 /*
-player_draw
-Any calls to draw 3d objects on the player can be put here
-ie. collision box shape, 3rd person player model, etc
-NOTE: For drawing weapons, hands, arms etc. see Viewmodel to draw instead
+player_movement
+Handles player directional input, movement, acceleration, and friction
 */
-void player_draw()
+void player_movement()
 {
-    DrawBoundingBox(player.gameobject.collision_box.bounding_box, RED);
-}
-
-
-/*
-player_get_move_dir
-Calculates the players movement direction from the control inputs
-*/
-Vector3 player_get_move_dir()
-{
-    // get intial input values
     float input_x = (IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
     float input_z = (IsKeyDown(KEY_W) - IsKeyDown(KEY_S));
 
-    // move in the camera direction
-    Vector3 forward = { sinf(global_cam_yaw), 0.0f, cosf(global_cam_yaw) };
+    float input_len = sqrtf(input_x * input_x + input_z * input_z);
+    if (input_len > 0.0f) {
+        input_x /= input_len;
+        input_z /= input_len;
+    }
+
+    Vector3 forward = { sinf(global_cam_yaw), 0.0f, cosf(global_cam_yaw)  };
     Vector3 right   = { cosf(global_cam_yaw), 0.0f, -sinf(global_cam_yaw) };
 
-    // calculate final move val
     Vector3 move_dir = {
         forward.x * input_z + right.x * input_x,
         0.0f,
         forward.z * input_z + right.z * input_x
     };
 
-    // normalize speed when we are moving forward and horizontal
-    float len = Vector3Length(move_dir);
-    if (len > 0.0f) move_dir = Vector3Scale(move_dir, 1.0f / len);
+    float accel = 10.0f;
+    float fric = 10.0f;
+    float air_fric = 1.0f;
+    float dt = GetFrameTime();
 
-    return move_dir;
+    if (input_len > 0.0f)
+    {
+        Vector3 desired = Vector3Scale(move_dir, player.gameobject.speed);
+        Vector3 delta = Vector3Subtract(desired, (Vector3){ player.gameobject.velocity.x, 0.0f, player.gameobject.velocity.z });
+        Vector3 accel_step = Vector3Scale(delta, accel * dt);
+        player.gameobject.velocity.x += accel_step.x;
+        player.gameobject.velocity.z += accel_step.z;
+    }
+    else
+    {
+        // apply friction only when no input
+        float current_fric = global_player_onground ? fric : air_fric;
+        player.gameobject.velocity.x = Lerp(player.gameobject.velocity.x, 0.0f, current_fric * dt);
+        player.gameobject.velocity.z = Lerp(player.gameobject.velocity.z, 0.0f, current_fric * dt);
+    }
 }
 
 
@@ -101,7 +107,7 @@ Call this to invoke the player jumping into the air
 */
 void player_jump()
 {
-    player.gameobject.yspd = 0.02f;
+    player.gameobject.yspd = player.jump_height;
     global_player_onground = false;
 }
 
@@ -115,4 +121,17 @@ void player_handle_jump()
     // jump
     if (IsKeyPressed(KEY_SPACE) && global_player_onground)
         player_jump();
+}
+
+
+/*
+player_draw
+Any calls to draw 3d objects on the player can be
+ie. collision box shape etc
+For drawing weapons, hands, arms etc. see Viewmodel to draw instead
+This is for actual player model etc not the arms or view model weapon.
+*/
+void player_draw()
+{
+    DrawBoundingBox(player.gameobject.collision_box.bounding_box, RED);
 }

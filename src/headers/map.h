@@ -18,6 +18,7 @@ extern int model_count;
 typedef struct {
     int mapversion;
     int brush_count;
+    int entity_count;
     Brush brushes[MAX_BRUSHES]; //contains all the brush faces in a map
     Entity entities[MAX_ENTITIES];
 } Map; 
