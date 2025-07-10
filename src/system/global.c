@@ -4,7 +4,6 @@
 
 // game/system properties
 int global_paused = false; // Game pause state
-Event events[255];
 
 // camera properties
 float global_cam_yaw = 0.0f;   // left/right

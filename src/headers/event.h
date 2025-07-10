@@ -13,7 +13,9 @@ enum EVENT_TYPE {
     MAP_START,
 };
 
+extern Event events[];
+
 void event_create(enum EVENT_TYPE event_type);
-void print(char string);
+void print(const char *string);
 
 #endif // EVENT_H

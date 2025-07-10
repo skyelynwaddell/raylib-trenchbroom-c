@@ -1,27 +1,6 @@
 #include "../headers/utils.h"
 #include "string.h"
 
-
-Vector3 convert_origin_to_raylib(Vector3 trench_origin, float scale)
-{
-    return (Vector3){
-        trench_origin.x * scale,  // X stays X
-        trench_origin.z * scale,  // Z (height) becomes Y
-        -trench_origin.y * scale   // Y becomes Z (forward/back)
-    };
-}
-
-
-
-float approach(float current, float target, float delta)
-{
-    float diff = target - current;
-    if (fabsf(diff) <= delta)
-        return target;
-    return current + copysignf(delta, diff);
-}
-
-
 /*
 string_equals
 string[char* string] - The first string to be compared

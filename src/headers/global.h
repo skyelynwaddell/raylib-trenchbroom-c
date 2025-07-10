@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "./defs.h"
-#include "event.h"
 
 // Global variables
 
@@ -15,8 +14,6 @@ extern float global_cam_pitch; // up/down
 
 extern Vector3 global_player_spawn;
 extern int global_player_onground;
-
-extern Event events[255];
 
 void pause_toggle(); // Toggle pause state
 float to_delta(float value);

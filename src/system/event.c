@@ -1,7 +1,8 @@
 #include "event.h"
 
+Event events[255];
 
-void print(const char string)
+void print(const char *string)
 {
     printf("%s\n", string);
 }
