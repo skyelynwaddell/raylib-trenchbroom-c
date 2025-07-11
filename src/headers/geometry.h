@@ -2,12 +2,12 @@
 #define GEOMETRY_H
 
 #include "raylib.h"
-#include "collisiontriangle.h"
+#include "collisionpolygon.h"
 
 typedef struct {
     Model model;
     BoundingBox bounds;
-    CollisionTriangle collision;
+    CollisionPolygon collision;
 } Geometry;
 
 

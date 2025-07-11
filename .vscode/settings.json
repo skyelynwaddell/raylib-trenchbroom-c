@@ -25,6 +25,13 @@
         "raymath.h": "c",
         "gameobject.h": "c",
         "event.h": "c",
-        "entity.h": "c"
-    }
+        "entity.h": "c",
+        "geometry.h": "c",
+        "texturemanager.h": "c",
+        "float.h": "c",
+        "rlights.h": "c",
+        "lights.h": "c",
+        "draw_viewmodel.h": "c",
+        "player.h": "c"
+    },
 }

@@ -8,6 +8,4 @@ typedef struct {
     Vector3 origin;
 } Entity;
 
-Vector3 convert_entity_origin(Vector3 trench_origin);
-
 #endif // ENTITY_H

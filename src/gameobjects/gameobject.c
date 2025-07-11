@@ -27,10 +27,10 @@ int place_meeting_solid(GameObject *object)
 
 /*
 CheckCollisionBoxesExt
-Checks for a collision between a BoundingBox and a CollisionTriangle
+Checks for a collision between a BoundingBox and a CollisionPolygon
 For expensive calculations against players simple BoundingBox and a Polygonal Brush/Geometry in the world
 */
-int CheckCollisionBoxesExt(BoundingBox box, CollisionTriangle shape)
+int CheckCollisionBoxesExt(BoundingBox box, CollisionPolygon shape)
 {
     for (int i=0; i<shape.count; i++)
     {
@@ -117,7 +117,7 @@ Applies vertical gravity to the player object
 */
 void apply_gravity(GameObject *obj)
 {
-    obj->yspd += obj->gravity;
+    obj->velocity.y += obj->gravity;
 }
 
 
@@ -131,7 +131,7 @@ void check_collisions(GameObject *obj, int is_player)
     float dt = GetFrameTime();
 
     // ---- Y axis (gravity + jump) ----
-    Vector3 moveY = { 0.0f, obj->yspd * dt, 0.0f };
+    Vector3 moveY = { 0.0f, obj->velocity.y * dt, 0.0f };
     Vector3 testY = Vector3Add(obj->position, moveY);
     collisionbox_set_position(&obj->collision_box, testY);
 
@@ -139,8 +139,8 @@ void check_collisions(GameObject *obj, int is_player)
         obj->position.y += moveY.y;
         if (is_player) global_player_onground = false;
     } else {
-        if (obj->yspd < 0 && is_player) global_player_onground = true;
-        obj->yspd = 0.0f;
+        if (obj->velocity.y < 0 && is_player) global_player_onground = true;
+        obj->velocity.y = 0.0f;
     }
 
     // ---- X axis ----

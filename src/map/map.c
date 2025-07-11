@@ -11,6 +11,7 @@
 #include "float.h"
 #include "global.h"
 #include "player.h"
+#include "lights.h"
 
 Map map; // stores the currently loaded map
 Geometry models[10000]; // if you have more than 10,000 map brushes, you need a second map...
@@ -113,7 +114,7 @@ int map_parse(const char* filename)
                     // info_player_start
                     if (string_equals(current_entity.classname, "info_player_start"))
                     {
-                        global_player_spawn = convert_entity_origin(current_entity.origin);
+                        global_player_spawn = trench_to_raylib_origin(current_entity.origin);
                     }
                 /*
                 ----------------------------------
@@ -156,7 +157,8 @@ int map_parse(const char* filename)
                     map.mapversion = atoi(value);
                     printf("Map Version: %i \n", map.mapversion);
 
-                    if (map.mapversion != 220){
+                    if (map.mapversion != 220)
+                    {
                         printf("Only support for valve 220 .map files currently...");
                         CloseWindow();
                     }
@@ -170,6 +172,8 @@ int map_parse(const char* filename)
                 Set Current Entity Properties
                 ----------------------------------
                 */
+                    // ### mandatory properties ###
+
                     // classname
                     if (string_equals(key, "classname"))
                     {
@@ -182,7 +186,13 @@ int map_parse(const char* filename)
                         sscanf(value, "%f %f %f", &current_entity.origin.x, &current_entity.origin.z, &current_entity.origin.y);
                     }
 
-                    // set optional properties
+                    // ### entity specific properties ###
+
+                    // light properties
+                    if (current_entity.classname == "light")
+                    {
+                        
+                    }
                     
 
                 /*
@@ -228,7 +238,9 @@ int map_parse(const char* filename)
                     current_brush.brush_faces[current_brushface_index++] = brushface;
                     current_brush.brush_face_count = current_brushface_index;
                 }
-            } else {
+            } 
+            else 
+            {
                 // failed
                 printf("!!! Failed to parse brush face line: %s (matched %d)\n", trimmed, matched);
             }
@@ -238,7 +250,7 @@ int map_parse(const char* filename)
         */
     }
 
-    printf("Loaded %i Geometry Brushes. \n", map.brush_count);
+    printf("Created %i brushes. \n", map.brush_count);
 
     //generate polygons
     printf("Generating map polygons from brushes.... \n");
@@ -290,9 +302,9 @@ void map_create_models()
 
             // Centroid calculation (raw)
             Vector3 centroid = {0};
-            for (int i = 0; i < poly->vertex_count; i++) {
+            for (int i = 0; i < poly->vertex_count; i++) 
                 centroid = Vector3Add(centroid, poly->vertices[i]);
-            }
+            
             centroid = Vector3Scale(centroid, 1.0f / poly->vertex_count);
 
             int triangle_count = poly->vertex_count;
@@ -381,12 +393,12 @@ void map_create_models()
 
             int tri_count = mesh.vertexCount / 3;
 
-            CollisionTriangle shape = {
+            CollisionPolygon shape = {
                 .triangles = MemAlloc(sizeof(Triangle) * tri_count),
                 .count = tri_count
             };
 
-            // Triangle Collisions -- More advanced detection
+            // Polygonal Collision Shape -- More advanced detection
             for (int i=0; i<tri_count; i++)
             {
                 shape.triangles[i].a = (Vector3){
@@ -458,6 +470,7 @@ void map_draw_models()
     for (int i=0; i < model_count; i++)
     {
         DrawModel(models[i].model, (Vector3){0}, 1.0f, WHITE);
+        models[i].model.materials[0].shader = sh_light;
         DrawModelWires(models[i].model,(Vector3){0}, 1.0f, WHITE);
         //DrawBoundingBox(models[i].bounds,PURPLE);
     }

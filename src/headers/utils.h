@@ -19,10 +19,8 @@ Vector3Double Vector3DoubleAdd(Vector3Double v1, Vector3Double v2);
 Vector3Double Vector3DoubleSubtract(Vector3Double v1, Vector3Double v2);
 Vector3Double Vector3DoubleNormalize(Vector3Double v);
 Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle);
-Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v);
+Vector3 trench_to_raylib_origin(Vector3 v);
 int string_equals(char* string, char* string_to_compare_to);
-float approach(float current, float target, float delta);
-Vector3 convert_origin_to_raylib(Vector3 trench_origin, float scale);
 
 
 #endif // UTILS_H

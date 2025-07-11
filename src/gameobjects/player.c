@@ -32,9 +32,9 @@ void player_init()
 
     // set player stats
     player.health = 100;
-    player.jump_height = 20.0;
+    player.jump_height = 25.0;
     player.gameobject.speed = 20.0f;
-    player.gameobject.gravity = -0.1f;
+    player.gameobject.gravity = -0.2f;
 };
 
 
@@ -107,7 +107,7 @@ Call this to invoke the player jumping into the air
 */
 void player_jump()
 {
-    player.gameobject.yspd = player.jump_height;
+    player.gameobject.velocity.y = player.jump_height;
     global_player_onground = false;
 }
 

@@ -17,11 +17,12 @@ int string_equals(char* string, char* string_to_compare_to)
 /*
 convert_trenchbroom_to_raylib_axis
 -- raylib and trenchbroom dont use the same xyz axis, so we have to convert this here
--- so our map isnt sideways :P
+-- so our stuff isnt sideways :P
 */
-Vector3 convert_trenchbroom_to_raylib_axis(Vector3 v)
+Vector3 trench_to_raylib_origin(Vector3 v)
 {
-    return (Vector3) { v.x, v.z, -v.y };
+    float s = 0.1; // scale
+    return (Vector3) { v.x*s, v.y*s, -v.z*s };
 }
 
 
