@@ -12,5 +12,5 @@ draw
 */
 void draw()
 {
-    polygon_draw_all();
+    map_draw();
 }

@@ -19,6 +19,7 @@ void brushface_print(BrushFace b, int face_index)
     printf("  V Scale: %d\n", b.v_scale);
 }
 
+
 /*
 --------------------------
 brush_face_to_plane

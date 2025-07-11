@@ -21,6 +21,13 @@
 	_sun_mangle(string) : "Sun mangle (Yaw pitch roll)"
 ]
 
+@baseclass = brush : "Any kind of brush in the world"
+[
+	sector(integer) : "Sector Group Tag [int]"
+]
+
+@SolidClass base(brush) = brush_default : "All brushes must inherit from this if to be culled" []
+
 //
 // base marker definitions
 //
@@ -42,8 +49,6 @@
 	target(target_destination) : "Target"
 	killtarget(target_destination) : "Killtarget"
 ]
-
-
 
 //
 // player starts, deathmatch, coop, teleport

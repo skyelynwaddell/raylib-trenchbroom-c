@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "raylib.h": "c",
         "stdio.h": "c",
         "global.h": "c",
@@ -14,6 +15,23 @@
         "brushclipper.h": "c",
         "triangle.h": "c",
         "polygon.h": "c",
-        "utils.h": "c"
-    }
+        "utils.h": "c",
+        "rcamera.h": "c",
+        "cleanup.h": "c",
+        "stdbool.h": "c",
+        "raygui.h": "c",
+        "__node_handle": "c",
+        "collisionbox.h": "c",
+        "raymath.h": "c",
+        "gameobject.h": "c",
+        "event.h": "c",
+        "entity.h": "c",
+        "geometry.h": "c",
+        "texturemanager.h": "c",
+        "float.h": "c",
+        "rlights.h": "c",
+        "lights.h": "c",
+        "draw_viewmodel.h": "c",
+        "player.h": "c"
+    },
 }
