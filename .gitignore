@@ -1,3 +1,4 @@
 *.exe
+bin
 .DS_STORE
 /maps/autosave
