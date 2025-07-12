@@ -3,7 +3,7 @@ echo Creating bin folder...
 if not exist bin mkdir bin
 
 echo Compiling...
-gcc -g -Wall -std=c99 src\*.c src\system\*.c src\map\*.c src\gameloop\*.c -Isrc/lib/raylib/include -Lsrc/lib/raylib/lib -lraylib -lm -lgdi32 -lwinmm -o bin/game.exe
+gcc -g -Wall -std=c99 src\*.c src\gameobjects\*.c src\system\*.c src\map\*.c src\gameloop\*.c -Isrc/lib/raylib/include -Lsrc/lib/raylib/lib -lraylib -lm -lgdi32 -lwinmm -o bin/game.exe
 
 if %errorlevel% neq 0 (
     echo Compilation failed!

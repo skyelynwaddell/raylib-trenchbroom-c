@@ -13,8 +13,6 @@
 #include "../headers/polygon.h"
 #include "../headers/map.h"
 
-Model models[10000]; // if you have more than 10,000 map brushes, you need a second map...
-int model_count = 0;
 
 /*
 polygon_get_intersection
@@ -54,7 +52,7 @@ polygon_generate_from_brush
 */
 void polygon_generate_from_brush(Brush *brush)
 {
-    printf("Setting vertex counts to 0...\n");
+    //printf("Setting vertex counts to 0...\n");
     for (int i=0; i < brush->brush_face_count; i++)
     {
         brush->polys[i].vertex_count = 0;
@@ -63,13 +61,12 @@ void polygon_generate_from_brush(Brush *brush)
     for (int i=0; i < brush->brush_face_count - 2; i++){
         for (int j = i+1; j < brush->brush_face_count -1; j++){
             for (int k = j + 1; k < brush->brush_face_count; k++){
-                printf("Generating plane: ");
+                //printf("Generating plane: ");
 
                 //create planes from brush faces
                 Plane plane_i = brushface_to_plane(brush->brush_faces[i]);
                 Plane plane_j = brushface_to_plane(brush->brush_faces[j]);
                 Plane plane_k = brushface_to_plane(brush->brush_faces[k]);
-
 
                 //check for intersecting planes in the polygon
                 Vector3 p;
@@ -78,7 +75,7 @@ void polygon_generate_from_brush(Brush *brush)
                     plane_i.distance, plane_j.distance, plane_k.distance, &p
                 )) 
                 {
-                    printf("FAILED.\n");
+                    //printf("FAILED.\n");
                     continue;
                 }
 
@@ -90,7 +87,7 @@ void polygon_generate_from_brush(Brush *brush)
                     if (Vector3DotProduct(test_plane.normal, p) + test_plane.distance < -0.001f)
                     {
                         //point is outside reject it
-                        printf("FAILED.\n");
+                        //printf("FAILED.\n");
                         legal = false;
                         break;
                     }
@@ -99,100 +96,41 @@ void polygon_generate_from_brush(Brush *brush)
                 // this generation of polygon is valid
                 if (legal)
                 {
-                    int success = 0; // checks if the plane creating was success
+                    int success = false; // checks if the plane creating was success
 
                     ///checks for i
-                    if (!polygon_has_vertex(&brush->polys[i],p) && (brush->polys[i].vertex_count < MAX_VERTICES_PER_FACE))
+                    if (!polygon_has_vertex(&brush->polys[i],p) && 
+                    (brush->polys[i].vertex_count < MAX_VERTICES_PER_FACE))
                     {
-                        success = 1;
+                        success = true;
                         brush->polys[i].vertices[brush->polys[i].vertex_count++] = p;
                     }
 
 
                     ///checks for j
-                    if (!polygon_has_vertex(&brush->polys[j],p) && brush->polys[j].vertex_count < MAX_VERTICES_PER_FACE)
+                    if (!polygon_has_vertex(&brush->polys[j],p) && 
+                    brush->polys[j].vertex_count < MAX_VERTICES_PER_FACE)
                     {
-                        success = 1;
+                        success = true;
                         brush->polys[j].vertices[brush->polys[j].vertex_count++] = p;
                     }
 
 
                     ///checks for k
-                    if (!polygon_has_vertex(&brush->polys[k],p) && brush->polys[k].vertex_count < MAX_VERTICES_PER_FACE)
+                    if (!polygon_has_vertex(&brush->polys[k],p) && 
+                    brush->polys[k].vertex_count < MAX_VERTICES_PER_FACE)
                     {
-                        success = 1;
+                        success = true;
                         brush->polys[k].vertices[brush->polys[k].vertex_count++] = p;
                     }
 
                     /// print if the creation was successful or not
-                    if (success == 1) printf("SUCCESS.\n");
-                    else printf("FAILED.\n");
+                    //if (success == true) printf("SUCCESS.\n");
+                    //else printf("FAILED.\n");
                 }
             }
         }
     }
-}
-
-
-/*
-polygon_draw_all
--- draw all polygons generated in the map
-*/
-void polygon_draw_all()
-{
-    polygon_draw_uvs();
-    //polygon_draw_wireframe(); // debug
-
-}
-
-
-/*
-polygon_draw_uvs
--- draws the uvs onto each polygon plane
-*/
-void polygon_draw_uvs()
-{
-    for (int i=0; i < model_count; i++)
-    {
-        DrawModel(models[i], (Vector3){0}, 1.0f, WHITE);
-    }
-}
-
-
-/*
-polygon_draw_wireframe
--- draws a debug wireframe around the polygonal mesh
-*/
-void polygon_draw_wireframe()
-{
-    //draw wireframe reflecting the Geometry coords
-    for (int i=0; i < model_count; i++)
-    {
-        DrawModelWires(models[i], (Vector3){0}, 1.0f, RED);
-    }
-
-    // Draws wireframe reflecting Trenchbroom original brush coords
-    /// DRAWS DEBUG WIREFRAME OF THE OBJECT
-        // for (int i = 0; i < map.brush_count; i++)
-        // {
-        //     Brush *brush = &map.brushes[i];
-
-        //     //printf("Attempting to draw brush...");
-        //     for (int j = 0; j < brush->brush_face_count; j++)
-        //     {
-        //         //printf("Brushface data:\n");
-        //         //brushface_print(brush->brush_faces[j], j);
-        //         Polygon *poly = &brush->polys[j];
-
-        //         for (int k = 0; k < poly->vertex_count; k++)
-        //         {
-        //             Vector3 a = poly->vertices[k];
-        //             Vector3 b = poly->vertices[(k + 1) % poly->vertex_count];
-        //             DrawLine3D(a, b, RED);
-        //             DrawPoint3D(a, BLUE);
-        //         }
-        //     }
-        // }
 }
 
 
@@ -271,11 +209,59 @@ void polygon_sort_vertices(Polygon* poly, Vector3 normal)
 
 
 /*
-polygon_project_to_uv
--- get the UV data from a brushface
+polygon_project_to_uv_standard
+-- get the UV data from a brushface of standard .map type
+*/
+Vector2 polygon_project_to_uv_standard(Vector3 point, BrushFace *face)
+{
+    Vector2 ret;
+    Texture2D texture = texture_get_cached(face->texture);
+    Vector2 texture_size = {texture.width, texture.height};
+    Vector3 normal = brushface_to_plane(*face).normal;
+
+    Vector3 UP = (Vector3){ 0.0f, 0.0f, 1.0f };
+    Vector3 RIGHT = (Vector3){ 0.0f, 1.0f, 0.0f };
+    Vector3 FORWARD = (Vector3){ 1.0f, 0.0f, 0.0f };
+
+    float du = fabs(Vector3DotProduct(normal, UP));
+    float dr = fabs(Vector3DotProduct(normal, RIGHT));
+    float df = fabs(Vector3DotProduct(normal, FORWARD));
+
+    if (du >= dr && du >= df)
+    {
+        ret = (Vector2){ point.x, -point.y };
+    }
+    else if (dr >= du && dr >= df)
+    {
+        ret = (Vector2){ point.x, -point.z };
+    }
+    else if (df >= du && df >= dr)
+    {
+        ret = (Vector2){ point.y, -point.z };
+    }
+
+    float angle = DEG2RAD * face->uv_rotation;
+    ret = Vector2Rotate(ret, angle);
+
+    ret.x /= texture_size.x;
+    ret.y /= texture_size.y;
+
+    ret.x /= face->u_scale;
+    ret.y /= face->v_scale;
+
+    ret.x += face->uv_s.w / texture_size.x;
+    ret.y += face->uv_t.w / texture_size.y;
+
+    return ret;
+}
+
+
+/*
+polygon_project_to_uv_valve220
+-- get the UV data from a brushface of .map version 220
 -- uses valve220 map uv format
 */
-Vector2 polygon_project_to_uv(Vector3 point, BrushFace *face)
+Vector2 polygon_project_to_uv_valve220(Vector3 point, BrushFace *face)
 {
     Texture2D texture = texture_get_cached(face->texture);
     Vector2 textureSize = {texture.width, texture.height};

@@ -21,6 +21,13 @@
 	_sun_mangle(string) : "Sun mangle (Yaw pitch roll)"
 ]
 
+@baseclass = brush : "Any kind of brush in the world"
+[
+	sector(integer) : "Sector Group Tag [int]"
+]
+
+@SolidClass base(brush) = brush_default : "All brushes must inherit from this if to be culled" []
+
 //
 // base marker definitions
 //
@@ -43,8 +50,6 @@
 	killtarget(target_destination) : "Killtarget"
 ]
 
-
-
 //
 // player starts, deathmatch, coop, teleport
 //
@@ -61,4 +66,13 @@
 @PointClass color(200 150 150) = info_null : "info_null (spotlight target)"
 [
 	targetname(target_source) : "Name"
+]
+
+@PointClass base(Appearflags) = light : "Light" 
+[
+	color(color255) : "Color" : "255 255 255"
+	alpha(float) : "Alpha" : 255.0 : "The transparency of the light color"
+	brightness(float) : "Brightness" : 0.6 : "How bright the light is." 
+	radius(float) : "Radius" : 40.0 : "How big the light is."
+	
 ]
