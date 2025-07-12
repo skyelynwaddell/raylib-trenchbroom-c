@@ -5,11 +5,15 @@
 #define SCREEN_HEIGHT 720
 
 #define GAME_TITLE "Skyesrc"
-#define FPS 2000
+#define FPS 2000 // max fps
 
+// brush defs
 #define MAX_COLUMNS 20
 #define MAX_TEXTURES 10000
 #define MAX_POLY_VERTS 64
+
+#define PLAYER_SPAWN_GAP 20 // how high to increase the player spawn gap so isnt stuck in floor
+#define MAX_DARK 0.2 // How dark the room can get without lighting (0 = BLACK)
 
 #define RAYGUI_IMPLEMENTATION
 

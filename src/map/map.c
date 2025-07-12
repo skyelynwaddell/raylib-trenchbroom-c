@@ -1,11 +1,11 @@
-#include "../headers/map.h"
-#include "../headers/brush.h"
-#include "../headers/brushface.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../headers/brushtopolygon.h"
-#include "../headers/texturemanager.h"
+#include "map.h"
+#include "brush.h"
+#include "brushface.h"
+#include "brushtopolygon.h"
+#include "texturemanager.h"
 #include "collisionbox.h"
 #include "geometry.h"
 #include "float.h"
@@ -14,9 +14,14 @@
 #include "lights.h"
 
 Map map; // stores the currently loaded map
+
 Geometry models[10000]; // if you have more than 10,000 map brushes, you need a second map...
 CollisionBox brush_collisions[10000];
 int model_count = 0;
+
+LightObject lights[MAX_LIGHTS];
+int light_index = 0;
+int light_count = 0;
 
 /*
 parse_map
@@ -25,8 +30,8 @@ filename[const char*] -- the filename of the map to be loaded ie. "myamazingmap.
 */
 int map_parse(const char* filename)
 {
-    printf("\n \n");
-    printf("Loading map data...\n");
+    printf("\n");
+    printf("### LOADING MAP FILE ### \n");
     char fullpath[256];
 
     // add maps/ filepath to the filename
@@ -35,12 +40,15 @@ int map_parse(const char* filename)
     FILE* file = fopen(fullpath, "r");
     if (!file)
     {
-        perror("Failed to open .map file!");
-        printf("Tried searching in: %s", fullpath);
+        perror("Failed to open .map file! \n");
+        printf("Tried searching in: %s \n", fullpath);
         return false;
     }
 
-    printf("Successfully opened map: %s\n", fullpath);
+    printf("    Successfully opened map: %s \n \n", fullpath);
+
+    printf("-----------------------------\n");
+    printf("### MAP PROPERTIES ### \n");
 
     char line[MAX_LINE];
     int in_entity = false;
@@ -114,7 +122,33 @@ int map_parse(const char* filename)
                     // info_player_start
                     if (string_equals(current_entity.classname, "info_player_start"))
                     {
-                        global_player_spawn = trench_to_raylib_origin(current_entity.origin);
+                        global_player_spawn = trench_to_raylib_origin(
+                            (Vector3){
+                                current_entity.origin.x,
+                                current_entity.origin.y + PLAYER_SPAWN_GAP,
+                                current_entity.origin.z
+                            }
+                        );
+                    }
+
+                    // light
+                    if (string_equals(current_entity.classname, "light"))
+                    {
+                        LightObject new_light = light_create(
+                            (Color){
+                                current_entity.color.r,
+                                current_entity.color.g,
+                                current_entity.color.b,
+                                current_entity.color.a
+                            },
+                            (float)current_entity.brightness,
+                            trench_to_raylib_origin(current_entity.origin),
+                            (float)current_entity.radius
+                        );
+
+                        // create & store light object
+                        lights[light_index++] = new_light; 
+                        light_count = light_index;
                     }
                 /*
                 ----------------------------------
@@ -145,7 +179,11 @@ int map_parse(const char* filename)
                 if (strstr(key, "classname") == 0)
                     printf("  Property: %s = %s\n", key, value);
                 else
-                    printf("\n  Entity: %s = %s\n", key, value);
+                {
+                    printf("-----------------------------\n\n");
+                    printf("-----------------------------\n");
+                    printf("### Entity: %s = %s ###\n", key, value);
+                }
                     
 
                 /*
@@ -155,8 +193,6 @@ int map_parse(const char* filename)
                 if (string_equals(key, "mapversion"))
                 {
                     map.mapversion = atoi(value);
-                    printf("Map Version: %i \n", map.mapversion);
-
                     if (map.mapversion != 220)
                     {
                         printf("Only support for valve 220 .map files currently...");
@@ -176,24 +212,45 @@ int map_parse(const char* filename)
 
                     // classname
                     if (string_equals(key, "classname"))
-                    {
                         strcpy(current_entity.classname, value);
-                    }
 
                     // origin
                     if (string_equals(key, "origin"))
-                    {
                         sscanf(value, "%f %f %f", &current_entity.origin.x, &current_entity.origin.z, &current_entity.origin.y);
-                    }
 
                     // ### entity specific properties ###
 
-                    // light properties
-                    if (current_entity.classname == "light")
+                    // color
+                    if (string_equals(key, "color")) 
                     {
-                        
+                        float r, g, b;
+                        if (sscanf(value, "%f %f %f", &r, &g, &b) == 3) {
+                            current_entity.color.r = (unsigned char)r;
+                            current_entity.color.g = (unsigned char)g;
+                            current_entity.color.b = (unsigned char)b;
+                        } else {
+                            printf("Warning: Failed to parse color value: %s\n", value);
+                        }
                     }
-                    
+
+                    // alpha
+                    if (string_equals(key, "alpha"))
+                    {
+                        float a;
+                        if (sscanf(value, "%f", &a) == 1) 
+                        {
+                        current_entity.color.a = (unsigned char)a;
+                        }
+                    }
+
+
+                    // brightness
+                    if (string_equals(key, "brightness"))
+                        sscanf(value, "%f", &current_entity.brightness);
+
+                    // radius
+                    if (string_equals(key, "radius"))
+                        sscanf(value, "%f", &current_entity.radius);
 
                 /*
                 ----------------------------------
@@ -249,11 +306,16 @@ int map_parse(const char* filename)
         ----------------------------------
         */
     }
-
-    printf("Created %i brushes. \n", map.brush_count);
+    printf("-----------------------------\n\n");
+    printf("### MAP OBJECTS CREATED ### \n");
+    printf("%i brushes. \n", map.brush_count);
+    printf("%i lights. \n", light_count);
+    printf("\n");
 
     //generate polygons
-    printf("Generating map polygons from brushes.... \n");
+    printf("### GENERATING MAP ###\n");
+    printf("Generating map polygons from brushes....\n");
+    printf("Generating planes from brushfaces and resorting polygon vertices...\n");
     for (int i=0; i < map.brush_count; i++)
     {
         //printf("Generating Polygon: %i \n", i);
@@ -272,13 +334,13 @@ int map_parse(const char* filename)
     return true;
 }
 
-
 /*
 map_create_models
 -- creates a model from a polygonal brush
 */
 void map_create_models()
 {
+    printf("Converting polygons into models... \n");
     float scale = 0.1f;
     float rotation_degrees = 0.0f; // change to 90.0f, 180.0f, etc. if needed
     float rotation_radians = rotation_degrees * (PI / 180.0f);
@@ -287,6 +349,7 @@ void map_create_models()
     float cos_theta = cosf(rotation_radians);
     float sin_theta = sinf(rotation_radians);
 
+    printf("\n### LOADING UV TEXTURES ### \n");
     for (int i = 0; i < map.brush_count; i++)
     {
         Brush *brush = &map.brushes[i];
@@ -420,6 +483,7 @@ void map_create_models()
 
             UploadMesh(&mesh, false);
             Model model = LoadModelFromMesh(mesh);
+            model.materials[0].shader = sh_light;
             model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
             Geometry geometry;
@@ -427,10 +491,10 @@ void map_create_models()
             geometry.bounds = bounds;
             geometry.collision = shape;
 
-            models[model_count++] = geometry;
-            
+            models[model_count++] = geometry;            
         }
     }
+    printf("\nMap was successfully generated! \n \n");
 }
 
 

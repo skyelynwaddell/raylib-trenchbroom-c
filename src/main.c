@@ -9,7 +9,6 @@
 #include "camera.h"
 #include "map.h"
 #include "player.h"
-#include "lights.h"
 
 #include "init.h"
 #include "input.h"
@@ -27,7 +26,6 @@ int main()
     // -----------------------------
     init();
     player_init();
-    lights_init();
     GuiLoadStyle(STYLE_AMBER);
 
     // Main Game Loop

@@ -64,6 +64,7 @@ void main()
                 float dist = length(delta);
                 light = normalize(delta);
                 attenuation = clamp(1.0 - (dist / radius[i]), 0.0, 1.0);
+                //attenuation = clamp(1.0 - (dist / 30.0f), 0.0, 1.0);
             }
 
             float NdotL = max(dot(normal, light), 0.0);

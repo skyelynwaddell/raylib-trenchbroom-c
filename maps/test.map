@@ -64,5 +64,25 @@
 // entity 1
 {
 "classname" "info_player_start"
-"origin" "160 32 72"
+"origin" "352 -112 56"
+}
+// entity 2
+{
+"classname" "light"
+"origin" "-120 72 120"
+"brightness" "0.6"
+"color" "182 0 255"
+"radius" "20"
+"spawnflags" "0"
+"alpha" "255"
+}
+// entity 3
+{
+"classname" "light"
+"origin" "136 440 120"
+"brightness" "0.6"
+"color" "255 255 255"
+"radius" "30"
+"spawnflags" "0"
+"alpha" "10"
 }
