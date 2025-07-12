@@ -67,3 +67,12 @@
 [
 	targetname(target_source) : "Name"
 ]
+
+@PointClass base(Appearflags) = light : "Light" 
+[
+	color(color255) : "Color" : "255 255 255"
+	alpha(float) : "Alpha" : 255.0 : "The transparency of the light color"
+	brightness(float) : "Brightness" : 0.6 : "How bright the light is." 
+	radius(float) : "Radius" : 40.0 : "How big the light is."
+	
+]

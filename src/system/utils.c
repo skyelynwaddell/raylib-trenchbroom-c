@@ -1,5 +1,6 @@
 #include "../headers/utils.h"
 #include "string.h"
+#include <stdio.h>
 
 /*
 string_equals
@@ -22,7 +23,8 @@ convert_trenchbroom_to_raylib_axis
 Vector3 trench_to_raylib_origin(Vector3 v)
 {
     float s = 0.1; // scale
-    return (Vector3) { v.x*s, v.y*s, -v.z*s };
+    Vector3 newpos = (Vector3) { v.x*s, v.y*s, -v.z*s };
+    return newpos;
 }
 
 

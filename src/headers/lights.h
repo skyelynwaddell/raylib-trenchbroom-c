@@ -18,7 +18,6 @@ typedef struct {
 } LightObject;
 
 Shader sh_light;
-LightObject lights[MAX_LIGHTS];
 float radiusLoc;
 
 void lights_init();
