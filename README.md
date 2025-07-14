@@ -12,7 +12,8 @@
 # 3D FPS Game / Engine
 
 A fast, lightweight 3D first-person shooter game engine written in C. <br/>
-Build classic FPS maps using [TrenchBroom](https://trenchbroom.github.io/), and run them with modern OpenGL rendering powered by [raylib](https://www.raylib.com/).
+Build classic FPS maps using [TrenchBroom](https://trenchbroom.github.io/), and run them with modern OpenGL rendering powered by [raylib](https://www.raylib.com/). <br/>
+Check out my Blog post about this repo: [3D Game Development in C](https://skyelynwaddell.github.io/fps-engine-c/)
 
 ## Features
 
