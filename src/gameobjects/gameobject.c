@@ -10,14 +10,14 @@ returns TRUE if GameObject is colliding with a solid geometry / wall.
 */
 int place_meeting_solid(GameObject *object)
 {
-    for (int i=0; i < model_count; i++)
+    for (int i=0; i < map.model_count; i++)
     {
     // potential collision -- do cheap math first
-    if ((CheckCollisionBoxes(object->collision_box.bounding_box, models[i].bounds)) == false) 
+    if ((CheckCollisionBoxes(object->collision_box.bounding_box, map.models[i].bounds)) == false) 
         continue;
 
     //actual collision -- do expensive math
-    if (CheckCollisionBoxesExt(object->collision_box.bounding_box, models[i].collision))
+    if (CheckCollisionBoxesExt(object->collision_box.bounding_box, map.models[i].collision))
         return true;
 
     }

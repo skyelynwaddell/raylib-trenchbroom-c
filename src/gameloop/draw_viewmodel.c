@@ -1,4 +1,4 @@
-#include <draw_viewmodel.h>
+#include "draw_viewmodel.h"
 
 /*
 draw_viewmodel
@@ -6,6 +6,4 @@ draw_viewmodel
 */
 void draw_viewmodel()
 {
-    // Example placeholder:
-    // DrawModel(viewModel, position, scale, color);
 }

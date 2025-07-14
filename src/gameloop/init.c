@@ -1,7 +1,7 @@
 #include "stdio.h"
-#include "../headers/init.h"
-#include "../headers/map.h"
-#include "../headers/camera.h"
+#include "init.h"
+#include "map.h"
+#include "camera.h"
 #include "raylib.h"
 #include <defs.h>
 #include <global.h>

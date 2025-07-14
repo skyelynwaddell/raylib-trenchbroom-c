@@ -15,14 +15,6 @@
 
 Map map; // stores the currently loaded map
 
-Geometry models[10000]; // if you have more than 10,000 map brushes, you need a second map...
-CollisionBox brush_collisions[10000];
-int model_count = 0;
-
-LightObject lights[MAX_LIGHTS];
-int light_index = 0;
-int light_count = 0;
-
 /*
 parse_map
 filename[const char*] -- the filename of the map to be loaded ie. "myamazingmap.map"
@@ -30,6 +22,9 @@ filename[const char*] -- the filename of the map to be loaded ie. "myamazingmap.
 */
 int map_parse(const char* filename)
 {
+    map.model_count = 0;
+    map.light_count = 0;
+
     printf("\n");
     printf("### LOADING MAP FILE ### \n");
     char fullpath[256];
@@ -77,7 +72,7 @@ int map_parse(const char* filename)
         Object Start {
         ----------------------------------
         */
-        if (strcmp(trimmed, "{\n") == false)
+        if (string_equals(trimmed, "{\n"))
         {
             if (in_entity && !in_brush)
             {
@@ -104,7 +99,7 @@ int map_parse(const char* filename)
         Object End }
         ----------------------------------
         */
-        if (strcmp(trimmed, "}\n") == false)
+        if (string_equals(trimmed, "}\n"))
         {
             if (in_brush)
             {
@@ -147,8 +142,7 @@ int map_parse(const char* filename)
                         );
 
                         // create & store light object
-                        lights[light_index++] = new_light; 
-                        light_count = light_index;
+                        map.lights[map.light_count++] = new_light; 
                     }
                 /*
                 ----------------------------------
@@ -309,7 +303,7 @@ int map_parse(const char* filename)
     printf("-----------------------------\n\n");
     printf("### MAP OBJECTS CREATED ### \n");
     printf("%i brushes. \n", map.brush_count);
-    printf("%i lights. \n", light_count);
+    printf("%i lights. \n", map.light_count);
     printf("\n");
 
     //generate polygons
@@ -491,7 +485,7 @@ void map_create_models()
             geometry.bounds = bounds;
             geometry.collision = shape;
 
-            models[model_count++] = geometry;            
+            map.models[map.model_count++] = geometry;            
         }
     }
     printf("\nMap was successfully generated! \n \n");
@@ -506,9 +500,9 @@ map_clear_models
 */
 void map_clear_models()
 {
-    for (int i=0; i < model_count; i++)
+    for (int i=0; i < map.model_count; i++)
     {
-        UnloadModel(models[i].model);
+        UnloadModel(map.models[i].model);
     }
 }
 
@@ -531,11 +525,11 @@ map_draw_models
 */
 void map_draw_models()
 {
-    for (int i=0; i < model_count; i++)
+    for (int i=0; i < map.model_count; i++)
     {
-        DrawModel(models[i].model, (Vector3){0}, 1.0f, WHITE);
-        models[i].model.materials[0].shader = sh_light;
-        DrawModelWires(models[i].model,(Vector3){0}, 1.0f, WHITE);
+        DrawModel(map.models[i].model, (Vector3){0}, 1.0f, WHITE);
+        map.models[i].model.materials[0].shader = sh_light;
+        DrawModelWires(map.models[i].model,(Vector3){0}, 1.0f, WHITE);
         //DrawBoundingBox(models[i].bounds,PURPLE);
     }
 }
@@ -548,8 +542,8 @@ map_draw_model_wireframes
 void map_draw_model_wireframes()
 {
     //draw wireframe reflecting the Geometry coords
-    for (int i=0; i < model_count; i++)
+    for (int i=0; i < map.model_count; i++)
     {
-        DrawModelWires(models[i].model, (Vector3){0}, 1.0f, RED);
+        DrawModelWires(map.models[i].model, (Vector3){0}, 1.0f, RED);
     }
 }

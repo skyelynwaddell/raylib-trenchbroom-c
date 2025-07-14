@@ -1,4 +1,4 @@
-#include "../headers/input.h"
+#include "input.h"
 #include "stdio.h"
 #include "global.h"
 #include "raylib.h"

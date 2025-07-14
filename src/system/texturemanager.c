@@ -1,5 +1,6 @@
 
-#include "../headers/texturemanager.h"
+#include "texturemanager.h"
+#include "utils.h"
 #include "string.h"
 
 int texture_cache_count = 0;
@@ -38,7 +39,7 @@ Texture2D texture_get_cached(char *texture_name)
 
     //prepare the texture path
     char path[128];
-    snprintf(path, sizeof(path), "textures/%s.png", texture_name);
+    snprintf(path, sizeof(path), "gamedata/textures/%s.png", texture_name);
 
     //attempt to load the texture
     Texture2D tex = LoadTexture(path);
@@ -51,7 +52,7 @@ Texture2D texture_get_cached(char *texture_name)
         //check if fallback is already cached
         for (int i = 0; i < texture_cache_count; i++)
         {
-            if (strcmp(texture_cache[i].name, "__TB_empty") == 0)
+            if (string_equals(texture_cache[i].name, "__TB_empty"))
             {
                 // returns cached TB empty texture
                 return texture_cache[i].texture;

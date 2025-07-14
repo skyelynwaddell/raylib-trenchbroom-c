@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include "raylib.h"
-#include "./defs.h"
+#include "defs.h"
 
 typedef struct {
     char name[64];

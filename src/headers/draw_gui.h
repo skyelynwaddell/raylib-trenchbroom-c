@@ -1,6 +1,11 @@
 #ifndef DRAW_GUI_H
 #define DRAW_GUI_H
 
+#include <stdio.h>
+#include "raylib.h"
+#include "raygui.h"
+#include <global.h>
+
 void draw_gui();
 void draw_pausemenu();
 void menu_item_start();

@@ -2,30 +2,30 @@
 #define MAP_H
 
 #include <stdio.h>
-#include "./brushface.h"
-#include "./brush.h"
+#include "defs.h"
+#include "brushface.h"
+#include "brush.h"
 #include "geometry.h"
 #include "entity.h"
 #include "lights.h"
 
-#define MAX_LINE 1024
-#define MAX_BRUSHES 10000
-#define MAX_ENTITIES 1000
-
-extern Geometry models[];
-extern int model_count;
-
-extern LightObject lights[];
-extern int light_index;
-extern int light_count;
-
 // struct to hold the data stored in .map file
 typedef struct {
     int mapversion;
-    int brush_count;
-    int entity_count;
+
     Brush brushes[MAX_BRUSHES]; //contains all the brush faces in a map
-    Entity entities[MAX_ENTITIES];
+    int brush_count;
+
+    Geometry models[MAX_BRUSHES]; // contains all brushes converted to raylib models
+    CollisionBox brush_collisions[MAX_BRUSHES]; // contains all model collision shapes
+    int model_count;
+
+    Entity entities[MAX_ENTITIES]; // contains all the map objects/entities
+    int entity_count;
+
+    LightObject lights[MAX_LIGHTS]; // contains all the map light objects
+    int light_count;
+
 } Map; 
 
 extern Map map;

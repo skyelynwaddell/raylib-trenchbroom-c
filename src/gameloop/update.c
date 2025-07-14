@@ -1,4 +1,4 @@
-#include "../headers/update.h"
+#include "update.h"
 #include <camera.h>
 #include <global.h>
 

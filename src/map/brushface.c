@@ -1,4 +1,4 @@
-#include "../headers/brushface.h"
+#include "brushface.h"
 
 /*
 --------------------------

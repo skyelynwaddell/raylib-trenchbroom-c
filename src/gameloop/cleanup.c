@@ -1,5 +1,5 @@
-#include "../headers/cleanup.h"
-#include "../headers/map.h"
+#include "cleanup.h"
+#include "map.h"
 
 /*
 clean_up

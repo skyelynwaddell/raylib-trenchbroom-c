@@ -2,7 +2,7 @@
 #define PLANE_H
 
 #include "raylib.h"
-#include "./utils.h"
+#include "utils.h"
 
 typedef struct {
     Vector3 normal; // plane normal (a,b,c)

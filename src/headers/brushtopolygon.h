@@ -2,15 +2,13 @@
 #define BRUSH_TO_POLYGON_H
 
 #include <stdbool.h>
+#include "defs.h"
 #include "raylib.h"
-#include "./utils.h"
-
-#include "./brush.h"
-#include "./polygon.h"
+#include "utils.h"
+#include "brush.h"
+#include "polygon.h"
 
 //https://github.com/stefanha/map-files/blob/master/MAPFiles.pdf
-
-#define MAX_POLYGONS 10000
 
 bool polygon_get_intersection(
     Vector3 n1,

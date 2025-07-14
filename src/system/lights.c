@@ -1,6 +1,6 @@
+#include "defs.h"
 
 #define RLIGHTS_IMPLEMENTATION
-#define PLATFORM_DESKTOP
 
 #if defined(PLATFORM_DESKTOP)
     #define GLSL_VERSION            330
@@ -80,15 +80,15 @@ void lights_update()
 {
     float cam_pos[3] = { camera.position.x,camera.position.y,camera.position.z };
     SetShaderValue(sh_light, sh_light.locs[SHADER_LOC_VECTOR_VIEW], cam_pos, SHADER_UNIFORM_VEC3);
-    for (int i = 0; i < light_count; i++)
+    for (int i = 0; i < map.light_count; i++)
     {
-        UpdateLightValues(sh_light, lights[i].light);
+        UpdateLightValues(sh_light, map.lights[i].light);
     }
 
     float radii[MAX_LIGHTS] = { 0 };
-    for (int i = 0; i < light_count; i++) 
+    for (int i = 0; i < map.light_count; i++) 
     {
-        radii[i] = lights[i].radius;
+        radii[i] = map.lights[i].radius;
     }
     
     SetShaderValueV(
@@ -96,5 +96,5 @@ void lights_update()
         radiusLoc, 
         radii, 
         SHADER_UNIFORM_FLOAT,
-        light_count);
+        map.light_count);
 }

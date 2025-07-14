@@ -2,8 +2,8 @@
 #define PLAYER_H
 
 #include "raylib.h"
-#include "./gameobject.h"
-#include "./collisionbox.h"
+#include "gameobject.h"
+#include "collisionbox.h"
 
 typedef struct {
     GameObject gameobject;

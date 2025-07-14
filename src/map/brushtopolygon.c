@@ -1,17 +1,17 @@
 #include "stdio.h"
-#include "../headers/brushtopolygon.h"
+#include "brushtopolygon.h"
 
 #include <stdbool.h>
 #include "raylib.h"
 #include "raymath.h"
 
-#include "../headers/defs.h"
-#include "../headers/global.h"
-#include "../headers/texturemanager.h"
+#include "defs.h"
+#include "global.h"
+#include "texturemanager.h"
 
-#include "../headers/brush.h"
-#include "../headers/polygon.h"
-#include "../headers/map.h"
+#include "brush.h"
+#include "polygon.h"
+#include "map.h"
 
 
 /*

@@ -1,15 +1,14 @@
 #ifndef BRUSH_H
 #define BRUSH_H
 
-#include "../headers/brushface.h"
-#include "../headers/polygon.h"
-
-#define BRUSH_FACE_COUNT 64 // a brush can have up to 64 faces - must be convex
+#include "defs.h"
+#include "brushface.h"
+#include "polygon.h"
 
 typedef struct {
     int brush_face_count;
     BrushFace brush_faces[BRUSH_FACE_COUNT];
-    Polygon polys[64];
+    Polygon polys[BRUSH_FACE_COUNT];
 } Brush;
 
 

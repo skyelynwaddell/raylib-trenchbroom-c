@@ -1,10 +1,10 @@
 #include "stdio.h"
 #include "raylib.h"
 #include "raymath.h"
-#include "../headers/map.h"
-#include "../headers/triangle.h"
-#include "../headers/brushtopolygon.h"
-#include "../headers/polygon.h"
+#include "map.h"
+#include "triangle.h"
+#include "brushtopolygon.h"
+#include "polygon.h"
 
 /*
 draw

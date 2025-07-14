@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "raymath.h"
-#include "../headers/camera.h"
-#include "../headers/global.h"
+#include "camera.h"
+#include "global.h"
 
 Camera3D camera;
 int camera_mode;

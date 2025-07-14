@@ -1,4 +1,4 @@
-#include "../headers/global.h"
+#include "global.h"
 #include "string.h"
 #include "raygui.h"
 

@@ -32,6 +32,7 @@
         "rlights.h": "c",
         "lights.h": "c",
         "draw_viewmodel.h": "c",
-        "player.h": "c"
+        "player.h": "c",
+        "draw_gui.h": "c"
     },
 }
