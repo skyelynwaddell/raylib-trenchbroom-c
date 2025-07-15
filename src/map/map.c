@@ -12,6 +12,7 @@
 #include "global.h"
 #include "player.h"
 #include "lights.h"
+#include "frustum.h"
 
 Map map; // stores the currently loaded map
 
@@ -25,8 +26,11 @@ int map_parse(const char* filename)
     map.model_count = 0;
     map.light_count = 0;
 
-    printf("\n");
-    printf("### LOADING MAP FILE ### \n");
+    #ifdef DEBUG
+        printf("\n");
+        printf("### LOADING MAP FILE ### \n");
+    #endif
+
     char fullpath[256];
 
     // add maps/ filepath to the filename
@@ -40,10 +44,12 @@ int map_parse(const char* filename)
         return false;
     }
 
-    printf("    Successfully opened map: %s \n \n", fullpath);
+    #ifdef DEBUG
+        printf("    Successfully opened map: %s \n \n", fullpath);
 
-    printf("-----------------------------\n");
-    printf("### MAP PROPERTIES ### \n");
+        printf("-----------------------------\n");
+        printf("### MAP PROPERTIES ### \n");
+    #endif
 
     char line[MAX_LINE];
     int in_entity = false;
@@ -170,14 +176,16 @@ int map_parse(const char* filename)
 
             if (sscanf(trimmed, "\"%127[^\"]\" \"%127[^\"]\"", key, value) == 2) 
             {
-                if (strstr(key, "classname") == 0)
-                    printf("  Property: %s = %s\n", key, value);
-                else
-                {
-                    printf("-----------------------------\n\n");
-                    printf("-----------------------------\n");
-                    printf("### Entity: %s = %s ###\n", key, value);
-                }
+                #ifdef DEBUG
+                    if (strstr(key, "classname") == 0)
+                        printf("  Property: %s = %s\n", key, value);
+                    else
+                    {
+                        printf("-----------------------------\n\n");
+                        printf("-----------------------------\n");
+                        printf("### Entity: %s = %s ###\n", key, value);
+                    }
+                #endif
                     
 
                 /*
@@ -300,6 +308,7 @@ int map_parse(const char* filename)
         ----------------------------------
         */
     }
+    #ifdef DEBUG
     printf("-----------------------------\n\n");
     printf("### MAP OBJECTS CREATED ### \n");
     printf("%i brushes. \n", map.brush_count);
@@ -310,6 +319,8 @@ int map_parse(const char* filename)
     printf("### GENERATING MAP ###\n");
     printf("Generating map polygons from brushes....\n");
     printf("Generating planes from brushfaces and resorting polygon vertices...\n");
+    #endif
+    
     for (int i=0; i < map.brush_count; i++)
     {
         //printf("Generating Polygon: %i \n", i);
@@ -334,7 +345,10 @@ map_create_models
 */
 void map_create_models()
 {
-    printf("Converting polygons into models... \n");
+    #ifdef DEBUG
+        printf("Converting polygons into models... \n");
+    #endif
+
     float scale = 0.1f;
     float rotation_degrees = 0.0f; // change to 90.0f, 180.0f, etc. if needed
     float rotation_radians = rotation_degrees * (PI / 180.0f);
@@ -343,7 +357,10 @@ void map_create_models()
     float cos_theta = cosf(rotation_radians);
     float sin_theta = sinf(rotation_radians);
 
-    printf("\n### LOADING UV TEXTURES ### \n");
+    #ifdef DEBUG
+        printf("\n### LOADING UV TEXTURES ### \n");
+    #endif
+
     for (int i = 0; i < map.brush_count; i++)
     {
         Brush *brush = &map.brushes[i];
@@ -484,11 +501,14 @@ void map_create_models()
             geometry.model = model;
             geometry.bounds = bounds;
             geometry.collision = shape;
+            geometry.position = trench_to_raylib_origin(centroid);
 
             map.models[map.model_count++] = geometry;            
         }
     }
-    printf("\nMap was successfully generated! \n \n");
+    #ifdef DEBUG
+        printf("\nMap was successfully generated! \n \n");
+    #endif
 }
 
 
@@ -514,8 +534,6 @@ map_draw
 void map_draw()
 {
     map_draw_models();
-    //map_draw_model_wireframes(); // debug
-
 }
 
 
@@ -525,25 +543,33 @@ map_draw_models
 */
 void map_draw_models()
 {
-    for (int i=0; i < map.model_count; i++)
+    Frustum frustum = frustum_get_from_camera(camera);
+    for (int i = 0; i < map.model_count; i++)
     {
-        DrawModel(map.models[i].model, (Vector3){0}, 1.0f, WHITE);
-        map.models[i].model.materials[0].shader = sh_light;
-        DrawModelWires(map.models[i].model,(Vector3){0}, 1.0f, WHITE);
-        //DrawBoundingBox(models[i].bounds,PURPLE);
+        Geometry *geo = &map.models[i];
+        // only draw map models inside camera view frustum
+        // occlusion culling
+        if (!frustum_check_boundingbox(geo->bounds, frustum)) 
+            continue;
+
+        geo->model.materials[0].shader = sh_light;
+        map_draw_model(geo->model);
+        
     }
 }
-
 
 /*
-map_draw_model_wireframes
--- draws a debug wireframe around the map polygonal mesh
+map_draw_model
+Wil draw the models in the room with correct positioning
+If DEBUG flag enabled will draw wire frames as well
 */
-void map_draw_model_wireframes()
-{
-    //draw wireframe reflecting the Geometry coords
-    for (int i=0; i < map.model_count; i++)
-    {
-        DrawModelWires(map.models[i].model, (Vector3){0}, 1.0f, RED);
-    }
+#ifdef DEBUG
+void map_draw_model(Model model){
+    DrawModel(model, (Vector3){0}, 1.0f, WHITE);
+    DrawModelWires(model, (Vector3){0}, 1.0f, RED);
 }
+#else
+void map_draw_model(Model model){
+    DrawModel(model, (Vector3){0}, 1.0f, WHITE);
+}
+#endif

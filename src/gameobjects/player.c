@@ -15,7 +15,9 @@ Called when the player object first enters the world
 */
 void player_init()
 {
-    printf("### Player Object Created ###\n\n");
+    #ifdef DEBUG
+        printf("### Player Object Created ###\n\n");
+    #endif
 
     // spawn position
     player.gameobject.position = global_player_spawn;

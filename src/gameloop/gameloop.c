@@ -25,6 +25,8 @@ int gameloop()
 {
     // Initialization
     // -----------------------------
+    SetConfigFlags(FLAG_MSAA_4X_HINT); // Multi Sampling Anti Aliasing 4X
+
     init();
     player_init();
     GuiLoadStyle(STYLE_AMBER);
@@ -33,8 +35,7 @@ int gameloop()
     // -----------------------------
     while(!WindowShouldClose())
     {
-        SetConfigFlags(FLAG_MSAA_4X_HINT); // Multi Sampling Anti Aliasing 4X
-        SetExitKey(0); // Disable exit key (ESC)
+        SetExitKey(false); // Disable exit key (ESC)
         
         input();
         update();

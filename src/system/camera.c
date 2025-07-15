@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "camera.h"
+#include "defs.h"
 #include "global.h"
 
 Camera3D camera;

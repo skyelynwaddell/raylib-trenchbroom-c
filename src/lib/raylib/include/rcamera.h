@@ -1,4 +1,3 @@
-#define CAMERA_IMPLEMENTATION
 /*******************************************************************************************
 *
 *   rcamera - Basic camera system with support for multiple camera modes
@@ -39,10 +38,10 @@
 *     3. This notice may not be removed or altered from any source distribution.
 *
 **********************************************************************************************/
+
 #ifndef RCAMERA_H
 #define RCAMERA_H
 
-#include "raylib.h"
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
@@ -168,8 +167,8 @@ RLAPI Matrix GetCameraProjectionMatrix(Camera *camera, float aspect);
 *   CAMERA IMPLEMENTATION
 *
 ************************************************************************************/
-#ifndef RCAMERA_IMPLEMENTATION 
-#define RCAMERA_IMPLEMENTATION
+
+#if defined(RCAMERA_IMPLEMENTATION)
 
 #include "raymath.h"        // Required for vector maths:
                             // Vector3Add()
@@ -193,14 +192,10 @@ RLAPI Matrix GetCameraProjectionMatrix(Camera *camera, float aspect);
                             // IsKeyPressed()
                             // GetFrameTime()
 
-
-// Custom Includes
-#include "player.h"
-
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
-#define CAMERA_MOVE_SPEED                               100.0f       // Units per second
+#define CAMERA_MOVE_SPEED                               5.4f       // Units per second
 #define CAMERA_ROTATION_SPEED                           0.03f
 #define CAMERA_PAN_SPEED                                0.2f
 
@@ -423,14 +418,14 @@ Matrix GetCameraProjectionMatrix(Camera *camera, float aspect)
 {
     if (camera->projection == CAMERA_PERSPECTIVE)
     {
-        return MatrixPerspective(camera->fovy*DEG2RAD, aspect, 0, 0);
+        return MatrixPerspective(camera->fovy*DEG2RAD, aspect, CAMERA_CULL_DISTANCE_NEAR, CAMERA_CULL_DISTANCE_FAR);
     }
     else if (camera->projection == CAMERA_ORTHOGRAPHIC)
     {
         double top = camera->fovy/2.0;
         double right = top*aspect;
 
-        return MatrixOrtho(-right, right, -top, top, 0, 0);
+        return MatrixOrtho(-right, right, -top, top, CAMERA_CULL_DISTANCE_NEAR, CAMERA_CULL_DISTANCE_FAR);
     }
 
     return MatrixIdentity();
@@ -556,4 +551,5 @@ void UpdateCameraPro(Camera *camera, Vector3 movement, Vector3 rotation, float z
     // Zoom target distance
     CameraMoveToTarget(camera, zoom);
 }
-#endif
+
+#endif // RCAMERA_IMPLEMENTATION
