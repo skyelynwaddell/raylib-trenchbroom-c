@@ -34,7 +34,7 @@ int map_parse(const char* filename);
 void map_create_models();
 void map_clear_models();
 void map_draw();
-void map_draw_model_wireframes();
 void map_draw_models();
+void map_draw_model(Model model);
 
 #endif // MAP_H

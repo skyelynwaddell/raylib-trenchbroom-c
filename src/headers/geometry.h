@@ -8,6 +8,7 @@ typedef struct {
     Model model;
     BoundingBox bounds;
     CollisionPolygon collision;
+    Vector3 position;
 } Geometry;
 
 

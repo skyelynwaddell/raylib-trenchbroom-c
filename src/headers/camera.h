@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "raylib.h"
 #include "player.h"
+#include "plane.h"
 
 extern Camera camera;
 extern int camera_mode;
@@ -19,7 +20,6 @@ Vector3 camera_get_right(Camera *camera);
 void camera_yaw(Camera *camera, float angle, bool rotateAroundTarget);
 void camera_pitch(Camera *camera, float angle, bool lockView, bool rotateAroundTarget, bool rotateUp);
 void camera_roll(Camera *camera, float angle);
-
 
 
 #endif
