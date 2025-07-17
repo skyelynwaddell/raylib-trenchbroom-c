@@ -1,6 +1,4 @@
-#include "collisionbox.h"
-#include "raylib.h"
-#include "raymath.h"
+#include "skyelib.h"
 
 /*
 collisionbox_set

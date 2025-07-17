@@ -1,11 +1,5 @@
 #include "player.h"
-#include "raylib.h"
-#include <stdio.h>
-#include "raymath.h"
-#include <math.h>
-#include "camera.h"
-#include "global.h"
-#include "collisionbox.h"
+#include "skyelib.h"
 
 Player player;
 
@@ -23,8 +17,8 @@ void player_init()
     player.gameobject.position = global_player_spawn;
 
     // create player collision box
-    float h = 4.0f; // units tall
-    float w = 1.0f; // units thick/wide
+    float h = PLAYER_HEIGHT; // units tall
+    float w = PLAYER_WIDTH;  // units thick/wide
     collisionbox_set(
         &player.gameobject.collision_box,
         player.gameobject.position,
@@ -33,10 +27,10 @@ void player_init()
     );
 
     // set player stats
-    player.health = 100;
-    player.jump_height = 25.0;
-    player.gameobject.speed = 20.0f;
-    player.gameobject.gravity = -0.2f;
+    player.health = PLAYER_HEALTH;
+    player.jump_height = PLAYER_JUMPHEIGHT;
+    player.gameobject.speed = PLAYER_SPEED;
+    player.gameobject.gravity = PLAYER_GRAVITY;
 };
 
 
@@ -46,7 +40,11 @@ Called every Tick
 */
 void player_update()
 {
-    if (global_paused) return;
+    if (global_paused) 
+    {
+        player.gameobject.velocity = Vector3Zero();
+        return;
+    }
 
     player_movement();
     apply_gravity(&player);
@@ -61,9 +59,19 @@ player_movement
 Handles player directional input, movement, acceleration, and friction
 */
 void player_movement()
-{
-    float input_x = (IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
-    float input_z = (IsKeyDown(KEY_W) - IsKeyDown(KEY_S));
+{   
+    float input_x, input_z;
+
+    // gamepad movement
+    if (IsGamepadAvailable(GAMEPAD_P1))
+    {
+        input_x = (IsKeyDown(BUTTON_MOVE_LEFT_PAD) - IsKeyDown(BUTTON_MOVE_RIGHT_PAD));
+        input_z = (IsKeyDown(BUTTON_MOVE_FORWARD_PAD) - IsKeyDown(BUTTON_MOVE_BACKWARD_PAD)); 
+    }
+
+    // keyboard movement
+    input_x = (IsKeyDown(BUTTON_MOVE_LEFT_KEY) - IsKeyDown(BUTTON_MOVE_RIGHT_KEY));
+    input_z = (IsKeyDown(BUTTON_MOVE_FORWARD_KEY) - IsKeyDown(BUTTON_MOVE_BACKWARD_KEY));
 
     float input_len = sqrtf(input_x * input_x + input_z * input_z);
     if (input_len > 0.0f) {
@@ -121,7 +129,7 @@ Called to handle when / if the player CAN jump
 void player_handle_jump()
 {
     // jump
-    if (IsKeyPressed(KEY_SPACE) && global_player_onground)
+    if ((IsKeyPressed(BUTTON_JUMP_KEY) || (IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_JUMP_PAD))) && global_player_onground)
         player_jump();
 }
 

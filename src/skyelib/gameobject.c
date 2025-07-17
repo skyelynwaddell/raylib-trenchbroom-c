@@ -1,8 +1,5 @@
-#include "gameobject.h"
-#include "geometry.h"
-#include "raymath.h"
+#include "skyelib.h"
 #include "map.h"
-#include "global.h"
 
 /*
 place_meeting

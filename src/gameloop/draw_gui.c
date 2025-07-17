@@ -1,8 +1,6 @@
-#include <draw_gui.h>
-#include <stdio.h>
-#include "raylib.h"
-#include "raygui.h"
-#include <global.h>
+#include "skyelib.h"
+#include "gameloop.h"
+#include "global.h"
 
 /*
 draw_gui
@@ -17,7 +15,6 @@ void draw_gui()
 
     if (global_paused) draw_pausemenu();
 }
-
 
 /*
 draw_pausemenu

@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include "raylib.h"
-#include "raymath.h"
-#include "camera.h"
-#include "defs.h"
+#include "skyelib.h"
 #include "global.h"
 
 Camera3D camera;
@@ -28,7 +24,7 @@ void camera_init()
 camera_follow_player
 Makes the Camera follow the Player target in First Person
 */
-void camera_follow_player(Camera3D *camera, Player *target)
+void camera_follow_player(Camera3D *camera, GameObject *target)
 {
     Vector2 mouseDelta = GetMouseDelta();
     float sensitivity = 0.002f;
@@ -48,17 +44,13 @@ void camera_follow_player(Camera3D *camera, Player *target)
     };
 
     // Set camera position just above player position (eye height)
-    Vector3 eyeOffset = {0.0f, 1.7f, 0.0f}; // adjust for player height
-    camera->position = Vector3Add(target->gameobject.position, eyeOffset);
+    camera->position = Vector3Add(target->position, CAMERA_HEIGHT);
 
     // Camera target is forward direction from eye position
     camera->target = Vector3Add(camera->position, forward);
 
     // Up vector stays world up
     camera->up = (Vector3){0.0f, 1.0f, 0.0f};
-
-    // Optionally update player's yaw (to rotate player model with camera)
-    // target->parent.rotation.y = yaw; // if your player has rotation property
 }
 
 

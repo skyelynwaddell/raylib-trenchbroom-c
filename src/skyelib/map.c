@@ -1,18 +1,7 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "map.h"
-#include "brush.h"
-#include "brushface.h"
-#include "brushtopolygon.h"
-#include "texturemanager.h"
-#include "collisionbox.h"
-#include "geometry.h"
-#include "float.h"
-#include "global.h"
 #include "player.h"
-#include "lights.h"
-#include "frustum.h"
+#include "skyelib.h"
+
 
 Map map; // stores the currently loaded map
 
@@ -23,6 +12,14 @@ filename[const char*] -- the filename of the map to be loaded ie. "myamazingmap.
 */
 int map_parse(const char* filename)
 {
+    global_paused = true;
+    char fullpath[256];
+    char preserved_filename[256];
+    snprintf(preserved_filename, sizeof(preserved_filename), "%s", filename);
+
+    map_clear_models();
+    memset(&map, 0, sizeof(map)); // clear map safely after
+
     map.model_count = 0;
     map.light_count = 0;
 
@@ -31,10 +28,10 @@ int map_parse(const char* filename)
         printf("### LOADING MAP FILE ### \n");
     #endif
 
-    char fullpath[256];
-
     // add maps/ filepath to the filename
-    snprintf(fullpath, sizeof(fullpath), "maps/%s", filename);
+    snprintf(map.filename, sizeof(map.filename), "%s", preserved_filename);
+    snprintf(fullpath, sizeof(fullpath), "maps/%s", preserved_filename);
+
 
     FILE* file = fopen(fullpath, "r");
     if (!file)
@@ -336,6 +333,7 @@ int map_parse(const char* filename)
 
     fclose(file);
     map_create_models();
+    global_paused = false;
     return true;
 }
 
@@ -347,17 +345,6 @@ void map_create_models()
 {
     #ifdef DEBUG
         printf("Converting polygons into models... \n");
-    #endif
-
-    float scale = 0.1f;
-    float rotation_degrees = 0.0f; // change to 90.0f, 180.0f, etc. if needed
-    float rotation_radians = rotation_degrees * (PI / 180.0f);
-
-    // Precompute Y-axis rotation matrix (TrenchBroom Y is Raylib Z)
-    float cos_theta = cosf(rotation_radians);
-    float sin_theta = sinf(rotation_radians);
-
-    #ifdef DEBUG
         printf("\n### LOADING UV TEXTURES ### \n");
     #endif
 
@@ -413,29 +400,16 @@ void map_create_models()
                         uvs[2] = polygon_project_to_uv_valve220(verts[2], face);
                     break;
                 }
-                
 
                 for (int v = 0; v < 3; v++) {
-                    Vector3 p = verts[v];
-
                     // Coordinate conversion: (x, y, z) → (x, z, -y)
-                    float x = p.x;
-                    float y = p.z;    // swap Y and Z
-                    float z = -p.y;   // invert old Y
-
-                    // Apply Y-axis rotation (around new Y axis, which was TrenchBroom Z)
-                    float x_rot = x * cos_theta - z * sin_theta;
-                    float z_rot = x * sin_theta + z * cos_theta;
-
-                    // Apply scale
-                    x_rot *= scale;
-                    y *= scale;
-                    z_rot *= scale;
+                    Vector3 p = verts[v];
+                    Vector3 pos = trench_to_raylib_origin((Vector3){p.x,p.z,p.y});
 
                     // Store vertex
-                    mesh.vertices[index * 3 + 0] = x_rot;
-                    mesh.vertices[index * 3 + 1] = y;
-                    mesh.vertices[index * 3 + 2] = z_rot;
+                    mesh.vertices[index * 3 + 0] = pos.x;
+                    mesh.vertices[index * 3 + 1] = pos.y;
+                    mesh.vertices[index * 3 + 2] = pos.z;
 
                     mesh.texcoords[index * 2 + 0] = uvs[v].x;
                     mesh.texcoords[index * 2 + 1] = uvs[v].y;
@@ -573,3 +547,19 @@ void map_draw_model(Model model){
     DrawModel(model, (Vector3){0}, 1.0f, WHITE);
 }
 #endif
+
+/*
+map_hotreload
+DEBUG : Allows for you to instantly reload the map for testing changes when you press ENTER
+WARNING : Dont be moving or you may fall through the floor
+*/
+void map_hotreload() {
+    #ifdef DEBUG
+    if (IsKeyPressed(KEY_ENTER))
+    {
+        char filename[256];
+        snprintf(filename, sizeof(filename), "%s", map.filename); // safe copy
+        map_parse(filename);
+    }
+    #endif
+}

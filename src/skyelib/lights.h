@@ -1,15 +1,11 @@
 #ifndef LIGHTS_H
 #define LIGHTS_H
 
-#include "raylib.h"
-#include "raymath.h"
+#include "skyelib.h"
 #include "../lib/raylib/include/rlights.h"
-#include "gameobject.h"
 #include "player.h"
-#include "camera.h"
-#include "defs.h"
 
-typedef struct {
+typedef struct LightObject {
     GameObject gameobject;
     Light light;
     float brightness;
@@ -17,8 +13,8 @@ typedef struct {
     float radius;
 } LightObject;
 
-Shader sh_light;
-float radiusLoc;
+extern Shader sh_light;
+extern float radiusLoc;
 
 void lights_init();
 void lights_update();

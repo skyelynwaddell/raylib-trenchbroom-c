@@ -1,7 +1,6 @@
-#include "input.h"
-#include "stdio.h"
+#include "skyelib.h"
+#include "gameloop.h"
 #include "global.h"
-#include "raylib.h"
 
 /*
 input

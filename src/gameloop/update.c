@@ -1,6 +1,7 @@
-#include "update.h"
-#include <camera.h>
-#include <global.h>
+#include "skyelib.h"
+#include "gameloop.h"
+#include "global.h"
+#include "map.h"
 
 /*
 update
@@ -10,5 +11,6 @@ update
 void update()
 {
     if (global_paused) return; // If the game is paused, skip the update logic
+    map_hotreload();
     //UpdateCamera(&camera, camera_mode);
 }

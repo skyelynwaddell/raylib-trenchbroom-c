@@ -1,9 +1,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "raylib.h"
-#include "gameobject.h"
-#include "collisionbox.h"
+#include "skyelib.h"
+#include "global.h"
 
 typedef struct {
     GameObject gameobject;

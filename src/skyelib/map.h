@@ -1,16 +1,16 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <stdio.h>
-#include "defs.h"
-#include "brushface.h"
-#include "brush.h"
-#include "geometry.h"
-#include "entity.h"
+#include "skyelib.h"
 #include "lights.h"
 
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
+
 // struct to hold the data stored in .map file
-typedef struct {
+typedef struct Map {
+    char filename[128];
     int mapversion;
 
     Brush brushes[MAX_BRUSHES]; //contains all the brush faces in a map
@@ -36,5 +36,8 @@ void map_clear_models();
 void map_draw();
 void map_draw_models();
 void map_draw_model(Model model);
+
+void map_hotreload();
+time_t get_file_mod_time(const char *filename);
 
 #endif // MAP_H

@@ -1,14 +1,7 @@
-#include "defs.h"
 
 #define RLIGHTS_IMPLEMENTATION
 
-#if defined(PLATFORM_DESKTOP)
-    #define GLSL_VERSION            330
-#else   // PLATFORM_ANDROID, PLATFORM_WEB
-    #define GLSL_VERSION            100
-#endif
-
-#include "lights.h" 
+#include "skyelib.h"
 #include "map.h"
 
 Shader sh_light;

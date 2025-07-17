@@ -35,6 +35,10 @@
         "player.h": "c",
         "draw_gui.h": "c",
         "math.h": "c",
-        "frustum.h": "c"
+        "frustum.h": "c",
+        "brushtopolygon.h": "c",
+        "stat.h": "c",
+        "skyelib.h": "c",
+        "gameloop.h": "c"
     },
 }

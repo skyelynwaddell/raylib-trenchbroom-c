@@ -1,18 +1,42 @@
-#include "stdio.h"
-#include "brushtopolygon.h"
-
-#include <stdbool.h>
-#include "raylib.h"
-#include "raymath.h"
-
-#include "defs.h"
-#include "global.h"
-#include "texturemanager.h"
-
-#include "brush.h"
-#include "polygon.h"
+#include "skyelib.h"
 #include "map.h"
 
+/*
+--------------------------
+brushface_print
+- prints a brush face's data to the console
+*/
+void brushface_print(BrushFace b, int face_index)
+{
+    #ifdef DEBUG
+    printf("Brush Face %i:\n", face_index);
+    printf("  Pos1: (%f, %f, %f)\n", b.pos_1.x, b.pos_1.y, b.pos_1.z);
+    printf("  Pos2: (%f, %f, %f)\n", b.pos_2.x, b.pos_2.y, b.pos_2.z);
+    printf("  Pos3: (%f, %f, %f)\n", b.pos_3.x, b.pos_3.y, b.pos_3.z);
+    printf("  Texture: %s\n", b.texture);
+    printf("  UV S: (%f, %f, %f, %f)\n", b.uv_s.x, b.uv_s.y, b.uv_s.z, b.uv_s.w);
+    printf("  UV T: (%f, %f, %f, %f)\n", b.uv_t.x, b.uv_t.y, b.uv_t.z, b.uv_t.w);
+    printf("  UV Rotation: %d\n", b.uv_rotation);
+    printf("  U Scale: %d\n", b.u_scale);
+    printf("  V Scale: %d\n", b.v_scale);
+    #endif
+}
+
+
+/*
+--------------------------
+brush_face_to_plane
+face [BrushFace] - the passed in BrushFace to be calculated to a plane
+- turns a BrushFace type into a plane
+*/
+Plane brushface_to_plane(BrushFace face)
+{
+    Vector3 edge1 = Vector3Subtract(face.pos_2, face.pos_1);
+    Vector3 edge2 = Vector3Subtract(face.pos_3, face.pos_1);
+    Vector3 normal = Vector3Normalize(Vector3CrossProduct(edge1,edge2));
+    double distance = -Vector3DotProduct(normal, face.pos_1);
+    return (Plane) { normal, distance };
+}
 
 /*
 polygon_get_intersection
@@ -60,7 +84,7 @@ void polygon_generate_from_brush(Brush *brush)
 
     for (int i=0; i < brush->brush_face_count - 2; i++){
         for (int j = i+1; j < brush->brush_face_count -1; j++){
-            for (int k = j + 1; k < brush->brush_face_count; k++){
+            for (int k = j+1; k < brush->brush_face_count; k++){
                 //printf("Generating plane: ");
 
                 //create planes from brush faces
@@ -70,12 +94,15 @@ void polygon_generate_from_brush(Brush *brush)
 
                 //check for intersecting planes in the polygon
                 Vector3 p;
-                if (!polygon_get_intersection(
+                if (polygon_get_intersection(
                     plane_i.normal, plane_j.normal, plane_k.normal,
                     plane_i.distance, plane_j.distance, plane_k.distance, &p
-                )) 
+                ) == false) 
                 {
-                    //printf("FAILED.\n");
+                    #ifdef DEBUG
+                        printf("FAILED.\n");
+                    #endif
+
                     continue;
                 }
 
@@ -87,7 +114,10 @@ void polygon_generate_from_brush(Brush *brush)
                     if (Vector3DotProduct(test_plane.normal, p) + test_plane.distance < -0.001f)
                     {
                         //point is outside reject it
-                        //printf("FAILED.\n");
+                        #ifdef DEBUG
+                            printf("FAILED.\n");
+                        #endif
+
                         legal = false;
                         break;
                     }
@@ -124,9 +154,11 @@ void polygon_generate_from_brush(Brush *brush)
                         brush->polys[k].vertices[brush->polys[k].vertex_count++] = p;
                     }
 
-                    /// print if the creation was successful or not
-                    //if (success == true) printf("SUCCESS.\n");
-                    //else printf("FAILED.\n");
+                    #ifdef DEBUG
+                        /// print if the creation was successful or not
+                        if (success == true) printf("SUCCESS.\n");
+                        else printf("FAILED.\n");
+                    #endif
                 }
             }
         }
@@ -167,9 +199,6 @@ void polygon_sort_vertices(Polygon* poly, Vector3 normal)
     for (int i=0; i< poly->vertex_count; i++)
     {
         Vector3 dir = Vector3Subtract(poly->vertices[i], centroid);
-
-        // project dir to plane perpendicular to normal:
-        // dir_proj = dir - (dir ⋅ normal)*normal
 
         float dist_to_normal = Vector3DotProduct(dir, normal);
         Vector3 proj = Vector3Subtract(dir, Vector3Scale(normal, dist_to_normal));

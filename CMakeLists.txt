@@ -16,6 +16,7 @@ include_directories(
     /opt/homebrew/include    # SDL2 headers (Homebrew default on Apple Silicon)
 )
 
+
 # SDL2: locate the SDL2 library installed via Homebrew
 find_library(SDL2_LIBRARY SDL2 HINTS /opt/homebrew/lib /usr/local/lib)
 
@@ -25,6 +26,7 @@ endif()
 
 # Manually import the precompiled raylib static library
 add_library(raylib STATIC IMPORTED GLOBAL)
+
 set_target_properties(raylib PROPERTIES
     IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/lib/raylib/lib/libraylib.a
     INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/lib/raylib/include
@@ -32,6 +34,7 @@ set_target_properties(raylib PROPERTIES
 
 # Gather all C source files
 file(GLOB_RECURSE SRC_FILES src/*.c)
+list(APPEND SRC_FILES src/lib/raylib/include/raygui.h)
 
 # Define the executable
 add_executable(game ${SRC_FILES})

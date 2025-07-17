@@ -1,4 +1,5 @@
-#include "draw_viewmodel.h"
+#include "skyelib.h"
+#include "gameloop.h"
 
 /*
 draw_viewmodel

@@ -1,7 +1,5 @@
 
-#include "texturemanager.h"
-#include "utils.h"
-#include "string.h"
+#include "skyelib.h"
 
 int texture_cache_count = 0;
 Texture2D default_texture;
@@ -47,7 +45,9 @@ Texture2D texture_get_cached(char *texture_name)
     //fallback to __TB_empty.png if failed
     if (tex.id == 0)
     {
-        printf("Failed to load texture: %s\n", path);
+        #ifdef DEBUG
+            printf("Failed to load texture: %s\n", path);
+        #endif
 
         //check if fallback is already cached
         for (int i = 0; i < texture_cache_count; i++)
@@ -65,7 +65,9 @@ Texture2D texture_get_cached(char *texture_name)
         if (tex.id == 0)
         {
             // returns a blank texture in case of extra fail and no TB empty was found
-            printf("FATAL: Failed to load fallback texture __TB_empty.png\n");
+            #ifdef DEBUG
+                printf("FATAL: Failed to load fallback texture __TB_empty.png\n");
+            #endif
             return default_texture;
         }
 
@@ -89,7 +91,9 @@ Texture2D texture_get_cached(char *texture_name)
     else
     {
         //we had no more space in the texture cache
-        printf("Texture cache is full! Returning uncached texture.\n");
+        #ifdef DEBUG
+            printf("Texture cache is full! Returning uncached texture.\n");
+        #endif
     }
 
     // returns the newly loaded and cached texture

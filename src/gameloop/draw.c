@@ -1,10 +1,6 @@
-#include "stdio.h"
-#include "raylib.h"
-#include "raymath.h"
+#include "skyelib.h"
+#include "gameloop.h"
 #include "map.h"
-#include "triangle.h"
-#include "brushtopolygon.h"
-#include "polygon.h"
 
 /*
 draw

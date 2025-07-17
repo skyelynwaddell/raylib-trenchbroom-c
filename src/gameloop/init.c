@@ -1,11 +1,6 @@
-#include "stdio.h"
-#include "init.h"
+#include "skyelib.h"
+#include "gameloop.h"
 #include "map.h"
-#include "camera.h"
-#include "raylib.h"
-#include <defs.h>
-#include <global.h>
-#include "lights.h"
 
 /*
 init

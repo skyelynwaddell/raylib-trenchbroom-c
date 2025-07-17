@@ -1,9 +1,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include "raylib.h"
-#include <stdio.h>
-#include "global.h"
+#include "skyelib.h"
 
 typedef struct {
     char name[64];
