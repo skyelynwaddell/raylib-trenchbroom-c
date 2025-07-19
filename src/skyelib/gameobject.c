@@ -206,6 +206,9 @@ void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask)
 check_raycast()
 Checks for a collision between the global raycast
 sets the gameobject is_hit variable to true
+
+NOTE: Must remember to call reset_raycast after doing logic
+or else the raycast will never lose target
 */
 int check_raycast(GameObject *obj)
 {
