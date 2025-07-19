@@ -1,5 +1,5 @@
-#include "skyelib.h"
 #include "gameloop.h"
+#include "skyelib.h"
 #include "global.h"
 
 /*
@@ -11,7 +11,10 @@ void draw_gui()
     // Draw the FPS counter
     char fps_text[16];
     sprintf(fps_text, "%d", GetFPS());
-    DrawText(fps_text, 10, 10, 20, BLACK);
+    DrawText(fps_text, 10, 10, 20, LIME);
+
+    DrawCircle(SCREEN_WIDTH/2-(HITMARKER_CIRCLE_RADIUS/2),SCREEN_HEIGHT/2-(HITMARKER_CIRCLE_RADIUS/2),HITMARKER_CIRCLE_RADIUS,global_raycast_has_target ? RED : WHITE);
+
 
     if (global_paused) draw_pausemenu();
 }
@@ -61,7 +64,7 @@ void draw_pausemenu()
     menu_item_next();
     if (GuiButton((Rectangle){ posX, get_pos_y(), btnWidth, btnHeight }, "Exit"))
     {
-        CloseWindow(); // Closes the window and exits the game
+        global_quit_game = true;
     }
 }
 

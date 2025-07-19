@@ -1,6 +1,5 @@
-#include "skyelib.h"
 #include "gameloop.h"
-#include "map.h"
+#include "skyelib.h"
 
 /*
 clean_up

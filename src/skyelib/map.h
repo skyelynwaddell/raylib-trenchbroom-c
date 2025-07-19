@@ -1,12 +1,7 @@
-#ifndef MAP_H
-#define MAP_H
+#ifndef SKYE_MAP_H
+#define SKYE_MAP_H
 
 #include "skyelib.h"
-#include "lights.h"
-
-#include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
 
 // struct to hold the data stored in .map file
 typedef struct Map {
@@ -38,6 +33,5 @@ void map_draw_models();
 void map_draw_model(Model model);
 
 void map_hotreload();
-time_t get_file_mod_time(const char *filename);
 
-#endif // MAP_H
+#endif // SKYE_MAP_H

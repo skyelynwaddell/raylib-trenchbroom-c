@@ -1,5 +1,7 @@
 #ifndef GAMELOOP_H
 #define GAMELOOP_H
+#include "skyelib.h"
+
 
 int gameloop();
 void init();

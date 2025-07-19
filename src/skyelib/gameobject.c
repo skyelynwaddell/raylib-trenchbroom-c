@@ -1,23 +1,53 @@
 #include "skyelib.h"
-#include "map.h"
+#include "global.h"
+#include "enemy.h"
 
 /*
 place_meeting
-returns TRUE if GameObject is colliding with a solid geometry / wall.
+returns TRUE if GameObject is colliding with a solid object
 */
-int place_meeting_solid(GameObject *object)
+int place_meeting_solid(GameObject *object, COLLISION_MASK mask)
 {
-    for (int i=0; i < map.model_count; i++)
+    // --- Map Collisions ---
+    if (mask == COLLISION_MASK_ALL || mask == COLLISION_MASK_SOLID)
     {
-    // potential collision -- do cheap math first
-    if ((CheckCollisionBoxes(object->collision_box.bounding_box, map.models[i].bounds)) == false) 
-        continue;
+        for (int i=0; i < map.model_count; i++)
+        {
+        Geometry *geo = &map.models[i];
+        Vector3 center = Vector3Lerp(geo->bounds.min, geo->bounds.max, 0.5f);
+        float dist = Vector3Distance(center, object->position);
+        if (dist > COLLISION_DISTANCE) continue; // too far to care
 
-    //actual collision -- do expensive math
-    if (CheckCollisionBoxesExt(object->collision_box.bounding_box, map.models[i].collision))
-        return true;
+        // potential collision -- do cheap math first
+        if ((CheckCollisionBoxes(object->collision_box.bounding_box, map.models[i].bounds)) == false) 
+            continue;
 
+        //actual collision -- do expensive math
+        if (CheckCollisionBoxesExt(object->collision_box.bounding_box, map.models[i].collision))
+            return true;
+
+        }
     }
+
+    // --- Enemy Collisions ---
+    if (mask == COLLISION_MASK_ALL || mask == COLLISION_MASK_ENEMY)
+    {
+        for (int i=0; i < MAX_ENEMIES; i++)
+        {
+            Enemy *e = enemies[i];
+            if (!e || e->health <= 0) continue;
+            if (e == object) continue;
+
+            Vector3 center = Vector3Lerp(e->gameobject.collision_box.bounding_box.min, e->gameobject.collision_box.bounding_box.max, 0.5f);
+            float dist = Vector3Distance(center, object->position);
+            if (dist > COLLISION_DISTANCE) continue; // too far to care
+
+            // collision
+            if ((CheckCollisionBoxes(object->collision_box.bounding_box, e->gameobject.collision_box.bounding_box))) 
+                return true;
+        }
+    }
+
     return false;
 }
 
@@ -114,7 +144,12 @@ Applies vertical gravity to the player object
 */
 void apply_gravity(GameObject *obj)
 {
-    obj->velocity.y += obj->gravity;
+    if (global_paused || global_game_loading) 
+    {
+        obj->velocity = Vector3Zero();
+        return;
+    }
+    obj->velocity.y += obj->gravity * GetFrameTime();
 }
 
 
@@ -122,7 +157,7 @@ void apply_gravity(GameObject *obj)
 check_collisions
 Handles all the X Y Z collisions between obj and walls/floors/ceilings
 */
-void check_collisions(GameObject *obj, int is_player)
+void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask)
 {
     Vector3 original_pos = obj->position;
     float dt = GetFrameTime();
@@ -132,7 +167,7 @@ void check_collisions(GameObject *obj, int is_player)
     Vector3 testY = Vector3Add(obj->position, moveY);
     collisionbox_set_position(&obj->collision_box, testY);
 
-    if (!place_meeting_solid(obj)) {
+    if (!place_meeting_solid(obj, mask)) {
         obj->position.y += moveY.y;
         if (is_player) global_player_onground = false;
     } else {
@@ -145,7 +180,7 @@ void check_collisions(GameObject *obj, int is_player)
     Vector3 testX = Vector3Add(obj->position, moveX);
     collisionbox_set_position(&obj->collision_box, testX);
 
-    if (!place_meeting_solid(obj)) {
+    if (!place_meeting_solid(obj, mask)) {
         obj->position.x += moveX.x;
     } else {
         obj->velocity.x = 0.0f;
@@ -156,7 +191,7 @@ void check_collisions(GameObject *obj, int is_player)
     Vector3 testZ = Vector3Add(obj->position, moveZ);
     collisionbox_set_position(&obj->collision_box, testZ);
 
-    if (!place_meeting_solid(obj)) {
+    if (!place_meeting_solid(obj, mask)) {
         obj->position.z += moveZ.z;
     } else {
         obj->velocity.z = 0.0f;
@@ -164,4 +199,62 @@ void check_collisions(GameObject *obj, int is_player)
 
     // Final update of the collision box
     collisionbox_set_position(&obj->collision_box, obj->position);
+}
+
+
+/*
+check_raycast()
+Checks for a collision between the global raycast
+sets the gameobject is_hit variable to true
+*/
+int check_raycast(GameObject *obj)
+{
+    BoundingBox world_bb = obj->collision_box.bounding_box;
+    RayCollision ray = GetRayCollisionBox(global_raycast.ray, world_bb);
+
+    if (ray.hit &&
+        (!global_raycast.has_hit || ray.distance < global_raycast.blocked_distance))
+    {
+        global_raycast_has_target = true;
+
+        if (global_player_shooting)
+        {
+            obj->is_hit = true;
+            return true;
+        }
+    }
+    obj->is_hit = false;
+    return false;
+}
+
+
+/*
+reset_raycast
+Called at the end of enemy update to reset its raycast hit status
+*/
+void reset_raycast(GameObject *obj)
+{
+    obj->is_hit = false;
+}
+
+
+/*
+distance_to
+Returns true if the gameobjects are equal or less to the distance
+*/
+int distance_to(GameObject *obj1, GameObject *obj2, float distance)
+{
+    float dist = Vector3Distance(obj1->position, obj2->position);
+    return dist <= distance;
+}
+
+
+/*
+distance_to
+Returns true if the gameobjects are equal or less to the distance
+*/
+int distance_to_player(GameObject *obj1, float distance)
+{
+    float dist = Vector3Distance(obj1->position, player.gameobject.position);
+    return dist <= distance;
 }

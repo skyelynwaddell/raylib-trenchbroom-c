@@ -1,5 +1,5 @@
-#include "skyelib.h"
 #include "gameloop.h"
+#include "skyelib.h"
 #include "global.h"
 
 /*
@@ -20,7 +20,5 @@ Pause / Unpause the game when the user presses the ESC key
 void handle_pause()
 {
     if (IsKeyPressed(KEY_ESCAPE)) 
-    {
         pause_toggle();
-    }
 }

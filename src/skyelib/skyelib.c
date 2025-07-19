@@ -1,7 +1,5 @@
 #include "skyelib.h"
 
-#define RAYGUI_IMPLEMENTATION
-
 /*
 to_delta
 Returns value multiplied by Delta Time
@@ -20,12 +18,12 @@ Frustum frustum_get_from_camera(Camera3D cam)
     Matrix view = MatrixLookAt(cam.position, cam.target, cam.up);
 
     #ifdef DEBUG
-        float debug_fov = 0.9f;
+        float _fov = 0.9f; // reduce FOV by 10% in DEBUG to show Occlussion Culling is working
     #else
-        float debug_fov = 1.0f;
+        float _fov = 1.0f;
     #endif
     
-    float fov = cam.fovy * debug_fov; // reduce FOV by 10% in DEBUG to show Occlussion Culling is working
+    float fov = cam.fovy * _fov;
     Matrix proj = MatrixPerspective(fov * DEG2RAD, (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.01f, 1000.0f);
 
     Matrix vp = MatrixMultiply(view, proj);

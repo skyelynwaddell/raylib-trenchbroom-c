@@ -1,4 +1,3 @@
-
 #include "skyelib.h"
 
 int texture_cache_count = 0;
@@ -37,7 +36,7 @@ Texture2D texture_get_cached(char *texture_name)
 
     //prepare the texture path
     char path[128];
-    snprintf(path, sizeof(path), "gamedata/textures/%s.png", texture_name);
+    snprintf(path, sizeof(path), TEXTURE_DIR "%s.png", texture_name);
 
     //attempt to load the texture
     Texture2D tex = LoadTexture(path);
@@ -60,7 +59,7 @@ Texture2D texture_get_cached(char *texture_name)
         }
 
         //fallback not cached yet, try to load it
-        snprintf(path, sizeof(path), "textures/__TB_empty.png");
+        snprintf(path, sizeof(path), TEXTURE_DIR "__TB_empty.png");
         tex = LoadTexture(path);
         if (tex.id == 0)
         {
@@ -98,4 +97,17 @@ Texture2D texture_get_cached(char *texture_name)
 
     // returns the newly loaded and cached texture
     return tex;
+}
+
+/*
+texture_cache_cleanup()
+Call this at game end to free up memory of
+all the textures used and stored in memory
+*/
+void texture_cache_cleanup()
+{
+    for (int i = 0; i < texture_cache_count; i++) {
+        UnloadTexture(texture_cache[i].texture);
+    }
+    texture_cache_count = 0;
 }

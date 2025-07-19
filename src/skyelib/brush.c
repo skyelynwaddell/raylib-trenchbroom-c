@@ -1,5 +1,4 @@
 #include "skyelib.h"
-#include "map.h"
 
 /*
 --------------------------
@@ -51,8 +50,7 @@ bool polygon_get_intersection(
     double d2,
     double d3,
     Vector3* out
-)
-{
+){
     Vector3 c1 = Vector3CrossProduct(n2, n3);
     Vector3 c2 = Vector3CrossProduct(n3, n1);
     Vector3 c3 = Vector3CrossProduct(n1, n2);

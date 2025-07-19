@@ -1,7 +1,5 @@
-#include "map.h"
-#include "player.h"
 #include "skyelib.h"
-
+#include "global.h"
 
 Map map; // stores the currently loaded map
 
@@ -14,14 +12,14 @@ int map_parse(const char* filename)
 {
     global_paused = true;
     char fullpath[256];
+
+    // preserve filename we need to load after, 
+    // since we are about to wipe the map data from memory
     char preserved_filename[256];
     snprintf(preserved_filename, sizeof(preserved_filename), "%s", filename);
 
+    // clear map data
     map_clear_models();
-    memset(&map, 0, sizeof(map)); // clear map safely after
-
-    map.model_count = 0;
-    map.light_count = 0;
 
     #ifdef DEBUG
         printf("\n");
@@ -33,6 +31,7 @@ int map_parse(const char* filename)
     snprintf(fullpath, sizeof(fullpath), "maps/%s", preserved_filename);
 
 
+    // attempt to load the .map file
     FILE* file = fopen(fullpath, "r");
     if (!file)
     {
@@ -334,6 +333,7 @@ int map_parse(const char* filename)
     fclose(file);
     map_create_models();
     global_paused = false;
+    global_game_loading = false;
     return true;
 }
 
@@ -498,6 +498,9 @@ void map_clear_models()
     {
         UnloadModel(map.models[i].model);
     }
+    memset(&map, 0, sizeof(map)); // clear map safely after
+    map.model_count = 0;
+    map.light_count = 0;
 }
 
 
@@ -517,16 +520,31 @@ map_draw_models
 */
 void map_draw_models()
 {
+
+    Vector2 screen_center = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+    global_raycast.ray = GetScreenToWorldRay(screen_center, camera);
+    global_raycast.has_hit = false;
+    global_raycast.blocked_distance = FLT_MAX;
+
     Frustum frustum = frustum_get_from_camera(camera);
     for (int i = 0; i < map.model_count; i++)
     {
+        RayCollision hit = GetRayCollisionBox(global_raycast.ray, map.models[i].bounds);
+        if (hit.hit && hit.distance < global_raycast.blocked_distance) {
+            global_raycast.blocked_distance = hit.distance;
+            global_raycast.has_hit = true;
+        }
+
         Geometry *geo = &map.models[i];
+        geo->visible = false;
+        //geo->visible = false;
         // only draw map models inside camera view frustum
         // occlusion culling
         if (!frustum_check_boundingbox(geo->bounds, frustum)) 
             continue;
 
         geo->model.materials[0].shader = sh_light;
+        geo->visible = true;
         map_draw_model(geo->model);
         
     }
@@ -557,6 +575,7 @@ void map_hotreload() {
     #ifdef DEBUG
     if (IsKeyPressed(KEY_ENTER))
     {
+        global_game_loading = true;
         char filename[256];
         snprintf(filename, sizeof(filename), "%s", map.filename); // safe copy
         map_parse(filename);

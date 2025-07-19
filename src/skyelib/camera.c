@@ -26,11 +26,28 @@ Makes the Camera follow the Player target in First Person
 */
 void camera_follow_player(Camera3D *camera, GameObject *target)
 {
+    if (global_paused) return;
+
     Vector2 mouseDelta = GetMouseDelta();
     float sensitivity = 0.002f;
 
     global_cam_yaw -= mouseDelta.x * sensitivity;
     global_cam_pitch -= mouseDelta.y * sensitivity;
+
+    if (IsGamepadAvailable(GAMEPAD_P1)) // GAMEPAD_PLAYER1
+    {
+        float look_x = GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+        float look_y = GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
+
+        float deadzone = 0.2f;
+        if (fabsf(look_x) < deadzone) look_x = 0.0f;
+        if (fabsf(look_y) < deadzone) look_y = 0.0f;
+
+        float joystick_sensitivity = 0.006f;
+
+        global_cam_yaw   -= look_x * joystick_sensitivity;
+        global_cam_pitch -= look_y * joystick_sensitivity;
+    }
 
     // Clamp pitch between looking straight up and down
     if (global_cam_pitch > PI/2 - 0.01f) global_cam_pitch = PI/2 - 0.01f;
@@ -43,8 +60,14 @@ void camera_follow_player(Camera3D *camera, GameObject *target)
         cosf(global_cam_pitch) * cosf(global_cam_yaw)
     };
 
+    global_camera_height_current = Vector3Lerp(
+        global_camera_height_current,
+        global_camera_height,
+        GetFrameTime() * 10
+    );
+
     // Set camera position just above player position (eye height)
-    camera->position = Vector3Add(target->position, CAMERA_HEIGHT);
+    camera->position = Vector3Add(target->position, global_camera_height_current);
 
     // Camera target is forward direction from eye position
     camera->target = Vector3Add(camera->position, forward);

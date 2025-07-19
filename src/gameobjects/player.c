@@ -30,7 +30,9 @@ void player_init()
     player.health = PLAYER_HEALTH;
     player.jump_height = PLAYER_JUMPHEIGHT;
     player.gameobject.speed = PLAYER_SPEED;
-    player.gameobject.gravity = PLAYER_GRAVITY;
+    player.gameobject.gravity = GRAVITY_DEFAULT;
+
+    global_camera_height_current = global_camera_height;
 };
 
 
@@ -40,18 +42,66 @@ Called every Tick
 */
 void player_update()
 {
-    if (global_paused) 
+    if (global_paused || global_game_loading) 
     {
         player.gameobject.velocity = Vector3Zero();
         return;
     }
 
+    float delta = GetFrameTime();
+
+    player_handle_crouch();
     player_movement();
     apply_gravity(&player);
     player_handle_jump();
-    check_collisions(&player, true);
+    check_collisions(&player, true, COLLISION_MASK_ALL);
     camera_follow_player(&camera, &player);
+
+    if (IsMouseButtonDown(BUTTON_SHOOT_KEY) || IsGamepadButtonDown(GAMEPAD_P1, BUTTON_SHOOT_PAD))
+    {
+        global_player_shooting = true;
+    }
+
 }
+
+
+/*
+player_draw
+Any calls to draw 3d objects on the player can be
+ie. collision box shape etc
+For drawing weapons, hands, arms etc. see Viewmodel to draw instead
+This is for actual player model etc not the arms or view model weapon.
+*/
+void player_draw()
+{
+    #ifdef DEBUG
+    DrawBoundingBox(player.gameobject.collision_box.bounding_box, RED);
+    #endif
+}
+
+
+/*
+player_handle_crouch
+Handles when the player presses the Crouch key,
+and toggles the player crouching moving up/down
+*/
+void player_handle_crouch()
+{
+    if (IsKeyPressed(BUTTON_CROUCH_KEY) || IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_CROUCH_PAD))
+    {
+        if (global_player_crouching == false)
+        {
+            global_player_crouching = true;
+            global_camera_height = CAMERA_HEIGHT_CROUCH;
+        }
+        else
+        {
+            global_player_crouching = false;
+            global_camera_height = CAMERA_HEIGHT_DEFAULT;
+        }
+    }  
+}
+
 
 
 /*
@@ -62,16 +112,24 @@ void player_movement()
 {   
     float input_x, input_z;
 
-    // gamepad movement
-    if (IsGamepadAvailable(GAMEPAD_P1))
-    {
-        input_x = (IsKeyDown(BUTTON_MOVE_LEFT_PAD) - IsKeyDown(BUTTON_MOVE_RIGHT_PAD));
-        input_z = (IsKeyDown(BUTTON_MOVE_FORWARD_PAD) - IsKeyDown(BUTTON_MOVE_BACKWARD_PAD)); 
-    }
-
     // keyboard movement
     input_x = (IsKeyDown(BUTTON_MOVE_LEFT_KEY) - IsKeyDown(BUTTON_MOVE_RIGHT_KEY));
     input_z = (IsKeyDown(BUTTON_MOVE_FORWARD_KEY) - IsKeyDown(BUTTON_MOVE_BACKWARD_KEY));
+
+    // gamepad movement
+    if (IsGamepadAvailable(GAMEPAD_P1) && (input_x == 0 && input_z == 0))
+    {
+        float lx = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+        float ly = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+        float deadzone = 0.2f;
+
+        if (fabsf(lx) < deadzone) lx = 0.0f;
+        if (fabsf(ly) < deadzone) ly = 0.0f;
+
+        input_x = -lx;
+        input_z = -ly;
+    }
 
     float input_len = sqrtf(input_x * input_x + input_z * input_z);
     if (input_len > 0.0f) {
@@ -88,14 +146,14 @@ void player_movement()
         forward.z * input_z + right.z * input_x
     };
 
-    float accel = 10.0f;
+    float accel = 5.0f;
     float fric = 10.0f;
     float air_fric = 1.0f;
     float dt = GetFrameTime();
 
     if (input_len > 0.0f)
     {
-        Vector3 desired = Vector3Scale(move_dir, player.gameobject.speed);
+        Vector3 desired = Vector3Scale(move_dir, player.gameobject.speed * input_len);
         Vector3 delta = Vector3Subtract(desired, (Vector3){ player.gameobject.velocity.x, 0.0f, player.gameobject.velocity.z });
         Vector3 accel_step = Vector3Scale(delta, accel * dt);
         player.gameobject.velocity.x += accel_step.x;
@@ -131,17 +189,4 @@ void player_handle_jump()
     // jump
     if ((IsKeyPressed(BUTTON_JUMP_KEY) || (IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_JUMP_PAD))) && global_player_onground)
         player_jump();
-}
-
-
-/*
-player_draw
-Any calls to draw 3d objects on the player can be
-ie. collision box shape etc
-For drawing weapons, hands, arms etc. see Viewmodel to draw instead
-This is for actual player model etc not the arms or view model weapon.
-*/
-void player_draw()
-{
-    DrawBoundingBox(player.gameobject.collision_box.bounding_box, RED);
 }

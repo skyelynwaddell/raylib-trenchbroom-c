@@ -4,6 +4,7 @@
 #include "skyelib.h"
 #include "global.h"
 
+
 typedef struct {
     GameObject gameobject;
     int health;
@@ -19,5 +20,6 @@ void player_draw();
 void player_movement();
 void player_jump();
 void player_handle_jump();
+void player_handle_crouch();
 
 #endif // PLAYER_H

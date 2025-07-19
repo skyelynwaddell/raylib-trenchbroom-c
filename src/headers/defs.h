@@ -9,7 +9,18 @@
 #define PLAYER_HEALTH_MAX 100
 #define PLAYER_HEALTH 100
 #define PLAYER_JUMPHEIGHT 35.0
-#define PLAYER_SPEED 20.0f
-#define PLAYER_GRAVITY -0.2f
+#define PLAYER_SPEED 40.0f
+#define HITMARKER_CIRCLE_RADIUS 2
+
+#define GRAVITY_DEFAULT -60.0f
+#define INTERACT_DISTANCE_ENEMY 50.0f
+#define RENDER_DISTANCE 100.0f // Max distance before we stop rendering something 
+#define COLLISION_DISTANCE 60.0f // Max distance before we dont check for collisions
+
+typedef enum ACTOR_STATE {
+    STATE_IDLE,
+    STATE_HURT,
+    STATE_DEAD
+} ENEMY_STATE;
 
 #endif

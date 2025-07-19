@@ -4,100 +4,20 @@
 #define PLATFORM_DESKTOP
 #define DEBUG
 
-#if defined(PLATFORM_DESKTOP)
-#define GLSL_VERSION            330
-#else   // PLATFORM_ANDROID, PLATFORM_WEB
-    #define GLSL_VERSION            100
+#ifdef PLATFORM_DESKTOP
+#define GLSL_VERSION 330
+#else // PLATFORM_ANDROID, PLATFORM_WEB
+    #define GLSL_VERSION 100
 #endif
 
-// game settings
-#define GAME_TITLE "skyesrc"
-#define FPS 2000 // max fps
+// --- Game Settings ---
+#define GAME_TITLE      "skyesrc"
+#define MAX_ENEMIES 128
 
-#define MAX_VERTICES_PER_FACE 128
-#define BRUSH_FACE_COUNT 64         // a brush can have up to 64 faces - must be convex
-#define MAX_TEXTURES 10000
-#define CAMERA_HEIGHT (Vector3){0.0f, 3.5f, 0.0f} // adjust for player height
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define MODEL_DIR "gamedata/models/"
+#define TEXTURE_DIR "gamedata/textures/"
 
-// brush & map geometry defs
-#define MAX_VERTICES_PER_FACE 128   // a brushface can have up to 128 vertices
-#define MAX_COLUMNS 20
-#define MAX_POLY_VERTS 64
-#define MAX_LINE 1024
-#define MAX_BRUSHES 10000
-#define MAX_POLYGONS 10000
-
-// level settings
-#define MAX_ENTITIES 1000 // Maximum entities can be in a room
-#define MAX_LIGHTS 255 // Maximum lightobjects can be in a room
-#define MAX_DARK 0.2 // How dark the room can get without lighting (0 = BLACK)
-
-// controls
-// --- Movement ---
-#define GAMEPAD_P1 0
-
-// --- Movement ---
-#define BUTTON_MOVE_FORWARD_KEY      KEY_W
-#define BUTTON_MOVE_FORWARD_PAD      GAMEPAD_BUTTON_LEFT_FACE_UP
-
-#define BUTTON_MOVE_BACKWARD_KEY     KEY_S
-#define BUTTON_MOVE_BACKWARD_PAD     GAMEPAD_BUTTON_LEFT_FACE_DOWN
-
-#define BUTTON_MOVE_LEFT_KEY         KEY_A
-#define BUTTON_MOVE_LEFT_PAD         GAMEPAD_BUTTON_LEFT_FACE_LEFT
-
-#define BUTTON_MOVE_RIGHT_KEY        KEY_D
-#define BUTTON_MOVE_RIGHT_PAD        GAMEPAD_BUTTON_LEFT_FACE_RIGHT
-
-// --- Actions ---
-#define BUTTON_JUMP_KEY              KEY_SPACE
-#define BUTTON_JUMP_PAD              GAMEPAD_BUTTON_RIGHT_FACE_DOWN  // X / A
-
-#define BUTTON_CROUCH_KEY            KEY_LEFT_CONTROL
-#define BUTTON_CROUCH_PAD            GAMEPAD_BUTTON_RIGHT_FACE_LEFT  // Y / X
-
-#define BUTTON_SPRINT_KEY            KEY_LEFT_SHIFT
-#define BUTTON_SPRINT_PAD            GAMEPAD_BUTTON_RIGHT_FACE_UP    // B / Circle
-
-// --- Combat ---
-#define BUTTON_SHOOT_KEY             MOUSE_LEFT_BUTTON
-#define BUTTON_SHOOT_PAD             GAMEPAD_BUTTON_RIGHT_TRIGGER
-
-#define BUTTON_AIM_KEY               MOUSE_RIGHT_BUTTON
-#define BUTTON_AIM_PAD               GAMEPAD_BUTTON_LEFT_TRIGGER
-
-#define BUTTON_RELOAD_KEY            KEY_R
-#define BUTTON_RELOAD_PAD            GAMEPAD_BUTTON_RIGHT_FACE_RIGHT // B / Circle
-
-#define BUTTON_MELEE_KEY             KEY_C
-#define BUTTON_MELEE_PAD             GAMEPAD_BUTTON_LEFT_FACE_UP     // optional
-
-// --- Weapons ---
-#define BUTTON_SWITCH_WEAPON_KEY     KEY_Q
-#define BUTTON_SWITCH_WEAPON_PAD     GAMEPAD_BUTTON_RIGHT_FACE_UP    // Y / Triangle
-
-#define BUTTON_NEXT_WEAPON_KEY       KEY_E
-#define BUTTON_NEXT_WEAPON_PAD       GAMEPAD_BUTTON_LEFT_FACE_RIGHT
-
-#define BUTTON_PREV_WEAPON_KEY       KEY_Q
-#define BUTTON_PREV_WEAPON_PAD       GAMEPAD_BUTTON_LEFT_FACE_LEFT
-
-#define BUTTON_FLASHLIGHT_KEY        KEY_F
-#define BUTTON_FLASHLIGHT_PAD        GAMEPAD_AXIS_RIGHT_TRIGGER // You may want to use a value check for this one
-
-// --- UI / Menus ---
-#define BUTTON_PAUSE_KEY             KEY_ESCAPE
-#define BUTTON_PAUSE_PAD             GAMEPAD_BUTTON_MIDDLE_RIGHT     // Start
-
-#define BUTTON_INTERACT_KEY          KEY_E
-#define BUTTON_INTERACT_PAD          GAMEPAD_BUTTON_RIGHT_FACE_LEFT  // X / Square
-
-#define BUTTON_USE_KEY               KEY_E
-#define BUTTON_USE_PAD               GAMEPAD_BUTTON_RIGHT_FACE_LEFT  // same as interact
-
-// raygui & styles/themes
+// --- Raygui & Styles/Themes ---
 #define STYLE_PATH "styles/"
 #define STYLE_AMBER STYLE_PATH "style_amber.rgs"
 #define STYLE_ASHES STYLE_PATH "style_ashes.rgs"
@@ -114,10 +34,100 @@
 #define STYLE_SUNNY STYLE_PATH "style_sunny.rgs"
 #define STYLE_TERMINAL STYLE_PATH "style_terminal.rgs"
 
+// --- Raylib ---
 #include "raylib.h"
+
+extern Vector3 global_camera_height_current;
+extern Vector3 global_camera_height;
+#define CAMERA_HEIGHT_DEFAULT (Vector3){0.0f, 3.5f, 0.0f} // adjust for player height
+#define CAMERA_HEIGHT_CROUCH  (Vector3){0.0f, -2.0f, 0.0f} // adjust for player height
+
+// --- Implemented Globals ---
+// You can define/implement any of these globals in your global.c file to be able to have access to them!
+// Most will be needed to be be implemented.
+extern int FPS;                 // max frame rate per second
+extern int SCREEN_WIDTH;        // screen width
+extern int SCREEN_HEIGHT;       // screen height
+
+extern float global_cam_yaw;    // left/right
+extern float global_cam_pitch;  // up/down
+
+extern int global_quit_game;
+extern int global_game_loading;
+
+extern int VSYNC;
+
+// --- Movement ---
+extern int BUTTON_MOVE_FORWARD_KEY;
+extern int BUTTON_MOVE_BACKWARD_KEY;
+extern int BUTTON_MOVE_LEFT_KEY;
+extern int BUTTON_MOVE_RIGHT_KEY;
+
+extern int BUTTON_JUMP_KEY;
+extern int BUTTON_JUMP_PAD;
+
+extern int BUTTON_CROUCH_KEY;
+extern int BUTTON_CROUCH_PAD; 
+
+extern int BUTTON_SPRINT_KEY;
+extern int BUTTON_SPRINT_PAD;  
+
+// --- Combat ---
+extern int BUTTON_SHOOT_KEY;
+extern int BUTTON_SHOOT_PAD;
+
+extern int BUTTON_RELOAD_KEY;
+extern int BUTTON_RELOAD_PAD;
+
+extern int BUTTON_SWITCH_WEAPON_KEY;
+extern int BUTTON_SWITCH_WEAPON_PAD;
+
+extern int BUTTON_FLASHLIGHT_KEY;
+extern int BUTTON_FLASHLIGHT_PAD;
+
+// --- DPAD ---
+extern int BUTTON_DPAD_UP_KEY;
+extern int BUTTON_DPAD_DOWN_KEY;
+extern int BUTTON_DPAD_LEFT_KEY;
+extern int BUTTON_DPAD_RIGHT_KEY;
+
+extern int BUTTON_DPAD_UP_PAD;
+extern int BUTTON_DPAD_DOWN_PAD;
+extern int BUTTON_DPAD_LEFT_PAD;
+extern int BUTTON_DPAD_RIGHT_PAD;
+
+// --- UI / Menus ---
+extern int BUTTON_PAUSE_KEY;
+extern int BUTTON_PAUSE_PAD;
+
+extern int BUTTON_INTERACT_KEY;
+extern int BUTTON_INTERACT_PAD;
+
+// --- Brush & Map Geometry ---
+#define MAX_VERTICES_PER_FACE   128   // a brushface can have up to 128 vertices
+#define MAX_LINE                1024  // max lines in a brush
+#define MAX_BRUSHES             10000 // max brushes in a level
+#define MAX_POLYGONS            10000 // max polygons per brush
+#define MAX_VERTICES_PER_FACE   128   // max vertices per brush face
+#define BRUSH_FACE_COUNT        64    // a brush can have up to 64 faces - must be convex
+#define MAX_TEXTURES            10000 // maximum texture count a level can store
+
+// --- Level Settings ---
+#define MAX_ENTITIES 1000 // Maximum entities can be in a room
+#define MAX_LIGHTS   255  // Maximum lightobjects can be in a room
+#define MAX_DARK     0.2  // How dark the room can get without lighting (0 = BLACK)
+
+// --- Gamepads ---
+#define GAMEPAD_P1 0
+#define GAMEPAD_P2 1
+#define GAMEPAD_P3 2
+#define GAMEPAD_P4 3
+
+
 #include "raymath.h"
 #include "raygui.h"
 
+// --- Libraries ---
 #include <stdio.h>
 #include "string.h"
 #include <stdbool.h>
@@ -125,11 +135,16 @@
 #include <stdlib.h>
 #include "float.h"
 
+// --- Global 3D Camera ---
 extern Camera camera;
 extern int camera_mode;
 extern int camera_move_spd;
-extern float global_cam_yaw;  // left/right
-extern float global_cam_pitch; // up/down
+
+typedef enum COLLISION_MASK {
+    COLLISION_MASK_ALL,
+    COLLISION_MASK_SOLID,
+    COLLISION_MASK_ENEMY
+} COLLISION_MASK;
 
 typedef struct Triangle {
     Vector3 a,b,c;
@@ -186,6 +201,7 @@ typedef struct Geometry {
     BoundingBox bounds;
     CollisionPolygon collision;
     Vector3 position;
+    int visible;
 } Geometry;
 
 typedef struct CollisionBox {
@@ -195,12 +211,22 @@ typedef struct CollisionBox {
     BoundingBox bounding_box;
 } CollisionBox;
 
+typedef struct Raycast {
+    Ray ray;
+    bool has_hit;
+    float blocked_distance;
+} Raycast;
+extern Raycast global_raycast;
+
 typedef struct GameObject {
+    int id;
     Vector3 position;
     Vector3 velocity;
-    CollisionBox collision_box; // TODO : Make a Collision 
+    CollisionBox collision_box;
     float speed;
     float gravity;
+    int visible;
+    int is_hit;
 } GameObject;
 
 typedef struct Vector3Double {
@@ -209,6 +235,7 @@ typedef struct Vector3Double {
     double z;
 } Vector3Double;
 
+#include "lights.h" // dont move
 typedef struct Entity {
     char classname[64];
     Vector3 origin;
@@ -231,13 +258,51 @@ extern TextureCacheEntry texture_cache[MAX_TEXTURES];
 extern Texture2D default_texture;
 Texture2D texture_get_cached(char *texture_name);
 Texture2D texture_get_default();
+void texture_cache_cleanup();
+
+extern int ANIM_SPEED;
+typedef struct sModel {
+    Model model;
+    char model_filepath[255];
+    Texture textures[64];
+    int anim_count;
+    int current_anim;
+    int current_anim_finished;
+    int anim_speed;
+    float current_frame;
+    Vector3 position;
+    float scale;
+
+    ModelAnimation *anims;
+
+} sModel;
+
+sModel smodel_create(
+    char model_filepath[255], 
+    Texture textures[64],
+    int anim_count,
+    int current_anim,
+    Vector3 position,
+    float scale
+);
+
+void smodel_animation_change(sModel *model, int new_anim);
+void smodel_draw(sModel *model, int excluded_mesh[255], int excluded_count);
+void smodel_update_animation(sModel *model);
+void smodel_update_position(GameObject *obj, sModel *model, Vector3 offset);
+void smodel_animate(sModel *model, int loop);
+
 
 // GameObject
-int place_meeting_solid(GameObject *object);
+int place_meeting_solid(GameObject *object, COLLISION_MASK mask);
 int CheckCollisionBoxesExt(BoundingBox, CollisionPolygon shape);
 int check_AABB_triangle_SAT(BoundingBox box, Triangle tri);
 void apply_gravity(GameObject *obj);
-void check_collisions(GameObject *obj, int is_player);
+void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask);
+int check_raycast(GameObject *obj);
+void reset_raycast(GameObject *obj);
+int distance_to_player(GameObject *obj1, float distance);
+int distance_to(GameObject *obj1, GameObject *obj2, float distance);
 
 // Camera
 void camera_init();
@@ -292,5 +357,8 @@ Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle);
 Vector3 trench_to_raylib_origin(Vector3 v);
 int string_equals(char* string, char* string_to_compare_to);
 float to_delta(float value);
+
+#include "map.h" // dont move
+
 
 #endif // SKYELIB_H

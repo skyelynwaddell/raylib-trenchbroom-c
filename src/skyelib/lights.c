@@ -2,7 +2,6 @@
 #define RLIGHTS_IMPLEMENTATION
 
 #include "skyelib.h"
-#include "map.h"
 
 Shader sh_light;
 float radiusLoc;

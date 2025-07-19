@@ -39,6 +39,9 @@
         "brushtopolygon.h": "c",
         "stat.h": "c",
         "skyelib.h": "c",
-        "gameloop.h": "c"
+        "gameloop.h": "c",
+        "rlmodels.h": "c",
+        "enemy.h": "c",
+        "anims.h": "c"
     },
 }

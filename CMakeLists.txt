@@ -16,7 +16,6 @@ include_directories(
     /opt/homebrew/include    # SDL2 headers (Homebrew default on Apple Silicon)
 )
 
-
 # SDL2: locate the SDL2 library installed via Homebrew
 find_library(SDL2_LIBRARY SDL2 HINTS /opt/homebrew/lib /usr/local/lib)
 
