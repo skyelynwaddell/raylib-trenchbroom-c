@@ -8,58 +8,21 @@
 #include "global.h"
 #include <OpenGL/gl3.h>
 
-
-static Camera weaponCamera = {
-    .position = {0.0f, 0.0f, 0.0f},
-    .target = {0.0f, 0.0f, -1.0f},   // Looking forward (negative Z)
-    .up = {0.0f, 1.0f, 0.0f},
-    .fovy = 90.0f,
-    .projection = CAMERA_PERSPECTIVE
-};
-static Shader viewmodel_shader;
-
-static void BeginModeViewModel()
-{
-    rlDrawRenderBatchActive();
-    glClear(GL_DEPTH_BUFFER_BIT);
-    BeginShaderMode(sh_light);
-    BeginMode3D(weaponCamera);
-}
-
-static void EndModeViewModel()
-{
-    EndShaderMode();
-    EndMode3D();
-}
-
 // Program Entry Point
 // -----------------------------
 int gameloop()
 {
     // Initialization
     // -----------------------------
-    global_game_loading = true;
-    global_paused = true;
     SetConfigFlags(FLAG_MSAA_4X_HINT); // Multi Sampling Anti Aliasing 4X
-
-    init();
-    player_init();
     GuiLoadStyle(STYLE_SKYE);
-
-    viewmodel_init();
-
+    init();
     Vector3 pos = (Vector3){global_player_spawn.x - 10, global_player_spawn.y, global_player_spawn.z - 10};
     enemy_create(ENEMY_SHOTGUNNER, pos);
 
     pos = (Vector3){global_player_spawn.x - 10, global_player_spawn.y, global_player_spawn.z - 15};
     Enemy *en2 = enemy_create(ENEMY_SHOTGUNNER, pos);
     en2->model.current_anim = ANIM_SHOTGUNNER_RUN;
-
-    global_paused = false;
-    global_game_loading = false;
-
-    console_line();
-
     // Main Game Loop
     // -----------------------------
     while(global_quit_game == false && !WindowShouldClose())
@@ -80,18 +43,24 @@ int gameloop()
 
             // 3D World
             // -----------------------------
-            BeginShaderMode(sh_light);
             BeginMode3D(camera);
+            BeginShaderMode(sh_light);
+
                 draw();
                 player_draw();
                 enemy_draw_all();
-            EndMode3D();
+
             EndShaderMode();
+            EndMode3D();
 
             // View Model
             // -----------------------------
             BeginModeViewModel();
-                viewmodel_draw(&weaponCamera);
+            BeginShaderMode(sh_light);
+
+                viewmodel_draw();
+
+            EndShaderMode();
             EndModeViewModel();
 
             draw_gui();
@@ -113,4 +82,17 @@ int gameloop()
     CloseWindow();
     return false;
     // de-init ----------------------
+}
+
+
+void BeginModeViewModel()
+{
+    rlDrawRenderBatchActive();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    BeginMode3D(viewmodel.camera);
+}
+
+void EndModeViewModel()
+{
+    EndMode3D();
 }

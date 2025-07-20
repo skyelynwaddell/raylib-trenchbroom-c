@@ -1,6 +1,27 @@
 #include "gameloop.h"
 #include "skyelib.h"
 #include <SDL.h>
+#include "global.h"
+#include "player.h"
+
+
+static void reinit()
+{
+    global_game_loading = true;
+    global_paused = true;
+
+    console_log("Creating camera...");
+    camera_init();
+
+    map_parse("test.map");
+
+    player_init();
+    viewmodel_init();
+
+    console_line();
+    global_paused = false;
+    global_game_loading = false;
+}
 
 /*
 init
@@ -9,6 +30,9 @@ init
 */
 void init()
 {
+    global_game_loading = true;
+    global_paused = true;
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE);
     DisableCursor(); // Limit cursor to relative movement inside the window
     SetTargetFPS(FPS);
@@ -42,9 +66,9 @@ void init()
     console_line();
 
     console_log("Initializing engine...");
-    console_log("Creating camera...");
-    camera_init();
+
     console_log("Adding lights to level...");
     lights_init();
-    map_parse("test.map");
+
+    reinit();
 }

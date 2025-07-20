@@ -23,6 +23,7 @@ float global_cam_yaw   = 0.0f;   // left/right
 float global_cam_pitch = 0.0f;   // up/down
 int global_raycast_has_target = false;
 Raycast global_raycast = {0};
+Viewmodel viewmodel = {0};
 
 // --- Movement ---
 int BUTTON_MOVE_FORWARD_KEY    = KEY_W;
@@ -93,5 +94,10 @@ void pause_toggle()
     { 
         if (global_console_open == false)
             DisableCursor();
+            // Reset mouse movement deltas to prevent warp spin
+            Vector2 mouse = GetMousePosition();
+            SetMouseOffset(0, 0); // Ensure no offsetting
+            SetMousePosition((int)mouse.x, (int)mouse.y);  // Reset it to itself to flush movement delta
+
     }
 }

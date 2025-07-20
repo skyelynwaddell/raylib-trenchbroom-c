@@ -1,10 +1,7 @@
 #ifndef SKYELIB_H
 #define SKYELIB_H
 
-#define SKYESRC_VERSION_MAJOR 0 
-#define SKYESRC_VERSION_MINOR 1
-#define SKYESRC_VERSION_PATCH 0
-
+// --- Toggles ---
 #define PLATFORM_DESKTOP
 //#define DEBUG
 
@@ -15,14 +12,19 @@
 #endif
 
 // --- Game Settings ---
-#define GAME_TITLE      "skyesrc"
+#define GAME_TITLE "skyesrc"
 #define MAX_ENEMIES 128
 
-#define Max(a, b) ((a) > (b) ? (a) : (b))
-#define Min(a, b) ((a) < (b) ? (a) : (b))
+#define SKYESRC_VERSION_MAJOR 0 
+#define SKYESRC_VERSION_MINOR 1
+#define SKYESRC_VERSION_PATCH 0
 
 #define MODEL_DIR "gamedata/models/"
 #define TEXTURE_DIR "gamedata/textures/"
+
+// --- Macros ---
+#define Max(a, b) ((a) > (b) ? (a) : (b))
+#define Min(a, b) ((a) < (b) ? (a) : (b))
 
 // --- Raygui & Styles/Themes ---
 #define STYLE_PATH "styles/"
@@ -46,26 +48,23 @@
 #include "raylib.h"
 #include "rlgl.h"
 
-extern Vector3 global_camera_height_current;
-extern Vector3 global_camera_height;
-#define CAMERA_HEIGHT_DEFAULT (Vector3){0.0f, 3.5f, 0.0f} // adjust for player height
-#define CAMERA_HEIGHT_CROUCH  (Vector3){0.0f, -2.0f, 0.0f} // adjust for player height
-
 // --- Implemented Globals ---
 // You can define/implement any of these globals in your global.c file to be able to have access to them!
 // Most will be needed to be be implemented.
 extern int FPS;                 // max frame rate per second
 extern int SCREEN_WIDTH;        // screen width
 extern int SCREEN_HEIGHT;       // screen height
+extern int VSYNC;
 
+#define CAMERA_HEIGHT_DEFAULT (Vector3){0.0f, 3.5f, 0.0f} // adjust for player height
+#define CAMERA_HEIGHT_CROUCH  (Vector3){0.0f, -2.0f, 0.0f} // adjust for player height
 extern float global_cam_yaw;    // left/right
 extern float global_cam_pitch;  // up/down
+extern Vector3 global_camera_height_current;
+extern Vector3 global_camera_height;
 
 extern int global_quit_game;
 extern int global_game_loading;
-
-extern int VSYNC;
-void stats_draw();
 
 // --- Movement ---
 extern int BUTTON_MOVE_FORWARD_KEY;
@@ -133,7 +132,7 @@ extern int BUTTON_INTERACT_PAD;
 #define GAMEPAD_P3 2
 #define GAMEPAD_P4 3
 
-
+// --- Raylib ---
 #include "raymath.h"
 #include "raygui.h"
 
@@ -150,6 +149,7 @@ extern Camera camera;
 extern int camera_mode;
 extern int camera_move_spd;
 
+// --- Map Collisions ---
 typedef enum COLLISION_MASK {
     COLLISION_MASK_ALL,
     COLLISION_MASK_SOLID,
@@ -280,6 +280,7 @@ Texture2D texture_get_cached(char *texture_name);
 Texture2D texture_get_default();
 void texture_cache_cleanup();
 
+// sModel
 extern int ANIM_SPEED;
 typedef struct sModel {
     Model model;
@@ -294,9 +295,7 @@ typedef struct sModel {
     Vector3 rotation;
     float scale;
     LightObject viewmodel_light;
-
     ModelAnimation *anims;
-
 } sModel;
 
 sModel smodel_create(
@@ -306,18 +305,12 @@ sModel smodel_create(
     int current_anim,
     Vector3 position,
     Vector3 rotation,
-    float scale,
-    LightObject viewmodel_light
-);
-
+    float scale);
 void smodel_animation_change(sModel *model, int new_anim);
 void smodel_draw(sModel *model, int excluded_mesh[255], int excluded_count);
 void smodel_update_animation(sModel *model);
 void smodel_update_position(GameObject *obj, sModel *model, Vector3 offset);
 void smodel_animate(sModel *model, int loop);
-
-extern sModel view_model;
-
 
 // GameObject
 int place_meeting_solid(GameObject *object, COLLISION_MASK mask);
@@ -378,17 +371,27 @@ Vector3Double Vector3DoubleAdd(Vector3Double v1, Vector3Double v2);
 Vector3Double Vector3DoubleSubtract(Vector3Double v1, Vector3Double v2);
 Vector3Double Vector3DoubleNormalize(Vector3Double v);
 
+// View Model
+typedef struct Viewmodel {
+    sModel model;
+    Camera camera;
+    LightObject light;
+    Vector3 position;
+    Vector3 rotation_axis;
+    float rotation;
+} Viewmodel;
+extern Viewmodel viewmodel;
+void viewmodel_init();
+void viewmodel_draw();
+
 // Utility Functions
 Vector3 rotate_vector_around_axis(Vector3 vec, Vector3 axis, float angle);
 Vector3 trench_to_raylib_origin(Vector3 v);
 int string_equals(char* string, char* string_to_compare_to);
 float to_delta(float value);
+const char *rlGetVersionString();
+void stats_draw();
 
 #include "map.h" // dont move
-
-const char *rlGetVersionString();
-void viewmodel_init();
-void viewmodel_draw(Camera *weaponCamera);
-
 
 #endif // SKYELIB_H

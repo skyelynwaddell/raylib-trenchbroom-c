@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "raylib.h"
+#include "anims.h"
 
 // Global variables
 

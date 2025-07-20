@@ -16,4 +16,7 @@ void menu_item_next();
 int get_pos_y(); // Returns the current Y position for the next GUI element
 void handle_pause(); // Pause / Unpause the game when the user presses the ESC key
 
+extern Camera camera_weapon;
+static void BeginModeViewModel();
+static void EndModeViewModel();
 #endif // GAMELOOP_H

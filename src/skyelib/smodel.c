@@ -14,8 +14,7 @@ sModel smodel_create(
     int current_anim,
     Vector3 position,
     Vector3 rotation,
-    float scale,
-    LightObject viewmodel_light
+    float scale
 ){
     sModel model = {0};
 
@@ -23,7 +22,6 @@ sModel smodel_create(
     snprintf(fullpath, sizeof(fullpath), "%s%s", MODEL_DIR, model_filepath);
 
     model.model = LoadModel(fullpath);
-    model.viewmodel_light = viewmodel_light;
 
     // copy file path
     strncpy(model.model_filepath, fullpath, sizeof(model.model_filepath) - 1);

@@ -19,16 +19,14 @@ void camera_init()
     camera_mode = CAMERA_FIRST_PERSON;
 }
 
-
 /*
 camera_follow_player
 Makes the Camera follow the Player target in First Person
 */
 void camera_follow_player(Camera3D *camera, GameObject *target)
 {
-    if (global_paused) return;
-
     Vector2 mouseDelta = GetMouseDelta();
+
     float sensitivity = 0.002f;
 
     global_cam_yaw -= mouseDelta.x * sensitivity;

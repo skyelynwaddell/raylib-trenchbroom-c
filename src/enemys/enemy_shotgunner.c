@@ -112,14 +112,13 @@ Enemy *shotgunner_create(Vector3 position) {
     e->update = shotgunner_update;
     e->draw = shotgunner_draw;
     e->model = smodel_create(
-            "monster_shotgunner/monster_shotgunner.glb",
+            MODEL_SHOTGUNNER,
             textures_shotgunner,
             ANIM_COUNT_SHOTGUNNER, 
             ANIM_SHOTGUNNER_IDLE,
             position,
             Vector3Zero(),
-            1.2,
-            (LightObject){0}
+            1.2
         );
 
 
