@@ -3,7 +3,8 @@
 
 // --- SHOTGUNNER ---
 #define MODEL_SHOTGUNNER "monster_shotgunner/monster_shotgunner.glb"
-#define ANIM_COUNT_SHOTGUNNER 12
+static int ANIM_COUNT_SHOTGUNNER = 12;
+static float SHOTGUNNER_MODEL_SCALE = 1.2;
 static Texture textures_shotgunner[3];
 // ----------------------------------
 #define ANIM_SHOTGUNNER_CROUCH      0
@@ -23,12 +24,13 @@ static Texture textures_shotgunner[3];
 
 // --- PISTOL ARMS ---
 #define MODEL_PISTOL_ARMS "arms_newpistol/arms_newpistol.glb"
-static float PISTOL_MODEL_SCALE = 1.2f;
 static int ANIM_COUNT_PISTOL = 6;
-// ----------------------------------
+static float PISTOL_MODEL_SCALE = 1.2f;
 static Texture viewmodel_pistol_textures[6];
+// ----------------------------------
 static int ANIM_PISTOL_IDLE = 0;
-static int ANIM_PISTOL_RELOAD = 2;
+static int ANIM_PISTOL_RELOAD = 1;
+static int ANIM_PISTOL_SHOOT = 2;
 // ----------------------------------
 
 

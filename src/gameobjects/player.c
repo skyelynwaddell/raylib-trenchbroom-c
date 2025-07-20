@@ -35,6 +35,45 @@ void player_init()
     global_camera_height_current = global_camera_height;
 };
 
+static float shoot_cooldown = 0;
+static float shoot_cooldown_max = 0.3;
+
+
+/*
+player_shoot
+Call this to invoke the player shooting
+*/
+static void player_shoot()
+{
+    global_player_shooting = true;
+    viewmodel.model.current_frame = 0;
+    viewmodel.model.current_anim = ANIM_PISTOL_SHOOT;
+    shoot_cooldown = shoot_cooldown_max;
+}
+
+
+/*
+player_handle_shoot
+Handles if the player can shoot, and the button presses
+*/
+static void player_handle_shoot(float delta)
+{
+    if (shoot_cooldown > 0) 
+    {
+        if (viewmodel.model.current_anim_finished)
+        shoot_cooldown -= delta;
+        shoot_cooldown = Clamp(shoot_cooldown,0,shoot_cooldown_max);
+
+        if (shoot_cooldown <= 0.1)
+            viewmodel.model.current_anim = ANIM_PISTOL_IDLE;
+        return;
+    }
+
+    if (IsMouseButtonDown(BUTTON_SHOOT_KEY) || 
+    IsGamepadButtonDown(GAMEPAD_P1, BUTTON_SHOOT_PAD))
+        player_shoot();
+}
+
 
 /*
 player_update
@@ -57,12 +96,7 @@ void player_update()
     apply_gravity(&player);
     player_handle_jump();
     camera_follow_player(&camera, &player);
-
-    if (IsMouseButtonDown(BUTTON_SHOOT_KEY) || IsGamepadButtonDown(GAMEPAD_P1, BUTTON_SHOOT_PAD))
-    {
-        global_player_shooting = true;
-    }
-
+    player_handle_shoot(delta);
 }
 
 

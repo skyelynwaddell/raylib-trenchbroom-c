@@ -9,8 +9,9 @@
 
 // --- Toggles ---
 #define PLATFORM_DESKTOP
-#define OS_LINUX
-//#define OS_MACOS
+
+//#define OS_LINUX
+#define OS_MACOS
 //#define OS_WINDOWS
 //#define OS_ANDROID
 //#define OS_WEB
@@ -26,6 +27,7 @@
 
 #define MODEL_DIR "gamedata/models/"
 #define TEXTURE_DIR "gamedata/textures/"
+#define MAP_DIR "gamedata/maps/"
 
 // --- Macros ---
 #define Max(a, b) ((a) > (b) ? (a) : (b))
@@ -35,21 +37,21 @@
 
 // --- Raygui & Styles/Themes ---
 #define STYLE_PATH "styles/"
-#define STYLE_AMBER STYLE_PATH "style_amber.rgs"
-#define STYLE_ASHES STYLE_PATH "style_ashes.rgs"
-#define STYLE_BLUISH STYLE_PATH "style_bluish.rgs"
-#define STYLE_CANDY STYLE_PATH "style_candy.rgs"
-#define STYLE_CHERRY STYLE_PATH "style_cherry.rgs"
-#define STYLE_CYBER STYLE_PATH "style_cyber.rgs"
-#define STYLE_DARK STYLE_PATH "style_dark.rgs"
-#define STYLE_ENFETE STYLE_PATH "style_enfete.rgs"
-#define STYLE_GENESIS STYLE_PATH "style_genesis.rgs"
-#define STYLE_JUNGLE STYLE_PATH "style_jungle.rgs"
-#define STYLE_LAVANDA STYLE_PATH "style_lavanda.rgs"
-#define STYLE_RLTECH STYLE_PATH "style_rltech.rgs"
-#define STYLE_SUNNY STYLE_PATH "style_sunny.rgs"
+#define STYLE_AMBER STYLE_PATH    "style_amber.rgs"
+#define STYLE_ASHES STYLE_PATH    "style_ashes.rgs"
+#define STYLE_BLUISH STYLE_PATH   "style_bluish.rgs"
+#define STYLE_CANDY STYLE_PATH    "style_candy.rgs"
+#define STYLE_CHERRY STYLE_PATH   "style_cherry.rgs"
+#define STYLE_CYBER STYLE_PATH    "style_cyber.rgs"
+#define STYLE_DARK STYLE_PATH     "style_dark.rgs"
+#define STYLE_ENFETE STYLE_PATH   "style_enfete.rgs"
+#define STYLE_GENESIS STYLE_PATH  "style_genesis.rgs"
+#define STYLE_JUNGLE STYLE_PATH   "style_jungle.rgs"
+#define STYLE_LAVANDA STYLE_PATH  "style_lavanda.rgs"
+#define STYLE_RLTECH STYLE_PATH   "style_rltech.rgs"
+#define STYLE_SUNNY STYLE_PATH    "style_sunny.rgs"
 #define STYLE_TERMINAL STYLE_PATH "style_terminal.rgs"
-#define STYLE_SKYE STYLE_PATH "style_skye.rgs"
+#define STYLE_SKYE STYLE_PATH     "style_skye.rgs"
 
 // --- Raylib ---
 #include "raylib.h"
@@ -151,12 +153,13 @@ extern int BUTTON_INTERACT_PAD;
 #include <math.h>
 #include <stdlib.h>
 #include "float.h"
-#include "SDL.h"
 
 #ifdef OS_MACOS
-#include <OpenGL/gl3.h>
+    #include <OpenGL/gl3.h>
+    #include "SDL2/SDL.h"
 #else
-#include "GL/gl.h"
+    #include "GL/gl.h"
+    #include "SDL.h"
 #endif
 
 #define TEXTURE_FILTER TEXTURE_FILTER_BILINEAR

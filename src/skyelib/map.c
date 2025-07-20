@@ -29,7 +29,7 @@ int map_parse(const char* filename)
 
     // add maps/ filepath to the filename
     snprintf(map.filename, sizeof(map.filename), "%s", preserved_filename);
-    snprintf(fullpath, sizeof(fullpath), "maps/%s", preserved_filename);
+    snprintf(fullpath, sizeof(fullpath), "%s%s", MAP_DIR, preserved_filename);
 
 
     // attempt to load the .map file

@@ -1,5 +1,6 @@
 #include "gameloop.h"
 #include "skyelib.h"
+#include "enemy.h"
 
 /*
 clean_up

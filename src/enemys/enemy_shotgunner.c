@@ -55,16 +55,14 @@ static void shotgunner_update(void *self)
 
         case STATE_HURT:
             smodel_animate(mdl, true);
-
+            shotgunner_handle_hurt(mon);
+            
             if (mdl->current_anim_finished == true)
-            { 
                 enemy_change_state(mon, STATE_IDLE, ANIM_SHOTGUNNER_IDLE);
-            } 
         break;
 
         case STATE_DEAD:
             smodel_animate(mdl, false);
-   
         break;
         default: break;
     }
@@ -114,8 +112,8 @@ Enemy *shotgunner_create(Vector3 position) {
             ANIM_COUNT_SHOTGUNNER, 
             ANIM_SHOTGUNNER_IDLE,
             position,
-            Vector3Zero(),
-            1.2
+            (Vector3){0},
+            SHOTGUNNER_MODEL_SCALE
         );
 
 

@@ -1,6 +1,8 @@
 #include "gameloop.h"
 #include "skyelib.h"
 #include "global.h"
+#include "player.h"
+#include "enemy.h"
 
 /*
 update
