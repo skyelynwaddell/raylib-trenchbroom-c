@@ -9,6 +9,7 @@ any USER INPUT from keyboard, controllers, etc.
 */
 void input()
 {
+    SetExitKey(false); // Disable exit key (ESC)
     handle_pause();
 }
 

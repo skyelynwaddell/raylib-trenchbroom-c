@@ -40,7 +40,8 @@ Texture2D texture_get_cached(char *texture_name)
 
     //attempt to load the texture
     Texture2D tex = LoadTexture(path);
-
+    SetTextureFilter(tex, TEXTURE_FILTER);
+    
     //fallback to __TB_empty.png if failed
     if (tex.id == 0)
     {

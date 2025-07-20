@@ -1,4 +1,27 @@
+#define RAYGUI_IMPLEMENTATION
 #include "skyelib.h"
+
+/*
+BeginModeViewModel()
+Starts the 3D mode for the view model rendering.
+*/
+void BeginModeViewModel()
+{
+    rlDrawRenderBatchActive();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    BeginMode3D(viewmodel.camera);
+}
+
+
+/*
+EndModeViewModel()
+Ends the 3D mode for the view model rendering.
+*/
+void EndModeViewModel()
+{
+    EndMode3D();
+}
+
 
 /*
 to_delta
@@ -8,6 +31,7 @@ float to_delta(float value)
 {
     return value * GetFrameTime();
 }
+
 
 /*
 frustum_get_from_camera
@@ -83,6 +107,30 @@ int frustum_check_boundingbox(BoundingBox box, Frustum f)
     }
 
     return true; // At least partially inside
+}
+
+
+/*
+frustum_check_sphere
+Returns TRUE if a sphere is inside or intersecting the frustum
+*/
+int frustum_check_sphere(Vector3 center, float radius, Frustum f)
+{
+    Vector4 planes[6] = { f.left, f.right, f.top, f.bottom, f.near, f.far };
+
+    for (int i = 0; i < 6; i++)
+    {
+        float distance = planes[i].x * center.x + 
+                         planes[i].y * center.y + 
+                         planes[i].z * center.z + 
+                         planes[i].w;
+
+        // Completely outside this plane
+        if (distance < -radius)
+            return false;
+    }
+
+    return true; // Inside or intersecting
 }
 
 

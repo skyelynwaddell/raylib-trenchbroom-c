@@ -1,9 +1,7 @@
 #include "gameloop.h"
 #include "skyelib.h"
-#include <SDL.h>
 #include "global.h"
 #include "player.h"
-
 
 static void reinit()
 {
@@ -71,4 +69,9 @@ void init()
     lights_init();
 
     reinit();
+    GuiLoadStyle(STYLE_SKYE);
+
+    global_raycast.ray = CENTER_RAY(camera);
+    global_raycast.blocked_distance = FLT_MAX;
+    global_raycast.has_hit = false;
 }

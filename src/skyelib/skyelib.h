@@ -1,9 +1,22 @@
 #ifndef SKYELIB_H
 #define SKYELIB_H
 
+// --- Game Settings ---
+#define GAME_TITLE "skyesrc"
+#define SKYESRC_VERSION_MAJOR 0 
+#define SKYESRC_VERSION_MINOR 1
+#define SKYESRC_VERSION_PATCH 0
+
 // --- Toggles ---
 #define PLATFORM_DESKTOP
-//#define DEBUG
+#define OS_LINUX
+//#define OS_MACOS
+//#define OS_WINDOWS
+//#define OS_ANDROID
+//#define OS_WEB
+
+#define DEV_MODE    // Enable dev mode for additional features
+//#define DEBUG     // Enable debug mode for debug messages
 
 #ifdef PLATFORM_DESKTOP
 #define GLSL_VERSION 330
@@ -11,20 +24,14 @@
     #define GLSL_VERSION 100
 #endif
 
-// --- Game Settings ---
-#define GAME_TITLE "skyesrc"
-#define MAX_ENEMIES 128
-
-#define SKYESRC_VERSION_MAJOR 0 
-#define SKYESRC_VERSION_MINOR 1
-#define SKYESRC_VERSION_PATCH 0
-
 #define MODEL_DIR "gamedata/models/"
 #define TEXTURE_DIR "gamedata/textures/"
 
 // --- Macros ---
 #define Max(a, b) ((a) > (b) ? (a) : (b))
 #define Min(a, b) ((a) < (b) ? (a) : (b))
+#define SCREEN_CENTER() ((Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f })
+#define CENTER_RAY(cam) (GetScreenToWorldRay(SCREEN_CENTER(), cam))
 
 // --- Raygui & Styles/Themes ---
 #define STYLE_PATH "styles/"
@@ -56,8 +63,8 @@ extern int SCREEN_WIDTH;        // screen width
 extern int SCREEN_HEIGHT;       // screen height
 extern int VSYNC;
 
-#define CAMERA_HEIGHT_DEFAULT (Vector3){0.0f, 3.5f, 0.0f} // adjust for player height
-#define CAMERA_HEIGHT_CROUCH  (Vector3){0.0f, -2.0f, 0.0f} // adjust for player height
+#define CAMERA_HEIGHT_DEFAULT (Vector3){0.0f, 3.5f, 0.0f} 
+#define CAMERA_HEIGHT_CROUCH  (Vector3){0.0f, -2.0f, 0.0f}
 extern float global_cam_yaw;    // left/right
 extern float global_cam_pitch;  // up/down
 extern Vector3 global_camera_height_current;
@@ -123,6 +130,7 @@ extern int BUTTON_INTERACT_PAD;
 
 // --- Level Settings ---
 #define MAX_ENTITIES 1000 // Maximum entities can be in a room
+#define MAX_ENEMIES 128
 #define MAX_LIGHTS   255  // Maximum lightobjects can be in a room
 #define MAX_DARK     0.2  // How dark the room can get without lighting (0 = BLACK)
 
@@ -143,6 +151,15 @@ extern int BUTTON_INTERACT_PAD;
 #include <math.h>
 #include <stdlib.h>
 #include "float.h"
+#include "SDL.h"
+
+#ifdef OS_MACOS
+#include <OpenGL/gl3.h>
+#else
+#include "GL/gl.h"
+#endif
+
+#define TEXTURE_FILTER TEXTURE_FILTER_BILINEAR
 
 // --- Global 3D Camera ---
 extern Camera camera;
@@ -212,6 +229,7 @@ typedef struct Geometry {
     CollisionPolygon collision;
     Vector3 position;
     int visible;
+    float bounding_radius; // for sphere collision checks
 } Geometry;
 
 typedef struct CollisionBox {
@@ -318,10 +336,14 @@ int CheckCollisionBoxesExt(BoundingBox, CollisionPolygon shape);
 int check_AABB_triangle_SAT(BoundingBox box, Triangle tri);
 void apply_gravity(GameObject *obj);
 void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask);
-int check_raycast(GameObject *obj);
-void reset_raycast(GameObject *obj);
+void raycast_start();
+void raycast_update();
+int raycast_check_bb(BoundingBox box);
+int raycast_check(GameObject *obj);
+void raycast_reset(GameObject *obj);
 int distance_to_player(GameObject *obj1, float distance);
 int distance_to(GameObject *obj1, GameObject *obj2, float distance);
+int distance_to_pos(Vector3 pos1, Vector3 pos2, float distance);
 
 // Camera
 void camera_init();
@@ -362,6 +384,8 @@ Plane brushface_to_plane(BrushFace face);
 // Frustum
 Frustum frustum_get_from_camera(Camera3D cam);
 int frustum_check_boundingbox(BoundingBox box, Frustum f);
+int frustum_check_sphere(Vector3 center, float radius, Frustum f);
+extern Frustum global_frustum;
 
 // Vector3Double
 Vector3Double Vector3DoubleCrossProduct(Vector3Double v1, Vector3Double v2);
@@ -375,7 +399,6 @@ Vector3Double Vector3DoubleNormalize(Vector3Double v);
 typedef struct Viewmodel {
     sModel model;
     Camera camera;
-    LightObject light;
     Vector3 position;
     Vector3 rotation_axis;
     float rotation;

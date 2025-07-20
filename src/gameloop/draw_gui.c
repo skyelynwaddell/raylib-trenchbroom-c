@@ -2,6 +2,7 @@
 #include "skyelib.h"
 #include "global.h"
 
+
 /*
 draw_gui
 -- any calls to render GUI or HUD elements should be called here

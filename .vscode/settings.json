@@ -46,6 +46,7 @@
         "rlgl.h": "c",
         "__locale": "c",
         "optional": "c",
-        "__bit_reference": "c"
+        "__bit_reference": "c",
+        "sdl.h": "c"
     },
 }

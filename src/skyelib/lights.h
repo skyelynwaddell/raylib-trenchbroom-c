@@ -13,6 +13,7 @@ typedef struct LightObject {
 } LightObject;
 
 extern Shader sh_light;
+extern Shader sh_viewmodel;
 extern float radiusLoc;
 
 void lights_init();

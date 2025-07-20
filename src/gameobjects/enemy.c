@@ -43,6 +43,8 @@ void enemy_update_all()
     for (int i = 0; i < MAX_ENEMIES; i++) {
         if (enemies[i]) {
             enemies[i]->update(enemies[i]);
+            if (enemies[i]->health <= 0) continue;
+            raycast_check_bb(enemies[i]->gameobject.collision_box.bounding_box);
         }
     }
 }

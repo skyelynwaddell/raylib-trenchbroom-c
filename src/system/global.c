@@ -14,16 +14,25 @@ int SCREEN_WIDTH  = 1280;
 int SCREEN_HEIGHT = 720;
 int VSYNC         = 0;
 
-sModel view_model = {0};
+// --- Shaders ---
+Shader sh_light;
+Shader sh_viewmodel;
 
-// camera properties
+// --- Shader Properties ---
+float radiusLoc; // light radius location in shader
+
+// --- Camera ---
 Vector3 global_camera_height_current = {0};
 Vector3 global_camera_height = (Vector3){0.0f, 3.5f, 0.0f}; // adjust for player height
 float global_cam_yaw   = 0.0f;   // left/right
 float global_cam_pitch = 0.0f;   // up/down
+
+// --- Raycast ---
 int global_raycast_has_target = false;
 Raycast global_raycast = {0};
+
 Viewmodel viewmodel = {0};
+Frustum global_frustum = {0};
 
 // --- Movement ---
 int BUTTON_MOVE_FORWARD_KEY    = KEY_W;
@@ -78,7 +87,6 @@ int global_player_onground = false;
 int global_player_crouching = false;
 int global_player_shooting = false;
 
-
 /*
 pause_toggle
 This function toggles the pause state of the game.
@@ -93,11 +101,8 @@ void pause_toggle()
     else 
     { 
         if (global_console_open == false)
+        {
             DisableCursor();
-            // Reset mouse movement deltas to prevent warp spin
-            Vector2 mouse = GetMousePosition();
-            SetMouseOffset(0, 0); // Ensure no offsetting
-            SetMousePosition((int)mouse.x, (int)mouse.y);  // Reset it to itself to flush movement delta
-
+        }
     }
 }

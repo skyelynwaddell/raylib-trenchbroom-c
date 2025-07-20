@@ -10,4 +10,8 @@ clean_up
 void clean_up()
 {
     map_clear_models(); //clears all the map models cache from memory
+    UnloadShader(sh_light);
+    UnloadShader(sh_viewmodel);
+    enemy_cleanup_all();
+    texture_cache_cleanup();
 }

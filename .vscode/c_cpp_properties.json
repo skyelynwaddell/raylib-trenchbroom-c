@@ -5,13 +5,30 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/homebrew/include",
-                "/opt/homebrew/include/SDL2"    
+                "/opt/homebrew/include/SDL2",
+                "/usr/include",
+                "/usr/include/SDL2"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "macos-clang-arm64"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include",
+                "/usr/include/SDL2",
+                "/opt/homebrew/include",
+                "/opt/homebrew/include/SDL2"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-clang-x64"
         }
     ],
     "version": 4

@@ -222,16 +222,44 @@ void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask)
     collisionbox_set_position(&obj->collision_box, obj->position);
 }
 
+/*
+raycast_start()
+Called at the start of the game loop to initialize the raycast
+*/
+void raycast_start()
+{
+    global_raycast_has_target = false;
+    global_player_shooting = false;
+} 
 
 /*
-check_raycast()
+raycast_check_bb()
+Called to check if the raycast hits a BoundingBox.
+Must be called on a BoundingBox every TICK or 
+the boundingbox will ignore the raycast collision.
+(ie. you cant shoot what you dont check)
+*/
+int raycast_check_bb(BoundingBox box)
+{
+    RayCollision hit = GetRayCollisionBox(global_raycast.ray, box);
+    if (hit.hit && hit.distance < global_raycast.blocked_distance) {
+        global_raycast.blocked_distance = hit.distance;
+        global_raycast.has_hit = true;
+        return true;
+    }
+    return false;
+}
+
+
+/*
+raycast_check()
 Checks for a collision between the global raycast
 sets the gameobject is_hit variable to true
 
-NOTE: Must remember to call reset_raycast after doing logic
+NOTE: Must remember to call raycast_reset after doing logic
 or else the raycast will never lose target
 */
-int check_raycast(GameObject *obj)
+int raycast_check(GameObject *obj)
 {
     BoundingBox world_bb = obj->collision_box.bounding_box;
     RayCollision ray = GetRayCollisionBox(global_raycast.ray, world_bb);
@@ -239,24 +267,41 @@ int check_raycast(GameObject *obj)
     if (ray.hit &&
         (!global_raycast.has_hit || ray.distance < global_raycast.blocked_distance))
     {
-        global_raycast_has_target = true;
-
-        if (global_player_shooting)
+        // still blocked by something else?
+        if (ray.distance < global_raycast.blocked_distance)
         {
-            obj->is_hit = true;
-            return true;
+            global_raycast_has_target = true;
+
+            if (global_player_shooting)
+            {
+                obj->is_hit = true;
+                return true;
+            }
         }
     }
+
     obj->is_hit = false;
     return false;
 }
 
 
 /*
-reset_raycast
-Called at the end of enemy update to reset its raycast hit status
+raycast_update()
+This function is called every TICK before drawing
 */
-void reset_raycast(GameObject *obj)
+void raycast_update()
+{
+    global_raycast.ray = CENTER_RAY(camera);
+    global_raycast.has_hit = false;
+    global_raycast.blocked_distance = FLT_MAX;
+}
+
+
+/*
+raycast_reset
+Called at the end of all drawing and update logic
+*/
+void raycast_reset(GameObject *obj)
 {
     obj->is_hit = false;
 }
@@ -272,9 +317,20 @@ int distance_to(GameObject *obj1, GameObject *obj2, float distance)
     return dist <= distance;
 }
 
-
 /*
 distance_to
+Returns true if the gameobjects are equal or less to the distance
+*/
+int distance_to_pos(Vector3 pos1, Vector3 pos2, float distance)
+{
+    float dist = Vector3Distance(pos1, pos2);
+    return dist <= distance;
+}
+
+
+
+/*
+distance_to_player
 Returns true if the gameobjects are equal or less to the distance
 */
 int distance_to_player(GameObject *obj1, float distance)

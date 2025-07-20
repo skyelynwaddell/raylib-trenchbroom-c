@@ -35,18 +35,15 @@ static void shotgunner_update(void *self)
     Enemy *mon = (Enemy *)self;
     GameObject *obj = &mon->gameobject;
 
-
     check_collisions(obj, false, COLLISION_MASK_SOLID);
 
     if (global_paused) return;
-
     if (enemy_should_update(mon) == false) return;
 
     sModel *mdl = &mon->model;
-
     apply_gravity(obj);
     smodel_update_position(obj, mdl, (Vector3){ 0, -4.7, 0 });
-    check_raycast(obj);
+    raycast_check(obj);
 
     // --- State Machine ---
     switch(mon->state)
@@ -72,7 +69,7 @@ static void shotgunner_update(void *self)
         default: break;
     }
 
-    reset_raycast(obj);
+    raycast_reset(obj);
 }
 
 

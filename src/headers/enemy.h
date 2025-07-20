@@ -22,7 +22,7 @@ typedef struct Enemy {
     void (*draw)(void *self);    
 } Enemy;
 
-Enemy *enemies[MAX_ENEMIES];
+extern Enemy *enemies[MAX_ENEMIES];
 
 Enemy *enemy_create(ENEMY_TYPE type, Vector3 position);
 void enemy_update_all();

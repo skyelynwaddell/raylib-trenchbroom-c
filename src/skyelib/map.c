@@ -484,6 +484,11 @@ void map_create_models()
             geometry.collision = shape;
             geometry.position = trench_to_raylib_origin(centroid);
 
+            Vector3 center = Vector3Lerp(geometry.bounds.min, geometry.bounds.max, 0.5f); // center of the box
+            Vector3 extent = Vector3Subtract(geometry.bounds.max, center);     // half-dimensions
+            Vector3 diagonal = Vector3Subtract(geometry.bounds.max, geometry.bounds.min);
+            geometry.bounding_radius = Vector3Length(diagonal) * 2.0f;
+
             map.models[map.model_count++] = geometry;            
         }
     }
@@ -520,36 +525,32 @@ void map_draw()
     map_draw_models();
 }
 
-
+#include "player.h"
 /*
 map_draw_models
 -- draws each model in the model array
 */
 void map_draw_models()
 {
-
-    Vector2 screen_center = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
-    global_raycast.ray = GetScreenToWorldRay(screen_center, camera);
-    global_raycast.has_hit = false;
-    global_raycast.blocked_distance = FLT_MAX;
-
-    Frustum frustum = frustum_get_from_camera(camera);
     for (int i = 0; i < map.model_count; i++)
     {
-        RayCollision hit = GetRayCollisionBox(global_raycast.ray, map.models[i].bounds);
-        if (hit.hit && hit.distance < global_raycast.blocked_distance) {
-            global_raycast.blocked_distance = hit.distance;
-            global_raycast.has_hit = true;
-        }
-
         Geometry *geo = &map.models[i];
         geo->visible = false;
-        //geo->visible = false;
-        // only draw map models inside camera view frustum
-        // occlusion culling
-        if (!frustum_check_boundingbox(geo->bounds, frustum)) 
-            continue;
 
+        // check distance to player
+        if (distance_to_pos(geo->position, 
+        player.gameobject.position, RENDER_DISTANCE) == false) 
+            continue; // too far to care
+
+        // cheap frustum check
+        if (!frustum_check_sphere(geo->position, geo->bounding_radius, global_frustum)) 
+            continue; 
+
+        // expensive frustum check
+        // if (!frustum_check_boundingbox(geo->bounds, global_frustum)) 
+        //     continue;
+
+        raycast_check_bb(geo->bounds);
         geo->model.materials[0].shader = sh_light;
         geo->visible = true;
         map_draw_model(geo->model);
@@ -581,7 +582,7 @@ DEBUG : Allows for you to instantly reload the map for testing changes when you 
 WARNING : Dont be moving or you may fall through the floor
 */
 void map_hotreload() {
-    #ifdef DEBUG
+    #ifdef DEV_MODE
     if (IsKeyPressed(KEY_BACKSLASH))
     {
         global_game_loading = true;

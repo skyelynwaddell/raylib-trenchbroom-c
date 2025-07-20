@@ -1,5 +1,4 @@
-#include "raylib.h"
-#include "SDL.h"
+#include "skyelib.h"
 
 char sys_ram[64];
 char cpu_cores[64];

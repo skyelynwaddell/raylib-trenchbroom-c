@@ -3,9 +3,6 @@
 
 #include "skyelib.h"
 
-Shader sh_light;
-float radiusLoc;
-
 /*
 light_create
 Creates a light object with the designated properties

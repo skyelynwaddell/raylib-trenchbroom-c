@@ -4,58 +4,68 @@ project(fps_game C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Output binaries to /bin
+# Output directory for binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-# Include project headers
+# Include directories
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/headers
-    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/skyelib
     ${CMAKE_SOURCE_DIR}/src/lib/raylib/include
-    /Users/skye/Downloads/raygui-4.0/src
+    /Users/skye/Downloads/raygui-4.0/src # Optional: platform-specific
 )
 
-# === SDL2 (Homebrew on macOS) ===
-find_path(SDL2_INCLUDE_DIR SDL.h HINTS /opt/homebrew/include/SDL2 /usr/local/include/SDL2)
-find_library(SDL2_LIBRARY SDL2 HINTS /opt/homebrew/lib /usr/local/lib)
-
-if(NOT SDL2_INCLUDE_DIR OR NOT SDL2_LIBRARY)
-    message(FATAL_ERROR "SDL2 not found. Install it with: brew install sdl2")
+# Platform-specific SDL2 setup
+if(APPLE)
+    find_library(SDL2_LIBRARY SDL2 HINTS /opt/homebrew/lib /usr/local/lib)
+    include_directories(/opt/homebrew/include)
+elseif(UNIX)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL2 REQUIRED sdl2)
+    include_directories(${SDL2_INCLUDE_DIRS})
 endif()
 
-# Add SDL2 includes
-include_directories(${SDL2_INCLUDE_DIR})
+if(NOT SDL2_LIBRARY AND NOT SDL2_LIBRARIES)
+    message(FATAL_ERROR "SDL2 library not found. On Linux, try: sudo apt install libsdl2-dev")
+endif()
 
-# === Raylib static library ===
+# Detect platform and set Raylib lib folder accordingly
+if(APPLE)
+    set(RAYLIB_LIB_DIR ${CMAKE_SOURCE_DIR}/src/lib/raylib/lib/mac)
+elseif(UNIX)
+    set(RAYLIB_LIB_DIR ${CMAKE_SOURCE_DIR}/src/lib/raylib/lib/linux)
+else()
+    message(FATAL_ERROR "Unsupported platform for raylib static library")
+endif()
+
+# Raylib static library (precompiled)
 add_library(raylib STATIC IMPORTED GLOBAL)
 set_target_properties(raylib PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/lib/raylib/lib/libraylib.a
+    IMPORTED_LOCATION ${RAYLIB_LIB_DIR}/libraylib.a
     INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/lib/raylib/include
 )
 
-# === Source files ===
+# Gather source files
 file(GLOB_RECURSE SRC_FILES src/*.c)
-list(APPEND SRC_FILES src/lib/raylib/include/raygui.h)
 
-# === Executable ===
+# Define executable
 add_executable(game ${SRC_FILES})
 
-# === Link libraries ===
-target_link_libraries(game
-    raylib
-    ${SDL2_LIBRARY}
-    m
-    dl
-    pthread
-)
-
-# === macOS Frameworks ===
+# Link libraries
 if(APPLE)
     target_link_libraries(game
+        raylib
+        ${SDL2_LIBRARY}
+        m dl pthread
         "-framework OpenGL"
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreVideo"
+    )
+elseif(UNIX)
+    target_link_libraries(game
+        raylib
+        ${SDL2_LIBRARIES}
+        m dl pthread GL X11
     )
 endif()

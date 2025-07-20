@@ -4,7 +4,7 @@
 // --- SHOTGUNNER ---
 #define MODEL_SHOTGUNNER "monster_shotgunner/monster_shotgunner.glb"
 #define ANIM_COUNT_SHOTGUNNER 12
-Texture textures_shotgunner[3];
+static Texture textures_shotgunner[3];
 // ----------------------------------
 #define ANIM_SHOTGUNNER_CROUCH      0
 #define ANIM_SHOTGUNNER_DEATH_1     1
