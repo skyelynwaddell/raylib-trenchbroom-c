@@ -197,3 +197,22 @@ Vector3Double Vector3DoubleNormalize(Vector3Double v)
     return result;
 }
 
+
+/*
+rlGetVersionString
+Returns the current OpenGL version as formatted
+string :)
+*/
+const char *rlGetVersionString(void)
+{
+    switch (rlGetVersion())
+    {
+        case RL_OPENGL_11: return "OpenGL: v1.1";
+        case RL_OPENGL_21: return "OpenGL: v2.1";
+        case RL_OPENGL_33: return "OpenGL: v3.3";
+        case RL_OPENGL_43: return "OpenGL: v4.3";
+        case RL_OPENGL_ES_20: return "OpenGL ES: v2.0";
+        case RL_OPENGL_ES_30: return "OpenGL ES: v3.0";
+        default: return "OpenGL";
+    }
+}

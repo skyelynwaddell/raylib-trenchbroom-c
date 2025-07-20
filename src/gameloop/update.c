@@ -11,7 +11,6 @@ void update()
 {
     if (global_paused) return; // If the game is paused, skip the update logic
     map_hotreload();
+    console_update();
     global_raycast_has_target = false;
-
-    //UpdateCamera(&camera, camera_mode);
 }

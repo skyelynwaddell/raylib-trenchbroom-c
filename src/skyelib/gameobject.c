@@ -169,11 +169,32 @@ void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask)
 
     if (!place_meeting_solid(obj, mask)) {
         obj->position.y += moveY.y;
-        if (is_player) global_player_onground = false;
+        
+        if (is_player) 
+            global_player_onground = false;
     } else {
-        if (obj->velocity.y < 0 && is_player) global_player_onground = true;
+        if (obj->velocity.y < 0 && is_player) 
+            global_player_onground = true;
+
         obj->velocity.y = 0.0f;
     }
+
+    if (is_player) {
+        // Check slightly below current position to detect ground
+        const float ground_check_offset = 2.0f;
+        Vector3 ground_check_pos = Vector3Add(obj->position, (Vector3){0.0f, -ground_check_offset, 0.0f});
+        collisionbox_set_position(&obj->collision_box, ground_check_pos);
+
+        if (place_meeting_solid(obj, mask)) {
+            global_player_onground = true;
+        } else {
+            global_player_onground = false;
+        }
+
+        // Restore original collision box position so it's not offset for other logic
+        collisionbox_set_position(&obj->collision_box, obj->position);
+    }
+
 
     // ---- X axis ----
     Vector3 moveX = { obj->velocity.x * dt, 0.0f, 0.0f };

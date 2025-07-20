@@ -25,6 +25,7 @@ int map_parse(const char* filename)
         printf("\n");
         printf("### LOADING MAP FILE ### \n");
     #endif
+    console_log("Loading map file...");
 
     // add maps/ filepath to the filename
     snprintf(map.filename, sizeof(map.filename), "%s", preserved_filename);
@@ -35,6 +36,8 @@ int map_parse(const char* filename)
     FILE* file = fopen(fullpath, "r");
     if (!file)
     {
+        console_log("Failed to open .map file! Tried searching in:");
+        console_log(fullpath);
         perror("Failed to open .map file! \n");
         printf("Tried searching in: %s \n", fullpath);
         return false;
@@ -57,6 +60,8 @@ int map_parse(const char* filename)
 
     Entity current_entity = {0};
     int current_entity_index = 0;
+
+    console_log("Creating brushes & entities...");
 
     // Loop through all text in the .map file
     while (fgets(line, sizeof(line), file))
@@ -316,6 +321,8 @@ int map_parse(const char* filename)
     printf("Generating map polygons from brushes....\n");
     printf("Generating planes from brushfaces and resorting polygon vertices...\n");
     #endif
+
+    console_log("Generating map geometry from brushes...");
     
     for (int i=0; i < map.brush_count; i++)
     {
@@ -332,10 +339,10 @@ int map_parse(const char* filename)
 
     fclose(file);
     map_create_models();
-    global_paused = false;
-    global_game_loading = false;
+    console_log("Map was successfully generated.");
     return true;
 }
+
 
 /*
 map_create_models
@@ -550,6 +557,7 @@ void map_draw_models()
     }
 }
 
+
 /*
 map_draw_model
 Wil draw the models in the room with correct positioning
@@ -566,6 +574,7 @@ void map_draw_model(Model model){
 }
 #endif
 
+
 /*
 map_hotreload
 DEBUG : Allows for you to instantly reload the map for testing changes when you press ENTER
@@ -573,7 +582,7 @@ WARNING : Dont be moving or you may fall through the floor
 */
 void map_hotreload() {
     #ifdef DEBUG
-    if (IsKeyPressed(KEY_ENTER))
+    if (IsKeyPressed(KEY_BACKSLASH))
     {
         global_game_loading = true;
         char filename[256];

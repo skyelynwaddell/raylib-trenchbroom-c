@@ -2,14 +2,12 @@
 #define GAMELOOP_H
 #include "skyelib.h"
 
-
 int gameloop();
 void init();
 void input();
 void update();
 void draw();
 void draw_gui();
-void draw_viewmodel();
 void clean_up();
 
 void draw_pausemenu();

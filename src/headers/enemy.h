@@ -30,4 +30,5 @@ void enemy_draw_all();
 void enemy_cleanup_all();
 void enemy_change_state(Enemy *mon, int new_state, int new_anim);
 int enemy_should_update(Enemy *mon);
+
 #endif // ENEMY_H

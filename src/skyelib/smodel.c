@@ -1,7 +1,7 @@
 #include "skyelib.h"
 #include "global.h"
 
-int ANIM_SPEED = 60;
+int ANIM_SPEED = 70;
 
 /*
 smodel_create()
@@ -13,7 +13,9 @@ sModel smodel_create(
     int anim_count,
     int current_anim,
     Vector3 position,
-    float scale
+    Vector3 rotation,
+    float scale,
+    LightObject viewmodel_light
 ){
     sModel model = {0};
 
@@ -21,6 +23,7 @@ sModel smodel_create(
     snprintf(fullpath, sizeof(fullpath), "%s%s", MODEL_DIR, model_filepath);
 
     model.model = LoadModel(fullpath);
+    model.viewmodel_light = viewmodel_light;
 
     // copy file path
     strncpy(model.model_filepath, fullpath, sizeof(model.model_filepath) - 1);
@@ -37,11 +40,14 @@ sModel smodel_create(
     // model position
     model.position = position;
     model.scale = scale;
+    model.rotation = rotation;
 
     // make the model affected by light
     for (int i=0; i < model.model.materialCount; i++)
     {
+        printf("Material count ; %d\n", model.model.materialCount);
         model.model.materials[i].shader = sh_light;
+        model.model.materials[i].maps[MATERIAL_MAP_DIFFUSE].texture = textures[i];
     }
 
     return model;
@@ -112,9 +118,8 @@ void smodel_animate(sModel *model, int loop)
 
         }
             model->current_anim_finished = true;
-
-
     }
+    smodel_update_animation(model);
 }
 
 
@@ -130,6 +135,7 @@ void smodel_animation_change(sModel *model, int new_anim)
     model->current_frame = 0;
     model->current_anim_finished = false;
 }
+
 
 /*
 smodel+update_animation()

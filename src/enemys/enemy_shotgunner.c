@@ -32,29 +32,32 @@ Called every game TICK -- Main Update Event
 */
 static void shotgunner_update(void *self) 
 {
+    Enemy *mon = (Enemy *)self;
+    GameObject *obj = &mon->gameobject;
+
+
+    check_collisions(obj, false, COLLISION_MASK_SOLID);
+
     if (global_paused) return;
 
-    Enemy *mon = (Enemy *)self;
     if (enemy_should_update(mon) == false) return;
 
-    GameObject *obj = &mon->gameobject;
     sModel *mdl = &mon->model;
 
     apply_gravity(obj);
-    smodel_update_position(obj,mdl, (Vector3){ 0, -4.3, 0 });
+    smodel_update_position(obj, mdl, (Vector3){ 0, -4.7, 0 });
     check_raycast(obj);
-    check_collisions(obj, false, COLLISION_MASK_SOLID);
 
     // --- State Machine ---
     switch(mon->state)
     {
         case STATE_IDLE:
-            smodel_animate(&mon->model, true);
+            smodel_animate(mdl, true);
             shotgunner_handle_hurt(mon);
         break;
 
         case STATE_HURT:
-            smodel_animate(&mon->model, true);
+            smodel_animate(mdl, true);
 
             if (mdl->current_anim_finished == true)
             { 
@@ -63,13 +66,12 @@ static void shotgunner_update(void *self)
         break;
 
         case STATE_DEAD:
-            smodel_animate(&mon->model, false);
+            smodel_animate(mdl, false);
    
         break;
         default: break;
     }
 
-    smodel_update_animation(&mon->model);
     reset_raycast(obj);
 }
 
@@ -99,7 +101,8 @@ Enemy *shotgunner_create(Vector3 position) {
     Enemy *e = calloc(1, sizeof(Enemy));
 
     textures_shotgunner[0] = texture_get_cached("soldier_texture");
-    textures_shotgunner[1] = texture_get_cached("pumpnew");
+    textures_shotgunner[1] = texture_get_cached("soldier_texture");
+    textures_shotgunner[2] = texture_get_cached("pumpnew");
 
     e->type = ENEMY_SHOTGUNNER;
     e->health = 100;
@@ -114,13 +117,15 @@ Enemy *shotgunner_create(Vector3 position) {
             ANIM_COUNT_SHOTGUNNER, 
             ANIM_SHOTGUNNER_IDLE,
             position,
-            1.2
+            Vector3Zero(),
+            1.2,
+            (LightObject){0}
         );
 
 
     // create collision box
     float h = 9.5;  // units tall
-    float w = 4;  // units thick/wide
+    float w = 4;    // units thick/wide
 
     collisionbox_set(
         &e->gameobject.collision_box,

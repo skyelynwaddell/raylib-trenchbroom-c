@@ -99,6 +99,7 @@ Texture2D texture_get_cached(char *texture_name)
     return tex;
 }
 
+
 /*
 texture_cache_cleanup()
 Call this at game end to free up memory of

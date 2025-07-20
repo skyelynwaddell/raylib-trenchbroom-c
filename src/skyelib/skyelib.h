@@ -1,8 +1,12 @@
 #ifndef SKYELIB_H
 #define SKYELIB_H
 
+#define SKYESRC_VERSION_MAJOR 0 
+#define SKYESRC_VERSION_MINOR 1
+#define SKYESRC_VERSION_PATCH 0
+
 #define PLATFORM_DESKTOP
-#define DEBUG
+//#define DEBUG
 
 #ifdef PLATFORM_DESKTOP
 #define GLSL_VERSION 330
@@ -13,6 +17,9 @@
 // --- Game Settings ---
 #define GAME_TITLE      "skyesrc"
 #define MAX_ENEMIES 128
+
+#define Max(a, b) ((a) > (b) ? (a) : (b))
+#define Min(a, b) ((a) < (b) ? (a) : (b))
 
 #define MODEL_DIR "gamedata/models/"
 #define TEXTURE_DIR "gamedata/textures/"
@@ -33,9 +40,11 @@
 #define STYLE_RLTECH STYLE_PATH "style_rltech.rgs"
 #define STYLE_SUNNY STYLE_PATH "style_sunny.rgs"
 #define STYLE_TERMINAL STYLE_PATH "style_terminal.rgs"
+#define STYLE_SKYE STYLE_PATH "style_skye.rgs"
 
 // --- Raylib ---
 #include "raylib.h"
+#include "rlgl.h"
 
 extern Vector3 global_camera_height_current;
 extern Vector3 global_camera_height;
@@ -56,6 +65,7 @@ extern int global_quit_game;
 extern int global_game_loading;
 
 extern int VSYNC;
+void stats_draw();
 
 // --- Movement ---
 extern int BUTTON_MOVE_FORWARD_KEY;
@@ -251,6 +261,16 @@ typedef struct TextureCacheEntry {
     Texture2D texture;
 } TextureCacheEntry;
 
+#define MAX_CONSOLE_LINES 128
+#define MAX_LINE_LENGTH 256
+
+extern int global_console_open;
+void console_init();
+void console_update();
+void console_draw();
+void console_log(const char *text);
+void console_line();
+void console_br();
 
 // Texture Manager
 extern int texture_cache_count;
@@ -271,7 +291,9 @@ typedef struct sModel {
     int anim_speed;
     float current_frame;
     Vector3 position;
+    Vector3 rotation;
     float scale;
+    LightObject viewmodel_light;
 
     ModelAnimation *anims;
 
@@ -283,7 +305,9 @@ sModel smodel_create(
     int anim_count,
     int current_anim,
     Vector3 position,
-    float scale
+    Vector3 rotation,
+    float scale,
+    LightObject viewmodel_light
 );
 
 void smodel_animation_change(sModel *model, int new_anim);
@@ -291,6 +315,8 @@ void smodel_draw(sModel *model, int excluded_mesh[255], int excluded_count);
 void smodel_update_animation(sModel *model);
 void smodel_update_position(GameObject *obj, sModel *model, Vector3 offset);
 void smodel_animate(sModel *model, int loop);
+
+extern sModel view_model;
 
 
 // GameObject
@@ -359,6 +385,10 @@ int string_equals(char* string, char* string_to_compare_to);
 float to_delta(float value);
 
 #include "map.h" // dont move
+
+const char *rlGetVersionString();
+void viewmodel_init();
+void viewmodel_draw(Camera *weaponCamera);
 
 
 #endif // SKYELIB_H

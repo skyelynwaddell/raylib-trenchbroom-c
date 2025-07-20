@@ -42,7 +42,9 @@ Called every Tick
 */
 void player_update()
 {
-    if (global_paused || global_game_loading) 
+    check_collisions(&player, true, COLLISION_MASK_ALL);
+
+    if (global_paused || global_game_loading || global_console_open) 
     {
         player.gameobject.velocity = Vector3Zero();
         return;
@@ -54,7 +56,6 @@ void player_update()
     player_movement();
     apply_gravity(&player);
     player_handle_jump();
-    check_collisions(&player, true, COLLISION_MASK_ALL);
     camera_follow_player(&camera, &player);
 
     if (IsMouseButtonDown(BUTTON_SHOOT_KEY) || IsGamepadButtonDown(GAMEPAD_P1, BUTTON_SHOOT_PAD))
@@ -187,6 +188,6 @@ Called to handle when / if the player CAN jump
 void player_handle_jump()
 {
     // jump
-    if ((IsKeyPressed(BUTTON_JUMP_KEY) || (IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_JUMP_PAD))) && global_player_onground)
+    if (((GetMouseWheelMove() < 0) || IsKeyPressed(BUTTON_JUMP_KEY) || (IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_JUMP_PAD))) && global_player_onground)
         player_jump();
 }

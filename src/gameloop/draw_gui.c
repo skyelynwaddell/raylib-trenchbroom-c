@@ -8,15 +8,28 @@ draw_gui
 */
 void draw_gui()
 {
+    // Draw Crosshair
+    DrawRectangle(
+        SCREEN_WIDTH/2-(CROSSHAIR_SIZE/2),
+        SCREEN_HEIGHT/2-(CROSSHAIR_SIZE/2),
+        CROSSHAIR_SIZE,
+        CROSSHAIR_SIZE,
+        global_raycast_has_target ? RED : WHITE
+        );
+
+    console_draw();
+
     // Draw the FPS counter
     char fps_text[16];
     sprintf(fps_text, "%d", GetFPS());
-    DrawText(fps_text, 10, 10, 20, LIME);
-
-    DrawCircle(SCREEN_WIDTH/2-(HITMARKER_CIRCLE_RADIUS/2),SCREEN_HEIGHT/2-(HITMARKER_CIRCLE_RADIUS/2),HITMARKER_CIRCLE_RADIUS,global_raycast_has_target ? RED : WHITE);
-
+    int text_width = MeasureText(fps_text, 20);
+    int x = SCREEN_WIDTH - text_width - 10;     
+    DrawText(fps_text, x, 5, 20, GetFPS() < 30 ? RED : WHITE);     
 
     if (global_paused) draw_pausemenu();
+
+    //stats_draw();
+
 }
 
 /*

@@ -42,6 +42,10 @@
         "gameloop.h": "c",
         "rlmodels.h": "c",
         "enemy.h": "c",
-        "anims.h": "c"
+        "anims.h": "c",
+        "rlgl.h": "c",
+        "__locale": "c",
+        "optional": "c",
+        "__bit_reference": "c"
     },
 }

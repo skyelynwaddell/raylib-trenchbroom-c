@@ -5,13 +5,16 @@
 int global_paused = false; // Game pause state
 int global_quit_game = false;
 int global_game_loading = true;
+int global_console_open = false;
 
 // --- SKYELIB GLOBAL IMPLEMENTATIONS ---
 // --------------------------------------------------------------------
-int FPS           = 10000;
+int FPS           = 144;
 int SCREEN_WIDTH  = 1280;
 int SCREEN_HEIGHT = 720;
 int VSYNC         = 0;
+
+sModel view_model = {0};
 
 // camera properties
 Vector3 global_camera_height_current = {0};
@@ -74,6 +77,7 @@ int global_player_onground = false;
 int global_player_crouching = false;
 int global_player_shooting = false;
 
+
 /*
 pause_toggle
 This function toggles the pause state of the game.
@@ -83,9 +87,11 @@ void pause_toggle()
     global_paused = !global_paused;
     if (global_paused) {
         EnableCursor();
+        global_console_open = false;
     }
     else 
     { 
-        DisableCursor();
+        if (global_console_open == false)
+            DisableCursor();
     }
 }

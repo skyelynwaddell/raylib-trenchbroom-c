@@ -97,6 +97,11 @@ void enemy_change_state(Enemy *mon, int new_state, int new_anim)
 }
 
 
+/*
+enemy_should_update
+Returns true over many conditionals, if the enemy update event
+should currently be processing
+*/
 int enemy_should_update(Enemy *mon)
 {
     if (mon->gameobject.visible == false || distance_to_player(&mon->gameobject, RENDER_DISTANCE) == false) return false;
