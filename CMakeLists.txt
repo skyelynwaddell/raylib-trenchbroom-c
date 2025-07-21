@@ -15,14 +15,40 @@ include_directories(
     /Users/skye/Downloads/raygui-4.0/src # Optional: platform-specific
 )
 
-# Platform-specific SDL2 setup
+# Platform-specific SDL2 and ENet setup
 if(APPLE)
     find_library(SDL2_LIBRARY SDL2 HINTS /opt/homebrew/lib /usr/local/lib)
     include_directories(/opt/homebrew/include)
+
+    # Try to find ENet manually on macOS (adjust if needed)
+    find_library(ENET_LIBRARY enet HINTS /usr/local/lib /opt/homebrew/lib)
+    if(NOT ENET_LIBRARY)
+        message(FATAL_ERROR "ENet library not found on macOS. Please install it.")
+    endif()
+    include_directories(/usr/local/include /opt/homebrew/include)
+
 elseif(UNIX)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SDL2 REQUIRED sdl2)
     include_directories(${SDL2_INCLUDE_DIRS})
+
+    # Try pkg-config for ENet, fallback if not found
+    execute_process(
+        COMMAND pkg-config --exists enet
+        RESULT_VARIABLE ENET_PKG_OK
+    )
+    if(ENET_PKG_OK EQUAL 0)
+        message(STATUS "Found ENet via pkg-config")
+        pkg_check_modules(ENET REQUIRED enet)
+        include_directories(${ENET_INCLUDE_DIRS})
+        link_directories(${ENET_LIBRARY_DIRS})
+        set(ENET_LIBS ${ENET_LIBRARIES})
+    else()
+        message(WARNING "ENet not found via pkg-config; using manual paths")
+        include_directories(/usr/include)
+        link_directories(/usr/lib/x86_64-linux-gnu)
+        set(ENET_LIBS enet)
+    endif()
 endif()
 
 if(NOT SDL2_LIBRARY AND NOT SDL2_LIBRARIES)
@@ -45,27 +71,53 @@ set_target_properties(raylib PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/lib/raylib/include
 )
 
-# Gather source files
+# Game
 file(GLOB_RECURSE SRC_FILES src/*.c)
-
-# Define executable
 add_executable(game ${SRC_FILES})
+
+# Server
+file(GLOB SERVER_SRC_FILES server/*.c)
+file(GLOB RAYGUI_SRC src/lib/raygui/*.c)
+
+add_executable(server ${SERVER_SRC_FILES} ${RAYGUI_SRC})
+
 
 # Link libraries
 if(APPLE)
     target_link_libraries(game
         raylib
         ${SDL2_LIBRARY}
+        ${ENET_LIBRARY}
         m dl pthread
         "-framework OpenGL"
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreVideo"
     )
+
+    target_link_libraries(server
+        raylib
+        ${SDL2_LIBRARY}
+        ${ENET_LIBRARY}
+        m dl pthread
+        "-framework OpenGL"
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreVideo"
+    )
+
 elseif(UNIX)
     target_link_libraries(game
         raylib
         ${SDL2_LIBRARIES}
+        ${ENET_LIBS}
+        m dl pthread GL X11
+    )
+
+    target_link_libraries(server
+        raylib
+        ${SDL2_LIBRARIES}
+        ${ENET_LIBS}
         m dl pthread GL X11
     )
 endif()

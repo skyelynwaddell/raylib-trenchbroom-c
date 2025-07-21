@@ -22,46 +22,53 @@ int gameloop()
     en2->model.current_anim = ANIM_SHOTGUNNER_RUN;
 
 
+    // --- ENET Client Initialization ---
+    if (enetclient_init() == false) {
+        printf("Failed to initialize ENet client.\n");
+    }
+
     // Main Game Loop
     // -----------------------------
     while(global_quit_game == false && !WindowShouldClose())
     {
-    if (global_game_loading == false)
-    {
-        input();
-        update();
+        enetclient_update();
 
-        // Draw
-        // -----------------------------
-        BeginDrawing();
-            ClearBackground(BLACK);
+        if (global_game_loading == false)
+        {
+            input();
+            update();
 
-            // 3D World
+            // Draw
             // -----------------------------
-            BeginMode3D(camera);
-            BeginShaderMode(sh_light);
+            BeginDrawing();
+                ClearBackground(BLACK);
 
-                draw();
-                player_draw();
-                enemy_draw_all();
+                // 3D World
+                // -----------------------------
+                BeginMode3D(camera);
+                BeginShaderMode(sh_light);
 
-            EndShaderMode();
-            EndMode3D();
+                    draw();
+                    player_draw();
+                    enemy_draw_all();
 
-            // View Model
-            // -----------------------------
-            BeginModeViewModel();
-            BeginShaderMode(sh_viewmodel);
+                EndShaderMode();
+                EndMode3D();
 
-                viewmodel_draw();
+                // View Model
+                // -----------------------------
+                BeginModeViewModel();
+                BeginShaderMode(sh_viewmodel);
 
-            EndShaderMode();
-            EndModeViewModel();
+                    viewmodel_draw();
 
-            draw_gui();
+                EndShaderMode();
+                EndModeViewModel();
 
-        EndDrawing();
-    }
+                draw_gui();
+
+            EndDrawing();
+        }
     }
 
     // De-Initialization
@@ -69,6 +76,7 @@ int gameloop()
     clean_up();
 
     CloseWindow();
+    enetclient_disconnect();
     return false;
     // de-init ----------------------
 }

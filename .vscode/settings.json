@@ -47,6 +47,9 @@
         "__locale": "c",
         "optional": "c",
         "__bit_reference": "c",
-        "sdl.h": "c"
+        "sdl.h": "c",
+        "enet.h": "c",
+        "server.h": "c",
+        "system_error": "c"
     },
 }

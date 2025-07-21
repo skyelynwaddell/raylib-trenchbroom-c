@@ -10,8 +10,8 @@
 // --- Toggles ---
 #define PLATFORM_DESKTOP
 
-//#define OS_LINUX
-#define OS_MACOS
+#define OS_LINUX
+//#define OS_MACOS
 //#define OS_WINDOWS
 //#define OS_ANDROID
 //#define OS_WEB
@@ -28,6 +28,9 @@
 #define MODEL_DIR "gamedata/models/"
 #define TEXTURE_DIR "gamedata/textures/"
 #define MAP_DIR "gamedata/maps/"
+
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 1234
 
 // --- Macros ---
 #define Max(a, b) ((a) > (b) ? (a) : (b))
@@ -153,6 +156,7 @@ extern int BUTTON_INTERACT_PAD;
 #include <math.h>
 #include <stdlib.h>
 #include "float.h"
+#include "enet.h"
 
 #ifdef OS_MACOS
     #include <OpenGL/gl3.h>
