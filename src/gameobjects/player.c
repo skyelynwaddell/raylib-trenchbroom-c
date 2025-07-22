@@ -1,5 +1,6 @@
 #include "player.h"
 #include "skyelib.h"
+#include "weapons.h"
 
 Player player;
 
@@ -35,9 +36,8 @@ void player_init()
     global_camera_height_current = global_camera_height;
 };
 
+static float anim_cooldown = 0;
 static float shoot_cooldown = 0;
-static float shoot_cooldown_max = 0.3;
-
 
 /*
 player_shoot
@@ -46,11 +46,13 @@ Call this to invoke the player shooting
 static void player_shoot()
 {
     global_player_shooting = true;
-    viewmodel.model.current_frame = 0;
-    viewmodel.model.current_anim = ANIM_PISTOL_SHOOT;
-    shoot_cooldown = shoot_cooldown_max;
+    smodel_animation_change(&viewmodel.model,weapons[current_weapon].anim_shoot);
+    shoot_cooldown = weapons[current_weapon].shoot_cooldown;
+    anim_cooldown = weapons[current_weapon].anim_duration;
+
 }
 
+static int reloading = false;
 
 /*
 player_handle_shoot
@@ -58,20 +60,59 @@ Handles if the player can shoot, and the button presses
 */
 static void player_handle_shoot(float delta)
 {
+
+    if (reloading) return;
+
+    if (anim_cooldown > 0){
+        anim_cooldown -= delta;
+        anim_cooldown = Clamp(anim_cooldown,0,weapons[current_weapon].anim_duration);
+
+        if (anim_cooldown <= 0.1)
+            viewmodel.model.current_anim = weapons[current_weapon].anim_idle;
+    }
+
+    
     if (shoot_cooldown > 0) 
     {
-        if (viewmodel.model.current_anim_finished)
         shoot_cooldown -= delta;
-        shoot_cooldown = Clamp(shoot_cooldown,0,shoot_cooldown_max);
-
-        if (shoot_cooldown <= 0.1)
-            viewmodel.model.current_anim = ANIM_PISTOL_IDLE;
         return;
     }
 
+    if (weapons[current_weapon].automatic)
+    {
     if (IsMouseButtonDown(BUTTON_SHOOT_KEY) || 
     IsGamepadButtonDown(GAMEPAD_P1, BUTTON_SHOOT_PAD))
         player_shoot();
+    }
+    else
+    {
+    if (IsMouseButtonPressed(BUTTON_SHOOT_KEY) || 
+    IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_SHOOT_PAD))
+        player_shoot();
+    }
+}
+
+
+
+/*
+player_handle_reload
+*/
+void player_handle_reload()
+{
+    if (IsKeyPressed(BUTTON_RELOAD_KEY) || IsGamepadButtonPressed(GAMEPAD_P1, BUTTON_RELOAD_PAD))
+    {
+        if (reloading) return;
+        reloading = true;
+        smodel_animation_change(&viewmodel.model, weapons[current_weapon].anim_reload);
+        printf("REEEELOADDDINNNGGG");
+    }
+
+    // Check if reload animation is finished
+    if (reloading && viewmodel.model.current_anim_finished)
+    {
+        reloading = false;
+        smodel_animation_change(&viewmodel.model, weapons[current_weapon].anim_idle);
+    }
 }
 
 
@@ -91,12 +132,13 @@ void player_update()
 
     float delta = GetFrameTime();
 
+    player_handle_reload();
+    player_handle_shoot(delta);
     player_handle_crouch();
     player_movement();
     apply_gravity(&player);
     player_handle_jump();
     camera_follow_player(&camera, &player);
-    player_handle_shoot(delta);
 }
 
 

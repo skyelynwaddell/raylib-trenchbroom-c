@@ -54,7 +54,7 @@ Texture2D texture_get_cached(char *texture_name)
         {
             if (string_equals(texture_cache[i].name, "__TB_empty"))
             {
-                // returns cached TB empty texture
+                // returns cached ETB empty texture
                 return texture_cache[i].texture;
             }
         }

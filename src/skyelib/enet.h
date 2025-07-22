@@ -22,6 +22,7 @@ typedef enum MESSAGE_TYPE {
 #pragma pack(push, 1)
 
 typedef struct MultiplayerUser {
+    ENetPeer *peer;
     int player_id;
     char username[64];
 } MultiplayerUser;
@@ -50,3 +51,5 @@ int enetserver_init();
 void enetserver_process_message(ENetEvent *event);
 void enetserver_draw_gui();
 void enetserver_update();
+void enetserver_start();
+void enetserver_stop();

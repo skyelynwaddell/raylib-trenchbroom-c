@@ -195,7 +195,6 @@ void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask)
         collisionbox_set_position(&obj->collision_box, obj->position);
     }
 
-
     // ---- X axis ----
     Vector3 moveX = { obj->velocity.x * dt, 0.0f, 0.0f };
     Vector3 testX = Vector3Add(obj->position, moveX);
@@ -222,6 +221,7 @@ void check_collisions(GameObject *obj, int is_player, COLLISION_MASK mask)
     collisionbox_set_position(&obj->collision_box, obj->position);
 }
 
+
 /*
 raycast_start()
 Called at the start of the game loop to initialize the raycast
@@ -231,6 +231,7 @@ void raycast_start()
     global_raycast_has_target = false;
     global_player_shooting = false;
 } 
+
 
 /*
 raycast_check_bb()
@@ -317,6 +318,7 @@ int distance_to(GameObject *obj1, GameObject *obj2, float distance)
     return dist <= distance;
 }
 
+
 /*
 distance_to
 Returns true if the gameobjects are equal or less to the distance
@@ -326,7 +328,6 @@ int distance_to_pos(Vector3 pos1, Vector3 pos2, float distance)
     float dist = Vector3Distance(pos1, pos2);
     return dist <= distance;
 }
-
 
 
 /*

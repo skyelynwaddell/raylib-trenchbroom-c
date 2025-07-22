@@ -1,7 +1,7 @@
 #include "skyelib.h"
 #include "global.h"
 
-int ANIM_SPEED = 70;
+int ANIM_SPEED = 60;
 
 /*
 smodel_create()

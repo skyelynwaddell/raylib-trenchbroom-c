@@ -1,9 +1,21 @@
 #include "skyelib.h"
 #include "global.h"
+#include "weapons.h"
 
 Camera3D camera;
 int camera_mode;
 int camera_move_spd;
+
+float camera_bob_phase = 0.0f;
+float camera_bob_amp = 0.02f;
+float camera_bob_speed = 8.4f;
+float bob_offset = 0.0f;
+static float weapon_bob = 0.006f;
+
+static float camera_tilt = 0.0f;
+static float camera_tilt_max = 0.01f; // max tilt in radians (~4.5 degrees)
+static float camera_tilt_speed = 8.0f; // how quickly tilt responds
+
 
 /*
 camera_init
@@ -18,6 +30,7 @@ void camera_init()
     camera.projection = CAMERA_PERSPECTIVE;
     camera_mode = CAMERA_FIRST_PERSON;
 }
+
 
 /*
 camera_follow_player
@@ -64,14 +77,70 @@ void camera_follow_player(Camera3D *camera, GameObject *target)
         GetFrameTime() * 10
     );
 
+    float move_spd = Vector3Length(target->velocity);
+    Vector3 base_viewmodel_pos = weapons[current_weapon].position;
+    float bob_offset = sinf(camera_bob_phase) * camera_bob_amp * move_spd;
+
     // Set camera position just above player position (eye height)
     camera->position = Vector3Add(target->position, global_camera_height_current);
 
+    float ls = 0.05; // lerp speed
+
+    float delta = GetFrameTime();
+    if (abs(move_spd) > 2)
+    {
+        camera->position.y += bob_offset;
+        camera_bob_phase += delta * camera_bob_speed;
+        viewmodel.position.z += bob_offset * weapon_bob;
+
+    }
+    else
+    {
+        viewmodel.position.x = Lerp(viewmodel.position.x, base_viewmodel_pos.x, ls);
+        viewmodel.position.y = Lerp(viewmodel.position.y, base_viewmodel_pos.y, ls);
+        viewmodel.position.z = Lerp(viewmodel.position.z, base_viewmodel_pos.z, ls);
+        camera_bob_phase = 0.0f;
+    }
+
+
+    if (!global_player_onground)
+    {
+        bob_offset = 0.0;
+        viewmodel.position.x = Lerp(viewmodel.position.x, base_viewmodel_pos.x, ls);
+        viewmodel.position.y = Lerp(viewmodel.position.y, base_viewmodel_pos.y, ls);
+        viewmodel.position.z = Lerp(viewmodel.position.z, base_viewmodel_pos.z, ls);
+        camera_bob_phase = 0.0f;
+    }
+
     // Camera target is forward direction from eye position
     camera->target = Vector3Add(camera->position, forward);
+    float strafe = 0.0f;
 
-    // Up vector stays world up
-    camera->up = (Vector3){0.0f, 1.0f, 0.0f};
+    // Keyboard
+    if (IsKeyDown(BUTTON_MOVE_LEFT_KEY)) strafe = -1.0f;
+    if (IsKeyDown(BUTTON_MOVE_RIGHT_KEY)) strafe =  1.0f;
+
+    // Gamepad (left stick X axis)
+    if (IsGamepadAvailable(GAMEPAD_P1)) {
+        float axis = GetGamepadAxisMovement(GAMEPAD_P1, GAMEPAD_AXIS_LEFT_X);
+        float deadzone = 0.2f;
+        if (axis < -deadzone) strafe = -1.0f;
+        else if (axis > deadzone) strafe = 1.0f;
+    }
+
+    float desired_tilt = 0.0f;
+    if (strafe != 0.0f) {
+        desired_tilt = Clamp(-strafe * camera_tilt_max, -camera_tilt_max, camera_tilt_max);
+    } else {
+        desired_tilt = 0.0f;
+    }
+
+    // Smoothly interpolate tilt for responsiveness
+    camera_tilt = Lerp(camera_tilt, desired_tilt, GetFrameTime() * camera_tilt_speed);
+
+    // Apply tilt to camera's up vector (roll)
+    camera->up = Vector3RotateByAxisAngle((Vector3){0.0f, 1.0f, 0.0f}, camera_get_forward(camera), camera_tilt);
+
 }
 
 
@@ -216,4 +285,9 @@ void camera_roll(Camera *camera, float angle)
 
     // Rotate up direction around forward axis
     camera->up = Vector3RotateByAxisAngle(camera->up, forward, angle);
+}
+
+void camera_update_fovy(Camera3D *camera)
+{
+    camera->fovy = 90.0f;
 }

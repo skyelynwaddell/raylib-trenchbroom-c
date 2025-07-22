@@ -2,6 +2,7 @@
 #include "skyelib.h"
 #include "global.h"
 #include "player.h"
+#include "weapons.h"
 
 static void reinit()
 {
@@ -38,6 +39,7 @@ void init()
     printf("\n \n ### SKYESRC ### \n \n");
     console_init();
 
+
     char raylib_version_string[64];
     snprintf(raylib_version_string, sizeof(raylib_version_string),
          "Raylib: v%d.%d.%d", 
@@ -64,6 +66,8 @@ void init()
     console_line();
 
     console_log("Initializing engine...");
+
+    weapons_init();
 
     console_log("Adding lights to level...");
     lights_init();

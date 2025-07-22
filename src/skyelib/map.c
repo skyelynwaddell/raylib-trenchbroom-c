@@ -487,7 +487,9 @@ void map_create_models()
             Vector3 center = Vector3Lerp(geometry.bounds.min, geometry.bounds.max, 0.5f); // center of the box
             Vector3 extent = Vector3Subtract(geometry.bounds.max, center);     // half-dimensions
             Vector3 diagonal = Vector3Subtract(geometry.bounds.max, geometry.bounds.min);
-            geometry.bounding_radius = Vector3Length(diagonal) * 2.0f;
+
+            float frustum_padding = 3.0f; // padding for frustum checks so we dont clip the model when in view
+            geometry.bounding_radius = Vector3Length(diagonal) * frustum_padding;
 
             map.models[map.model_count++] = geometry;            
         }
@@ -546,7 +548,8 @@ void map_draw_models()
         if (!frustum_check_sphere(geo->position, geo->bounding_radius, global_frustum)) 
             continue; 
 
-        // expensive frustum check
+        // expensive frustum check not sure if we need anymore
+        // since the cheap one seems to always work and is much cheaper
         // if (!frustum_check_boundingbox(geo->bounds, global_frustum)) 
         //     continue;
 

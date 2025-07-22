@@ -30,13 +30,18 @@
 #define MAP_DIR "gamedata/maps/"
 
 #define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 1234
+#define SERVER_PORT 25064
+//#define SERVER_HEADLESS // Run server without GUI
+
+extern int GAME_SCREEN_WIDTH;  
+extern int GAME_SCREEN_HEIGHT; 
+
 
 // --- Macros ---
 #define Max(a, b) ((a) > (b) ? (a) : (b))
 #define Min(a, b) ((a) < (b) ? (a) : (b))
-#define SCREEN_CENTER() ((Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f })
-#define CENTER_RAY(cam) (GetScreenToWorldRay(SCREEN_CENTER(), cam))
+
+
 
 // --- Raygui & Styles/Themes ---
 #define STYLE_PATH "styles/"
@@ -167,6 +172,14 @@ extern int BUTTON_INTERACT_PAD;
 #endif
 
 #define TEXTURE_FILTER TEXTURE_FILTER_BILINEAR
+
+int GetGameScreenWidth();
+int GetGameScreenHeight();
+
+Vector2 SCREEN_CENTER();
+Ray CENTER_RAY(Camera cam);
+
+extern float gui_scale;
 
 // --- Global 3D Camera ---
 extern Camera camera;
@@ -361,6 +374,12 @@ Vector3 camera_get_right(Camera *camera);
 void camera_yaw(Camera *camera, float angle, bool rotateAroundTarget);
 void camera_pitch(Camera *camera, float angle, bool lockView, bool rotateAroundTarget, bool rotateUp);
 void camera_roll(Camera *camera, float angle);
+void camera_update_fovy(Camera3D *camera);
+
+extern float camera_bob_phase;
+extern float camera_bob_amp;
+extern float camera_bob_speed;
+extern float bob_offset;
 
 // Polygon
 bool polygon_get_intersection(
@@ -421,6 +440,8 @@ int string_equals(char* string, char* string_to_compare_to);
 float to_delta(float value);
 const char *rlGetVersionString();
 void stats_draw();
+void font_set_size(int size);
+
 
 #include "map.h" // dont move
 

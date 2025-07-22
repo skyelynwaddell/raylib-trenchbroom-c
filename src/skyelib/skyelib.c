@@ -1,6 +1,25 @@
 #define RAYGUI_IMPLEMENTATION
 #include "skyelib.h"
 
+void font_set_size(int size){ GuiSetStyle(DEFAULT, TEXT_SIZE, size); }
+
+int GAME_SCREEN_WIDTH = 1280;
+int GAME_SCREEN_HEIGHT = 720;
+
+int GetGameScreenWidth(){ return GAME_SCREEN_WIDTH; }
+int GetGameScreenHeight(){ return GAME_SCREEN_HEIGHT; }
+
+float gui_scale = 1.5;
+
+Vector2 SCREEN_CENTER() 
+{ 
+    return (Vector2){ 
+        GetScreenWidth() / 2.0f, 
+        GetScreenHeight() / 2.0f
+    };
+}
+Ray CENTER_RAY(Camera cam) { return GetScreenToWorldRay(SCREEN_CENTER(), cam); }
+
 /*
 BeginModeViewModel()
 Starts the 3D mode for the view model rendering.
@@ -48,7 +67,7 @@ Frustum frustum_get_from_camera(Camera3D cam)
     #endif
     
     float fov = cam.fovy * _fov;
-    Matrix proj = MatrixPerspective(fov * DEG2RAD, (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.01f, 1000.0f);
+    Matrix proj = MatrixPerspective(fov * DEG2RAD, (float)GAME_SCREEN_WIDTH / GAME_SCREEN_HEIGHT, 0.01f, 1000.0f);
 
     Matrix vp = MatrixMultiply(view, proj);
 

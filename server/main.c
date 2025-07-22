@@ -9,20 +9,39 @@ int main(void) {
 
     enet_initialize();
     atexit(enet_deinitialize);
-    InitWindow(600, 600, "skyesrc server");
 
-    while (!WindowShouldClose()) {
-        // Poll network events
+    #ifndef SERVER_HEADLESS
+        //SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+        InitWindow(420, 360, "skyesrc server");
+    #else
+        enetserver_start();
+    #endif
 
-        if (server_online)
+    // Poll network events
+    #ifndef SERVER_HEADLESS
+        while (!WindowShouldClose()) {
+
+            if (server_online)
+                enetserver_update();
+
+            // Draw server status and messages
+            BeginDrawing();
+                ClearBackground(DARKGRAY);
+                enetserver_draw_gui();
+            EndDrawing();
+        }
+    #else
+        while (server_online) 
+        {
             enetserver_update();
-
-        // Draw server status and messages
-        enetserver_draw_gui();
-    }
+        }
+    #endif
 
     enet_host_destroy(server);
-    CloseWindow();
+
+    #ifndef SERVER_HEADLESS
+        CloseWindow();
+    #endif
 
     return false;
 }

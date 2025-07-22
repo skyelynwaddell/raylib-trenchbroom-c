@@ -71,16 +71,12 @@ set_target_properties(raylib PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/lib/raylib/include
 )
 
-# Game
-file(GLOB_RECURSE SRC_FILES src/*.c)
-add_executable(game ${SRC_FILES})
+file(GLOB_RECURSE SRC_FILES src/*.c) # Game Source Files
+file(GLOB SERVER_SRC_FILES server/*.c) # Server Source Files
+list(FILTER SRC_FILES EXCLUDE REGEX ".*src/main.c") # Exclude main.c from game source files
 
-# Server
-file(GLOB SERVER_SRC_FILES server/*.c)
-file(GLOB RAYGUI_SRC src/lib/raygui/*.c)
-
-add_executable(server ${SERVER_SRC_FILES} ${RAYGUI_SRC})
-
+add_executable(game src/main.c ${SRC_FILES}) # Include main.c in the game executable
+add_executable(server ${SRC_FILES} ${SERVER_SRC_FILES})
 
 # Link libraries
 if(APPLE)

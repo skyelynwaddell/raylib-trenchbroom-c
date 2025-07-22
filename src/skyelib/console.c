@@ -176,7 +176,7 @@ void console_draw() {
         scroll_offset = Max(0, line_count - max_visible_lines);
 
     // Draw background
-    DrawRectangle(0, 0, GetScreenWidth(), console_height, (Color){0, 0, 0, 100});
+    DrawRectangle(0, 0, GAME_SCREEN_WIDTH, console_height, (Color){0, 0, 0, 100});
 
     // Draw lines from bottom up, with scroll offset
     int y = console_height - 80;

@@ -1,0 +1,89 @@
+
+// #region Some ENET Server Message Examples
+// case MESSAGE_TYPE_HELLO:
+//     printf("Received HELLO message: %s\n", (char*)payload);
+//     // Your original logic starts here
+//     int received_int;
+//     memcpy(&received_int, payload, sizeof(int));
+//     const char *received_string = (const char *)(payload + sizeof(int));
+
+//     MultiplayerUser *sender = (MultiplayerUser *)event->peer->data;
+
+//     // Safety checks before printf
+//     const char *username = sender ? sender->username : "<unknown>";
+//     s
+// #region Some ENET Server Message Examples
+// case MESSAGE_TYPE_HELLO:
+//     printf("Received HELLO message: %s\n", (char*)payload);
+//     // Your original logic starts here
+//     int received_int;
+//     memcpy(&received_int, payload, sizeof(int));
+//     const char *received_string = (const char *)(payload + sizeof(int));
+
+//     MultiplayerUser *sender = (MultiplayerUser *)event->peer->data;
+
+//     // Safety checks before printf
+//     const char *username = sender ? sender->username : "<unknown>";
+//     size_t max_str_len = payload_len - sizeof(int);
+
+//     if (max_str_len <= 0 || memchr(received_string, '\0', max_str_len) == NULL) {
+//         printf("Warning: received string is not null-terminated or too short!\n");
+//         return;
+//     }
+
+//     printf("Received int: %d, string: %s from sender: %s \n",
+//            received_int, received_string, username);
+
+    // Safe options for message response
+
+    // reply to sender
+    // enet_peer_send(event->peer, 0, packet);
+
+    // send to all users including sender
+    //enet_host_broadcast(server, 0, packet);
+
+    // send to all users excluding sender
+    /*
+    for (size_t i = 0; i < server->peerCount; ++i)
+    {
+        ENetPeer *p = &server->peers[i];
+        if (p->state == ENET_PEER_STATE_CONNECTED && p != event->peer)
+        {
+            enet_peer_send(p, 0, packet);
+        }
+    }
+    */
+
+    // break;
+// #endregionize_t max_str_len = payload_len - sizeof(int);
+
+//     if (max_str_len <= 0 || memchr(received_string, '\0', max_str_len) == NULL) {
+//         printf("Warning: received string is not null-terminated or too short!\n");
+//         return;
+//     }
+
+//     printf("Received int: %d, string: %s from sender: %s \n",
+//            received_int, received_string, username);
+
+    // Safe options for message response
+
+    // reply to sender
+    // enet_peer_send(event->peer, 0, packet);
+
+    // send to all users including sender
+    //enet_host_broadcast(server, 0, packet);
+
+    // send to all users excluding sender
+    /*
+    for (size_t i = 0; i < server->peerCount; ++i)
+    {
+        ENetPeer *p = &server->peers[i];
+        if (p->state == ENET_PEER_STATE_CONNECTED && p != event->peer)
+        {
+            enet_peer_send(p, 0, packet);
+        }
+    }
+    */
+
+    // break;
+// #endregion

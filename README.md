@@ -47,8 +47,11 @@ sudo ./buildmac.sh
 Make sure you have the following installed:
 
 * A C compiler (e.g. `gcc`)
-* [raylib](https://www.raylib.com/)
-* [raygui](https://github.com/raysan5/raygui)
+* [Raylib](https://www.raylib.com/)
+* [Raygui](https://github.com/raysan5/raygui)
+* [SDL2](https://github.com/libsdl-org/SDL/tree/SDL2)
+* [OpenGL](https://www.opengl.org/)
+* [ENet](https://github.com/lsalzman/enet)
 * [TrenchBroom](https://trenchbroom.github.io/) (for building maps)
 
 ---

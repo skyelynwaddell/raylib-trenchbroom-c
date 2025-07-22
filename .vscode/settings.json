@@ -50,6 +50,9 @@
         "sdl.h": "c",
         "enet.h": "c",
         "server.h": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c"
     },
 }

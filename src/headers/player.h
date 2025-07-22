@@ -21,5 +21,6 @@ void player_movement();
 void player_jump();
 void player_handle_jump();
 void player_handle_crouch();
+void player_handle_reload();
 
 #endif // PLAYER_H
