@@ -1,5 +1,7 @@
 *.exe
-bin/*
+bin/server
+bin/game
+game
 build/*
 .DS_STORE
 *.DS_STORE

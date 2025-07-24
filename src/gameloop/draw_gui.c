@@ -1,6 +1,22 @@
 #include "gameloop.h"
 #include "skyelib.h"
 #include "global.h"
+#include "floatingwindow.h"
+
+static void draw_viewmodel_editmode()
+{
+    if (VIEWMODEL_POSITION_MODE == false) return;
+
+    int y = 50;
+    int g = 20;
+    DrawText("Position Viewmodel Mode",10,y,20,WHITE); y+=g;
+    DrawText("Controls:",10,y,20,WHITE); y+=g;
+    DrawText("Left/Right : X",10,y,20,WHITE); y+=g;
+    DrawText("Up/Down   : Y",10,y,20,WHITE); y+=g;
+    DrawText("[ / ]         : Z",10,y,20,WHITE); y+=g;
+    DrawText(", / .         : Rotation",10,y,20,WHITE); y+=g;
+    DrawText(TextFormat("Viewmodel Pos:\nX:%.2f \nY:%.2f \nZ:%.2f \nR:%d \n", viewmodel.position.x, viewmodel.position.y, viewmodel.position.z, (int)viewmodel.rotation),10,y,20,WHITE); y+=g;
+}
 
 
 /*
@@ -9,6 +25,9 @@ draw_gui
 */
 void draw_gui()
 {
+
+    draw_viewmodel_editmode();
+
     // Draw Crosshair
     DrawRectangle(
         GAME_SCREEN_WIDTH/2-(CROSSHAIR_SIZE/2),
@@ -21,13 +40,20 @@ void draw_gui()
     console_draw();
 
     // Draw the FPS counter
-    char fps_text[16];
-    sprintf(fps_text, "%d", GetFPS());
-    int text_width = MeasureText(fps_text, 20);
-    int x = GAME_SCREEN_WIDTH - text_width - 10;     
-    DrawText(fps_text, x, 5, 20, GetFPS() < 30 ? RED : WHITE);     
+    if (show_fps)
+    {
+        int font_size = 11;
+        char fps_text[16];
+        sprintf(fps_text, "%d", GetFPS());
+        int text_width = MeasureText(fps_text, font_size*gui_scale);
+        int x = GAME_SCREEN_WIDTH - text_width - 10;     
+        DrawText(fps_text, x, 5, font_size*gui_scale, GetFPS() <= 25 ? RED : WHITE);    
+    } 
 
     if (global_paused) draw_pausemenu();
+
+    if (gui_state == GUI_STATE_OPTIONS)
+        GuiWindowFloating(&window_position, &window_size, &window_minimized, &window_moving, &window_resizing, &draw_options_menu, (Vector2) { 400, 400 }, &window_scroll, "#142# Options");
     //stats_draw();
 
 }
@@ -39,11 +65,9 @@ int btnWidth = 130;   // Use a more reasonable base width
 int btnHeight = 26;   // Use a more reasonable base height
 int btnGap = 33;      // Use a more reasonable base gap
 
-float scale = 1.0f;   // Store scale globally for get_pos_y()
-
 void draw_pausemenu()
 {
-    float scale = 2.0;//Min((float)GetScreenWidth()/GAME_SCREEN_WIDTH, (float)GetScreenHeight()/GAME_SCREEN_HEIGHT) * gui_scale;
+    float scale = gui_scale;//Min((float)GetScreenWidth()/GAME_SCREEN_WIDTH, (float)GetScreenHeight()/GAME_SCREEN_HEIGHT) * gui_scale;
     //scale = Clamp(rawScale, 1.0, 1.4f); // Clamp scale between 0.75 and 1.5
 
     menu_item_start();
@@ -59,13 +83,28 @@ void draw_pausemenu()
     // Pause Menu Title
     DrawText("Game Paused", posX, posY, (int)(20 * scale), WHITE);
 
-    font_set_size((int)(10 * scale));
+    Rectangle window_rect = {
+        window_position.x,
+        window_position.y,
+        window_size.x,
+        window_size.y
+    };
+
+    Vector2 mouse = GetMousePosition();
+
+    bool mouse_over_window = false;
+    if (gui_state != GUI_STATE_DEFAULT)
+        mouse_over_window = CheckCollisionPointRec(mouse, window_rect);
 
     // Resume Button
     menu_item_next();
     if (GuiButton((Rectangle){ posX, get_pos_y(scaledBtnGap), scaledBtnWidth, scaledBtnHeight }, "Resume"))
     {
-        pause_toggle();
+        if (mouse_over_window == false)
+        {
+            pause_toggle();
+            gui_state = GUI_STATE_DEFAULT;
+        }
     }
 
     // Save Game Button
@@ -82,11 +121,23 @@ void draw_pausemenu()
         // TODO : Implement load game functionality
     }
 
+    // Options Button
+    menu_item_next();
+    if (GuiButton((Rectangle){ posX, get_pos_y(scaledBtnGap), scaledBtnWidth, scaledBtnHeight }, "Options"))
+    {
+        if (mouse_over_window == false)
+        {
+            gui_state = gui_state == GUI_STATE_DEFAULT ? GUI_STATE_OPTIONS : GUI_STATE_DEFAULT;
+            options_window_init();
+        }
+    }
+
     // Exit Button
     menu_item_next();
     if (GuiButton((Rectangle){ posX, get_pos_y(scaledBtnGap), scaledBtnWidth, scaledBtnHeight }, "Exit"))
     {
-        global_quit_game = true;
+        if (mouse_over_window == false)
+            global_quit_game = true;
     }
 }
 

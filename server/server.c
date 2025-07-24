@@ -22,7 +22,7 @@ int enetserver_init()
     }
     atexit(enet_deinitialize);
 
-    address.host = ENET_HOST_ANY;
+    enet_address_set_host(&address, SERVER_IP); 
     address.port = SERVER_PORT;
     server = enet_host_create(&address, 32, 2, 0, 0);
 
@@ -189,7 +189,7 @@ void enetserver_stop()
 // --- Draw Variabless ---
 static int x = 10;
 static int y = 10;
-    // Pause Menu Title
+// Pause Menu Title
 static int line_gap = 20;
 static void newline(){ y+=line_gap; }
 static int g = 10;  // gap 

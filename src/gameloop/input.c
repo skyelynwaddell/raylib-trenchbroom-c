@@ -20,6 +20,8 @@ Pause / Unpause the game when the user presses the ESC key
 */
 void handle_pause()
 {
-    if (IsKeyPressed(KEY_ESCAPE)) 
+    if (IsKeyPressed(KEY_ESCAPE)) { 
         pause_toggle();
+        gui_state = GUI_STATE_DEFAULT;
+    }
 }

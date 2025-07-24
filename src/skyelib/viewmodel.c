@@ -5,6 +5,30 @@
 #include "weapons.h"
 #include "anims.h"
 
+static void viewmodel_debug_editor()
+{
+    float ms = 0.05; // move speed
+    if (IsKeyDown(KEY_LEFT)) viewmodel.position.x -= ms; 
+    if (IsKeyDown(KEY_RIGHT)) viewmodel.position.x += ms; 
+    if (IsKeyDown(KEY_UP)) viewmodel.position.y -= ms; 
+    if (IsKeyDown(KEY_DOWN)) viewmodel.position.y += ms; 
+    if (IsKeyDown(KEY_LEFT_BRACKET)) viewmodel.position.z += ms;  
+    if (IsKeyDown(KEY_RIGHT_BRACKET)) viewmodel.position.z -= ms;
+
+    if (IsKeyDown(KEY_COMMA)) viewmodel.rotation -= ms;
+    if (IsKeyDown(KEY_PERIOD)) viewmodel.rotation += ms;
+
+    viewmodel.position.x = Clamp(viewmodel.position.x, -15, 15);
+    viewmodel.position.y = Clamp(viewmodel.position.y, -10, 10);
+    viewmodel.position.z = Clamp(viewmodel.position.z, -4, 4);
+
+    weapons[current_weapon].position = viewmodel.position;
+
+    //printf("Viewmodel Pos: X:%f Y:%f Z:%f R:%f \n", viewmodel.position.x, viewmodel.position.y, viewmodel.position.z, viewmodel.rotation);
+
+    //if (IsKeyPressed(KEY_BACKSPACE)) viewmodel.position = weapons[current_weapon].position;
+}
+
 static void viewmodel_set()
 {
     Weapon *w = &weapons[current_weapon];
@@ -64,6 +88,9 @@ void viewmodel_draw()
 {
     Viewmodel *vm = &viewmodel;
     float s = Min((float)GetScreenWidth()/GAME_SCREEN_WIDTH, (float)GetScreenHeight()/GAME_SCREEN_HEIGHT);
+
+    if (VIEWMODEL_POSITION_MODE)
+        viewmodel_debug_editor();
 
     // Draw the weapon model
     DrawModelEx(

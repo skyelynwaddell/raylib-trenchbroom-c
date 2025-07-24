@@ -1,16 +1,151 @@
 #define RAYGUI_IMPLEMENTATION
 #include "skyelib.h"
 
-void font_set_size(int size){ GuiSetStyle(DEFAULT, TEXT_SIZE, size); }
+// Server Properties
+char SERVER_IP[64] = "127.0.0.1";
+int SERVER_PORT = 25523;
+int SERVER_HEADLESS = false;
+// ----------------
+
+RenderTexture2D target;
+Vector2 mouse;
+Vector2 virtualMouse;
 
 int GAME_SCREEN_WIDTH = 1280;
 int GAME_SCREEN_HEIGHT = 720;
+int VIEWMODEL_POSITION_MODE = false;
+GUI_STATE gui_state = GUI_STATE_DEFAULT;
 
+int FPS           = 144;
+int SCREEN_WIDTH  = 1920;
+int SCREEN_HEIGHT = 1080;
+int VSYNC         = false;
+
+int FONT_SIZE_DEFAULT = 11;
+int fontsize = 11;
+float initial_gui_scale = 1.8;
+float gui_scale = 1.8;
+
+int should_camera_tilt = true;
+int should_weapon_bob = true;
+bool show_fps = true;
+
+// floating window properties
+Vector2 window_position = { 10, 10 };
+Vector2 window_size = { 450 , 450 };
+bool window_minimized = false;
+bool window_moving = false;
+bool window_resizing = false;
+Vector2 window_scroll;
+float window_scale = 1;
+int raygui_windowbox_statusbar_height = 24;
+int raygui_window_closebutton_size = 24;
+#define RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT 30
+#define RAYGUI_WINDOW_CLOSEBUTTON_SIZE 30
+
+void font_set_size(int size){ GuiSetStyle(DEFAULT, TEXT_SIZE, size); }
 int GetGameScreenWidth(){ return GAME_SCREEN_WIDTH; }
 int GetGameScreenHeight(){ return GAME_SCREEN_HEIGHT; }
 
-float gui_scale = 1.5;
 
+/*
+is_valid_number
+Returns true or false if the string is a number
+*/
+bool is_valid_number(const char *str) {
+    if (str[0] == '\0') return false; // empty string is invalid
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isdigit((unsigned char)str[i])) return false;
+    }
+    return true;
+}
+
+
+/*
+update_virtual_mouse
+Must be called every game TICK to translate the mouse coords
+to the scaled resolution GUI coords
+*/
+void update_virtual_mouse()
+{
+    // Update virtual mouse (clamped mouse value behind game screen)
+    mouse = GetMousePosition();
+    virtualMouse = (Vector2){ 0 };
+    window_scale = Min((float)GetScreenWidth()/GAME_SCREEN_WIDTH, (float)GetScreenHeight()/GAME_SCREEN_HEIGHT);
+
+    virtualMouse.x = (mouse.x - (GetScreenWidth() - (GAME_SCREEN_WIDTH*window_scale))*0.5f)/window_scale;
+    virtualMouse.y = (mouse.y - (GetScreenHeight() - (GAME_SCREEN_HEIGHT*window_scale))*0.5f)/window_scale;
+    virtualMouse = Vector2Clamp(virtualMouse, (Vector2){ 0, 0 }, (Vector2){ (float)GAME_SCREEN_WIDTH, (float)GAME_SCREEN_HEIGHT });
+
+    // Apply the same transformation as the virtual mouse to the real mouse (i.e. to work with raygui)
+    SetMouseOffset(-(GetScreenWidth() - (GAME_SCREEN_WIDTH*window_scale))*0.5f, -(GetScreenHeight() - (GAME_SCREEN_HEIGHT*window_scale))*0.5f);
+    SetMouseScale(1/window_scale, 1/window_scale);
+
+    window_position = (Vector2){ GetGameScreenWidth()/2-(window_size.x/2), GetGameScreenHeight()/2-(window_size.y/2) };
+}
+
+
+/*
+set_screen_size
+Sets the game screen size resolution to the enum of SCREEN_SIZE
+*/
+void set_screen_size(SCREEN_SIZE sz)
+{
+    switch(sz)
+    {
+        case SCREEN_SIZE_640:
+            GAME_SCREEN_WIDTH = 640; 
+            GAME_SCREEN_HEIGHT = 480;
+            gui_scale = 1.1;
+            window_size = (Vector2){ 450 , 450 };
+            target = LoadRenderTexture(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+            update_virtual_mouse(); 
+            font_set_size((int)(fontsize * gui_scale));
+        break;
+
+        case SCREEN_SIZE_1280:
+            GAME_SCREEN_WIDTH = 1280; 
+            GAME_SCREEN_HEIGHT = 720;
+            gui_scale = 1.8;
+            window_size = (Vector2){ 600 , 600 };
+            target = LoadRenderTexture(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+            update_virtual_mouse(); 
+            font_set_size((int)(fontsize * gui_scale));
+        break;
+
+        case SCREEN_SIZE_1920:
+            GAME_SCREEN_WIDTH = 1920; 
+            GAME_SCREEN_HEIGHT = 1080;
+            gui_scale = 2.8;
+            window_size = (Vector2){ 850 , 850 };
+            target = LoadRenderTexture(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+            update_virtual_mouse(); 
+            font_set_size((int)(11 * gui_scale));
+        break;
+    }
+}
+
+
+/*
+trim
+Trims whitespace in a char[]
+*/
+char *trim(char *str) {
+    while (isspace((unsigned char)*str)) str++;
+    if (*str == 0) return str;
+
+    char *end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end)) end--;
+
+    *(end + 1) = 0;
+    return str;
+}
+
+
+/*
+SCREEN_CENTER
+Returns the X and Y coords of the current Screen Center
+*/
 Vector2 SCREEN_CENTER() 
 { 
     return (Vector2){ 
@@ -18,7 +153,14 @@ Vector2 SCREEN_CENTER()
         GetScreenHeight() / 2.0f
     };
 }
+
+
+/*
+CENTER_RAY
+Returns the Ray that points towards the center of the screen
+*/
 Ray CENTER_RAY(Camera cam) { return GetScreenToWorldRay(SCREEN_CENTER(), cam); }
+
 
 /*
 BeginModeViewModel()

@@ -1,0 +1,24 @@
+ # Skyesrc Save Data
+server_ip=127.0.0.1
+server_port=25523
+game_screen-width=1920
+game_screen-height=1080
+should_camera-tilt=1
+should_weapon-bob-1
+gui_scale=1.5
+max_fps=144
+screen_width=1920
+screen_height=1080
+vsync=0
+camera_height=0.0 3.5 0.0
+player_height=8.0
+player_spawn_gap=18.0
+player_width=1.0
+player_health=100
+player_jumpheight=35
+player_speed=40
+crosshair_size=3
+gravity_default=-60
+interact_distance_enemy=50
+render_distance=1000
+collision_distance=60

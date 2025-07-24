@@ -10,15 +10,22 @@ int main(void) {
     enet_initialize();
     atexit(enet_deinitialize);
 
-    #ifndef SERVER_HEADLESS
+    parse_server_properties("server.properties");
+    printf("Server IP: %s\n", SERVER_IP);
+    printf("Server Port: %d\n", SERVER_PORT);
+
+    if (SERVER_HEADLESS == false)
+    {
         //SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         InitWindow(420, 360, "skyesrc server");
-    #else
+    }
+    else
+    {
         enetserver_start();
-    #endif
+    }
 
     // Poll network events
-    #ifndef SERVER_HEADLESS
+    if (SERVER_HEADLESS == false){
         while (!WindowShouldClose()) {
 
             if (server_online)
@@ -30,18 +37,19 @@ int main(void) {
                 enetserver_draw_gui();
             EndDrawing();
         }
-    #else
+    }
+    else
+    {
         while (server_online) 
         {
             enetserver_update();
         }
-    #endif
+    }
 
     enet_host_destroy(server);
 
-    #ifndef SERVER_HEADLESS
+    if (SERVER_HEADLESS == false)
         CloseWindow();
-    #endif
 
     return false;
 }

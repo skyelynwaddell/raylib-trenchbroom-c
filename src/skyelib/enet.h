@@ -53,3 +53,12 @@ void enetserver_draw_gui();
 void enetserver_update();
 void enetserver_start();
 void enetserver_stop();
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_LINE_LEN 256
+
+void parse_server_properties(const char *filename);

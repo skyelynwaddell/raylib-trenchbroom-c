@@ -56,7 +56,7 @@ void weapons_init()
         6,                                    // clip_size
         6,                                    // mag_size
         0.25,                                 // animation duration
-        0.15,                                  // shoot_cooldown
+        0.15,                                 // shoot_cooldown
         "arms_newpistol/arms_newpistol.glb",  // model_filepath
         1.5,                                  // model_scale
         6,                                    // anim_count
@@ -69,6 +69,7 @@ void weapons_init()
         false                                 // automatic fire
     };
     // --- 9mm Pistol Textures ---
+    // TODO : Validate the existence of the array positions 
     weapons[WEAPON_TYPE_PISTOL].model_textures[0] = texture_get_cached("skin");
     weapons[WEAPON_TYPE_PISTOL].model_textures[1] = texture_get_cached("skin");
     weapons[WEAPON_TYPE_PISTOL].model_textures[2] = texture_get_cached("gloves");

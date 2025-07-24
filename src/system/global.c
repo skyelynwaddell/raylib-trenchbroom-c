@@ -9,10 +9,6 @@ int global_console_open = false;
 
 // --- SKYELIB GLOBAL IMPLEMENTATIONS ---
 // --------------------------------------------------------------------
-int FPS           = 144;
-int SCREEN_WIDTH  = 1280;
-int SCREEN_HEIGHT = 720;
-int VSYNC         = 0;
 
 // --- Shaders ---
 Shader sh_light;
@@ -20,6 +16,7 @@ Shader sh_viewmodel;
 
 // --- Shader Properties ---
 float radiusLoc; // light radius location in shader
+const char global_player_name[64] = "Player";
 
 // --- Camera ---
 Vector3 global_camera_height_current = {0};

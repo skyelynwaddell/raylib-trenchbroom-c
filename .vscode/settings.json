@@ -53,6 +53,8 @@
         "system_error": "c",
         "array": "c",
         "string_view": "c",
-        "initializer_list": "c"
+        "initializer_list": "c",
+        "floatingwindow.h": "c",
+        "ctype.h": "c"
     },
 }

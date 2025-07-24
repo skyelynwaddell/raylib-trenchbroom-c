@@ -1,6 +1,14 @@
 #ifndef SKYELIB_H
 #define SKYELIB_H
 
+/*
+skyelib
+This file should contain any feature or functionality
+that could be reused across other Games, and projects.
+Basically my ultimate "include 1 header file and have it all" 
+file for making 3D games...
+*/
+
 // --- Game Settings ---
 #define GAME_TITLE "skyesrc"
 #define SKYESRC_VERSION_MAJOR 0 
@@ -29,19 +37,13 @@
 #define TEXTURE_DIR "gamedata/textures/"
 #define MAP_DIR "gamedata/maps/"
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 25064
-//#define SERVER_HEADLESS // Run server without GUI
-
-extern int GAME_SCREEN_WIDTH;  
-extern int GAME_SCREEN_HEIGHT; 
-
+extern char SERVER_IP[64];
+extern int SERVER_PORT;
+extern int SERVER_HEADLESS; // Run server without GUI
 
 // --- Macros ---
 #define Max(a, b) ((a) > (b) ? (a) : (b))
 #define Min(a, b) ((a) < (b) ? (a) : (b))
-
-
 
 // --- Raygui & Styles/Themes ---
 #define STYLE_PATH "styles/"
@@ -65,13 +67,51 @@ extern int GAME_SCREEN_HEIGHT;
 #include "raylib.h"
 #include "rlgl.h"
 
+#include <ctype.h>  // for isdigit
+
+bool is_valid_number(const char *str);
+extern bool show_fps;
+
 // --- Implemented Globals ---
 // You can define/implement any of these globals in your global.c file to be able to have access to them!
 // Most will be needed to be be implemented.
 extern int FPS;                 // max frame rate per second
 extern int SCREEN_WIDTH;        // screen width
 extern int SCREEN_HEIGHT;       // screen height
-extern int VSYNC;
+extern int GAME_SCREEN_WIDTH;   // game width
+extern int GAME_SCREEN_HEIGHT;  // game height
+extern int VSYNC;               // is v-sync enabled
+extern int VIEWMODEL_POSITION_MODE;
+
+typedef enum GUI_STATE {
+    GUI_STATE_DEFAULT,
+    GUI_STATE_OPTIONS,
+} GUI_STATE;
+extern GUI_STATE gui_state;
+
+extern int FONT_SIZE_DEFAULT;
+extern int fontsize;
+
+void options_window_init();
+extern RenderTexture2D target;
+extern Vector2 mouse;
+extern Vector2 virtualMouse;
+extern float window_scale;
+extern Vector2 window_position;
+extern Vector2 window_size;
+extern bool window_minimized;
+extern bool window_moving;
+extern bool window_resizing;
+extern Vector2 window_scroll;
+
+typedef enum SCREEN_SIZE {
+    SCREEN_SIZE_640,
+    SCREEN_SIZE_1280,
+    SCREEN_SIZE_1920
+} SCREEN_SIZE;
+void set_screen_size(SCREEN_SIZE sz);
+extern int raygui_windowbox_statusbar_height;
+extern int raygui_window_closebutton_size;
 
 #define CAMERA_HEIGHT_DEFAULT (Vector3){0.0f, 3.5f, 0.0f} 
 #define CAMERA_HEIGHT_CROUCH  (Vector3){0.0f, -2.0f, 0.0f}
@@ -79,6 +119,14 @@ extern float global_cam_yaw;    // left/right
 extern float global_cam_pitch;  // up/down
 extern Vector3 global_camera_height_current;
 extern Vector3 global_camera_height;
+
+extern float weapon_bob;
+extern float camera_tilt;
+extern float camera_tilt_max; // max tilt in radians (~4.5 degrees)
+extern float camera_tilt_speed; // how quickly tilt responds
+
+extern int should_camera_tilt;
+extern int should_weapon_bob;
 
 extern int global_quit_game;
 extern int global_game_loading;
@@ -172,6 +220,7 @@ extern int BUTTON_INTERACT_PAD;
 #endif
 
 #define TEXTURE_FILTER TEXTURE_FILTER_BILINEAR
+void update_virtual_mouse();
 
 int GetGameScreenWidth();
 int GetGameScreenHeight();
@@ -441,7 +490,8 @@ float to_delta(float value);
 const char *rlGetVersionString();
 void stats_draw();
 void font_set_size(int size);
-
+// Utility to trim whitespace from start and end of a string
+char *trim(char *str);
 
 #include "map.h" // dont move
 
