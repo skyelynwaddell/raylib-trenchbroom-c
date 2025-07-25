@@ -490,7 +490,8 @@ float to_delta(float value);
 const char *rlGetVersionString();
 void stats_draw();
 void font_set_size(int size);
-// Utility to trim whitespace from start and end of a string
+void window_check_for_resize();
+int game_is_running();
 char *trim(char *str);
 
 #include "map.h" // dont move

@@ -5,7 +5,6 @@ ENetAddress address;
 ENetEvent event;
 MultiplayerUser users[MAX_PLAYERS];
 int users_count = 0;
-int server_online = false;
 
 /*
 enetserver_init

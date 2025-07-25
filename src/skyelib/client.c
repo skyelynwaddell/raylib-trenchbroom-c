@@ -36,6 +36,12 @@ Returns true (1) on success, false (0) on failure.
 */
 int enetclient_init(void) 
 {
+    if (server_online == false) 
+    {
+        fprintf(stderr, "ENet Failed, Multiplayer mode not enabled.\n");
+        return false;
+    }
+
     if (enet_initialize() != 0) 
     {
         fprintf(stderr, "ENet initialization failed.\n");
@@ -212,6 +218,9 @@ This function should be called in the main game loop to keep the client updated.
 */
 void enetclient_update()
 {
+
+    if (server_online == false) return;
+
     // Poll ENet network events non-blocking
     while (enetclient_poll(buffer, sizeof(buffer), &len)) 
     {

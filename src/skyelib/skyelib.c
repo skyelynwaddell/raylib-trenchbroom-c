@@ -5,6 +5,7 @@
 char SERVER_IP[64] = "127.0.0.1";
 int SERVER_PORT = 25523;
 int SERVER_HEADLESS = false;
+int server_online = false;
 // ----------------
 
 RenderTexture2D target;
@@ -46,6 +47,33 @@ int raygui_window_closebutton_size = 24;
 void font_set_size(int size){ GuiSetStyle(DEFAULT, TEXT_SIZE, size); }
 int GetGameScreenWidth(){ return GAME_SCREEN_WIDTH; }
 int GetGameScreenHeight(){ return GAME_SCREEN_HEIGHT; }
+
+
+/*
+game_is_running
+Returns TRUE or FALSE depending
+if the window is open, and the main
+game loop is running 
+*/
+int game_is_running()
+{
+    return global_quit_game == false && !WindowShouldClose();
+}
+
+
+/*
+window_check_for_resize
+Checks the window if it was resized and then
+updates the mouse coords, and gamescreen texture size
+*/
+void window_check_for_resize()
+{
+    if (IsWindowResized())
+    {
+        target = LoadRenderTexture(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+        update_virtual_mouse(); 
+    }
+}
 
 
 /*

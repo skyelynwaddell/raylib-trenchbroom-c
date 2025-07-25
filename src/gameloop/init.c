@@ -29,14 +29,20 @@ init
 */
 void init()
 {
+    printf("\n \n ### SKYESRC ### \n \n");
+
     global_game_loading = true;
     global_paused = true;
 
+    SetConfigFlags(FLAG_MSAA_4X_HINT); // Multi Sampling Anti Aliasing 4X
+    SetWindowMinSize(320, 240);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, GAME_TITLE);
     DisableCursor(); // Limit cursor to relative movement inside the window
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);  // Texture scale filter to use
     SetTargetFPS(FPS);
 
-    printf("\n \n ### SKYESRC ### \n \n");
     console_init();
 
     char raylib_version_string[64];
@@ -77,4 +83,12 @@ void init()
     global_raycast.ray = CENTER_RAY(camera);
     global_raycast.blocked_distance = FLT_MAX;
     global_raycast.has_hit = false;
+
+    set_screen_size(SCREEN_SIZE_1920);
+    font_set_size((int)(FONT_SIZE_DEFAULT * gui_scale));
+
+    // Render texture initialization, used to hold the rendering result so we can easily resize it
+    target = LoadRenderTexture(GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT);
+    update_virtual_mouse();
+
 }

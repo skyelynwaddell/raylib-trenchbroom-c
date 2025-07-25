@@ -15,4 +15,6 @@ void clean_up()
     UnloadShader(sh_viewmodel);
     enemy_cleanup_all();
     texture_cache_cleanup();
+    UnloadRenderTexture(target);
+    enetclient_disconnect();
 }

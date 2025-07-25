@@ -1,10 +1,10 @@
  # Skyesrc Save Data
 server_ip=127.0.0.1
 server_port=25523
-game_screen-width=1920
-game_screen-height=1080
-should_camera-tilt=1
-should_weapon-bob-1
+game_screen_width=1920
+game_screen_height=1080
+should_camera_tilt=1
+should_weapon_bob-1
 gui_scale=1.5
 max_fps=144
 screen_width=1920
